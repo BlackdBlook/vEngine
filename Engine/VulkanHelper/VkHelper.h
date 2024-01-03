@@ -79,14 +79,15 @@ private:
     void createCommandBuffer();
     void createSyncObjects();
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
-
 public:
     VkHelper(vEngine* engine);
-    void WaitDeviceIdle();
-
-    GLFWwindow* InitWindow(uint32 X, uint32 Y);
     void InitVulkan();
+    GLFWwindow* InitWindow(uint32 X, uint32 Y);
     void CleanVk();
+
+    void WaitDeviceIdle();
+    uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+
     RenderInfo BeginRecordCommandBuffer();
     void EndRecordCommandBuffer(const RenderInfo& RenderInfo);
 };

@@ -11,11 +11,19 @@ enum class ShaderType
 class vShader
 {
     VkShaderModule vkshadermodule;
+
+    VkShaderStageFlagBits GetVkShaderStageFlagBits();
+
+    ShaderType type;
+    
 public:
     VkShaderModule GetShaderModule()
     {
         return vkshadermodule;
     }
     vShader(const char* Name, ShaderType type);
+    
     ~vShader();
+
+    VkPipelineShaderStageCreateInfo GetStageInfo();
 };

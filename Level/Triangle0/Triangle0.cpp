@@ -29,7 +29,7 @@ void Triangle0_Object::Draw(const RenderInfo& RenderInfo)
 {
     Component::Draw(RenderInfo);
 
-    pipeline.Bind(RenderInfo.CommmandBuffer);
+    pipeline.CmdBind(RenderInfo.CommmandBuffer);
 
     vkCmdDraw(RenderInfo.CommmandBuffer, 3, 1, 0, 0);
     

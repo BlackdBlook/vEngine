@@ -156,6 +156,7 @@
     <ClCompile Include="Engine\Core\Fence\Fence.cpp" />
     <ClCompile Include="Engine\Core\FrameInfo\RenderInfo.cpp" />
     <ClCompile Include="Engine\Core\Level\Level.cpp" />
+    <ClCompile Include="Engine\Core\MemoryBuffer\MemoryBuffer.cpp" />
     <ClCompile Include="Engine\Core\Object\Object.cpp" />
     <ClCompile Include="Engine\Core\Object\ObjectHandle\ObjectHandle.cpp" />
     <ClCompile Include="Engine\Core\RenderCommandQueue\RenderCommand.cpp" />
@@ -248,6 +249,7 @@
       <AdditionalOptions>/utf-8 </AdditionalOptions>
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
+    <ClCompile Include="Level\Triangle1\Triangle1.cpp" />
     <ClCompile Include="LogPrinter\Log.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
@@ -257,6 +259,7 @@
     <ClInclude Include="Engine\Core\Fence\Fence.h" />
     <ClInclude Include="Engine\Core\FrameInfo\RenderInfo.h" />
     <ClInclude Include="Engine\Core\Level\Level.h" />
+    <ClInclude Include="Engine\Core\MemoryBuffer\MemoryBuffer.h" />
     <ClInclude Include="Engine\Core\Object\Object.h" />
     <ClInclude Include="Engine\Core\Object\ObjectHandle\ObjectHandle.h" />
     <ClInclude Include="Engine\Core\RenderCommandQueue\RenderCommand.h" />
@@ -274,6 +277,7 @@
     <ClInclude Include="Engine\VulkanHelper\VkHelper.h" />
     <ClInclude Include="Level\Tests\test_run_triangle\test_run_triangle.h" />
     <ClInclude Include="Level\Triangle0\Triangle0.h" />
+    <ClInclude Include="Level\Triangle1\Triangle1.h" />
     <ClInclude Include="LogPrinter\Log.h" />
   </ItemGroup>
   <ItemGroup>

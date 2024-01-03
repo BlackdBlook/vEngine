@@ -6,48 +6,38 @@
 #include "Engine/vEngine.h"
 #include "Engine/SubSystem/AssetSystem/AssetSystem.h"
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"
+#include "LogPrinter/Log.h"
 
-void RenderPipeline::init(const char* c1, const char* c2)
+VkPipelineVertexInputStateCreateInfo* RenderPipelineInfo::PipelineVertexInputStateCreateInfo()
 {
-    string pathv = AssetSystemIns->GetFilePathByName("Triangle0.vert.spv");
-    string pathf = AssetSystemIns->GetFilePathByName("Triangle0.frag.spv");
-
-    auto vertShaderCode = FileToolKit::ReadFileAsBinary(pathv);
-    auto fragShaderCode = FileToolKit::ReadFileAsBinary(pathf);
-
-    vShader vertShaderModule = vShader(c1, ShaderType::Vertex);
-    vShader fragShaderModule = vShader(c2, ShaderType::Fragment);
-
-    VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
-    vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    vertShaderStageInfo.stage = VK_SHADER_STAGE_VERTEX_BIT;
-    vertShaderStageInfo.module = vertShaderModule.GetShaderModule();
-    vertShaderStageInfo.pName = "main";
-
-    VkPipelineShaderStageCreateInfo fragShaderStageInfo{};
-    fragShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    fragShaderStageInfo.stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    fragShaderStageInfo.module = fragShaderModule.GetShaderModule();
-    fragShaderStageInfo.pName = "main";
-
-    VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
-
-    VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+    static VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount = 0;
     vertexInputInfo.vertexAttributeDescriptionCount = 0;
+    return &vertexInputInfo;
+}
 
-    VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
+VkPipelineInputAssemblyStateCreateInfo* RenderPipelineInfo::PipelineInputAssemblyStateCreateInfo()
+{
+    static VkPipelineInputAssemblyStateCreateInfo inputAssembly{};
     inputAssembly.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
+    return &inputAssembly;
+}
 
-    VkPipelineViewportStateCreateInfo viewportState{};
+VkPipelineViewportStateCreateInfo* RenderPipelineInfo::PipelineViewportStateCreateInfo()
+{
+    static VkPipelineViewportStateCreateInfo viewportState{};
     viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     viewportState.viewportCount = 1;
     viewportState.scissorCount = 1;
+    return &viewportState;
+}
 
-    VkPipelineRasterizationStateCreateInfo rasterizer{};
+VkPipelineRasterizationStateCreateInfo* RenderPipelineInfo::PipelineRasterizationStateCreateInfo()
+{
+    static VkPipelineRasterizationStateCreateInfo rasterizer{};
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
@@ -56,52 +46,116 @@ void RenderPipeline::init(const char* c1, const char* c2)
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
     rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
+    return &rasterizer;
+}
 
-    VkPipelineMultisampleStateCreateInfo multisampling{};
+VkPipelineMultisampleStateCreateInfo* RenderPipelineInfo::PipelineMultisampleStateCreateInfo()
+{
+    static VkPipelineMultisampleStateCreateInfo multisampling{};
     multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     multisampling.sampleShadingEnable = VK_FALSE;
     multisampling.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    return &multisampling;
+}
 
-    VkPipelineColorBlendAttachmentState colorBlendAttachment{};
+VkPipelineColorBlendAttachmentState* RenderPipelineInfo::PipelineColorBlendAttachmentState()
+{
+    static VkPipelineColorBlendAttachmentState colorBlendAttachment{};
     colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     colorBlendAttachment.blendEnable = VK_FALSE;
+    return &colorBlendAttachment;
+}
 
-    VkPipelineColorBlendStateCreateInfo colorBlending{};
+VkPipelineColorBlendStateCreateInfo* RenderPipelineInfo::PipelineColorBlendStateCreateInfo()
+{
+    static VkPipelineColorBlendAttachmentState* colorBlendAttachment =
+        PipelineColorBlendAttachmentState();
+    
+    static VkPipelineColorBlendStateCreateInfo colorBlending{};
     colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     colorBlending.logicOpEnable = VK_FALSE;
     colorBlending.logicOp = VK_LOGIC_OP_COPY;
     colorBlending.attachmentCount = 1;
-    colorBlending.pAttachments = &colorBlendAttachment;
+    colorBlending.pAttachments = colorBlendAttachment;
     colorBlending.blendConstants[0] = 0.0f;
     colorBlending.blendConstants[1] = 0.0f;
     colorBlending.blendConstants[2] = 0.0f;
     colorBlending.blendConstants[3] = 0.0f;
+    return &colorBlending;
+}
 
-    std::vector<VkDynamicState> dynamicStates = {
+VkPipelineDynamicStateCreateInfo* RenderPipelineInfo::PipelineDynamicStateCreateInfo()
+{
+    static std::vector<VkDynamicState> dynamicStates = {
         VK_DYNAMIC_STATE_VIEWPORT,
         VK_DYNAMIC_STATE_SCISSOR
     };
-    VkPipelineDynamicStateCreateInfo dynamicState{};
+    static VkPipelineDynamicStateCreateInfo dynamicState{};
     dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
     dynamicState.pDynamicStates = dynamicStates.data();
 
+    return &dynamicState;
+}
+
+VkPipelineLayout RenderPipelineInfo::PipelineLayout()
+{
+    return GlobalVkPipeLineLayout;
+}
+
+VkRenderPass RenderPipelineInfo::PipelineRenderPass()
+{
+    return GlobalVkRenderPass;
+}
+
+std::string RenderPipelineInfo::GetName()
+{
+    return VertShaderName + "__" + FragShaderName;
+}
+
+void RenderPipeline::Init(RenderPipelineInfo* Info)
+{
+    if(graphicsPipeline != nullptr)
+    {
+        // 限定仅初始化一次
+        LOG("graphicsPipeline inited!!!", Info->GetName());
+        assert(graphicsPipeline != nullptr);
+        return;
+    }
+
+    if(Info->VertShaderName.empty() || Info->FragShaderName.empty())
+    {
+        LOG("Shader Name Is Empty !!!");
+        return;
+    }
+
+    
+    vShader vertShaderModule =
+        vShader(Info->VertShaderName.c_str(), ShaderType::Vertex);
+
+    vShader fragShaderModule =
+        vShader(Info->FragShaderName.c_str(), ShaderType::Fragment);
+
+    VkPipelineShaderStageCreateInfo shaderStages[] =
+        {vertShaderModule.GetStageInfo(), fragShaderModule.GetStageInfo()};
+
+    
     VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = 2;
     pipelineInfo.pStages = shaderStages;
-    pipelineInfo.pVertexInputState = &vertexInputInfo;
-    pipelineInfo.pInputAssemblyState = &inputAssembly;
-    pipelineInfo.pViewportState = &viewportState;
-    pipelineInfo.pRasterizationState = &rasterizer;
-    pipelineInfo.pMultisampleState = &multisampling;
-    pipelineInfo.pColorBlendState = &colorBlending;
-    pipelineInfo.pDynamicState = &dynamicState;
-    pipelineInfo.layout = GlobalVkPipeLineLayout;
-    pipelineInfo.renderPass = GlobalVkRenderPass;
+    pipelineInfo.pVertexInputState = Info->PipelineVertexInputStateCreateInfo();
+    pipelineInfo.pInputAssemblyState = Info->PipelineInputAssemblyStateCreateInfo();
+    pipelineInfo.pViewportState = Info->PipelineViewportStateCreateInfo();
+    pipelineInfo.pRasterizationState = Info->PipelineRasterizationStateCreateInfo();
+    pipelineInfo.pMultisampleState = Info->PipelineMultisampleStateCreateInfo();
+    pipelineInfo.pColorBlendState = Info->PipelineColorBlendStateCreateInfo();
+    pipelineInfo.pDynamicState = Info->PipelineDynamicStateCreateInfo();
+    pipelineInfo.layout = Info->PipelineLayout();
+    pipelineInfo.renderPass = Info->PipelineRenderPass();
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
-
+    
     if (vkCreateGraphicsPipelines(GlobalVkLogicDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
@@ -109,17 +163,33 @@ void RenderPipeline::init(const char* c1, const char* c2)
     PipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 }
 
+RenderPipeline::RenderPipeline(): graphicsPipeline(nullptr)
+{
+    PipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+}
+
 RenderPipeline::RenderPipeline(const char* ShaderName)
 {
-    init(ShaderName, ShaderName);
+    RenderPipelineInfo info;
+    info.FragShaderName = ShaderName;
+    info.VertShaderName = ShaderName;
+    Init(&info);
 }
 
 RenderPipeline::RenderPipeline(const char* VertShaderName, const char* FragShaderName)
 {
-    init(VertShaderName, FragShaderName);
+    RenderPipelineInfo info;
+    info.FragShaderName = FragShaderName;
+    info.VertShaderName = VertShaderName;
+    Init(&info);
 }
 
-void RenderPipeline::Bind(VkCommandBuffer commandBuffer)
+RenderPipeline::RenderPipeline(RenderPipelineInfo* info)
+{
+    Init(info);
+}
+
+void RenderPipeline::CmdBind(VkCommandBuffer commandBuffer)
 {
     vkCmdBindPipeline(commandBuffer, PipelineBindPoint, graphicsPipeline);
 }

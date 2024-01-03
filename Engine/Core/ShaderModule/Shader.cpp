@@ -19,10 +19,22 @@ VkShaderModule createShaderModule(const std::vector<uint8>& code) {
     return shaderModule;
 }
 
-vShader::vShader(const char* Name, ShaderType type)
+VkShaderStageFlagBits vShader::GetVkShaderStageFlagBits()
+{
+    switch (type)
+    {
+    case ShaderType::Vertex:
+        return VK_SHADER_STAGE_VERTEX_BIT;
+    case ShaderType::Fragment:
+        return VK_SHADER_STAGE_FRAGMENT_BIT;
+    }
+    return VK_SHADER_STAGE_ALL;
+}
+
+vShader::vShader(const char* Name, ShaderType type):type(type)
 {
     string fileName = Name;
-
+    
     switch (type) {
     case ShaderType::Vertex:
         fileName += ".vert.spv";
@@ -43,4 +55,14 @@ vShader::vShader(const char* Name, ShaderType type)
 vShader::~vShader()
 {
     vkDestroyShaderModule(GlobalVkLogicDevice, vkshadermodule, nullptr);
+}
+
+VkPipelineShaderStageCreateInfo vShader::GetStageInfo()
+{
+    VkPipelineShaderStageCreateInfo vertShaderStageInfo{};
+    vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    vertShaderStageInfo.stage = GetVkShaderStageFlagBits();
+    vertShaderStageInfo.module = GetShaderModule();
+    vertShaderStageInfo.pName = "main";
+    return vertShaderStageInfo;
 }
