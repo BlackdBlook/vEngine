@@ -1,8 +1,8 @@
 #include "AssetSystem.h"
 #include <stack>
-#include "CommonHead.h"
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"
 #include "Engine/Toolkit/stb_img/stb_img.h"
+#include "LogPrinter/Log.h"
 
 AssetSystem::AssetSystem()
 {

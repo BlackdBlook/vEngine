@@ -1,7 +1,8 @@
 #pragma once
 #include <vector>
-
 #include "Engine/TypeDef.h"
+
+class RenderInfo;
 
 class Object
 {
@@ -17,7 +18,7 @@ public:
     
     virtual void Update(float DeltaTime);
     virtual void LateUpdate(float DeltaTime);
-    virtual void Draw();
+    virtual void Draw(const RenderInfo& RenderInfo);
     virtual ~Object();
 };
 

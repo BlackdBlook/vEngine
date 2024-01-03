@@ -4,6 +4,7 @@
 
 #include "Engine/vEngine.h"
 #include "Engine/Core/Component/Component.h"
+#include "Engine/Core/FrameInfo/RenderInfo.h"
 #include "Engine/Core/Object/Object.h"
 #include "Engine/Core/ShaderModule/PipelineShader.h"
 #include "Engine/SubSystem/AssetSystem/AssetSystem.h"
@@ -14,18 +15,23 @@ class Triangle0_Object : public Component
 {
 public:
     Triangle0_Object();
-    void Draw() override;
+    void Draw(const RenderInfo& RenderInfo) override;
+
+    RenderPipeline pipeline;
 };
 
-Triangle0_Object::Triangle0_Object()
+Triangle0_Object::Triangle0_Object() : pipeline("Triangle0")
 {
     
 }
 
-void Triangle0_Object::Draw()
+void Triangle0_Object::Draw(const RenderInfo& RenderInfo)
 {
-    Component::Draw();
+    Component::Draw(RenderInfo);
 
+    pipeline.Bind(RenderInfo.CommmandBuffer);
+
+    vkCmdDraw(RenderInfo.CommmandBuffer, 3, 1, 0, 0);
     
 }
 

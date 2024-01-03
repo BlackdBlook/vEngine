@@ -39,11 +39,11 @@ void Object::LateUpdate(float DeltaTime)
     }
 }
 
-void Object::Draw()
+void Object::Draw(const RenderInfo& RenderInfo)
 {
     for(auto& c : Components)
     {
-        c->Draw();
+        c->Draw(RenderInfo);
     }
 }
 

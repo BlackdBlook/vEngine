@@ -86,15 +86,6 @@ void RenderPipeline::init(const char* c1, const char* c2)
     dynamicState.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size());
     dynamicState.pDynamicStates = dynamicStates.data();
 
-    VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0;
-    pipelineLayoutInfo.pushConstantRangeCount = 0;
-    VkPipelineLayout pipelineLayout;
-    if (vkCreatePipelineLayout(GlobalVkLogicDevice, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create pipeline layout!");
-    }
-
     VkGraphicsPipelineCreateInfo pipelineInfo{};
     pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineInfo.stageCount = 2;
@@ -106,7 +97,7 @@ void RenderPipeline::init(const char* c1, const char* c2)
     pipelineInfo.pMultisampleState = &multisampling;
     pipelineInfo.pColorBlendState = &colorBlending;
     pipelineInfo.pDynamicState = &dynamicState;
-    pipelineInfo.layout = pipelineLayout;
+    pipelineInfo.layout = GlobalVkPipeLineLayout;
     pipelineInfo.renderPass = GlobalVkRenderPass;
     pipelineInfo.subpass = 0;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
@@ -135,5 +126,5 @@ void RenderPipeline::Bind(VkCommandBuffer commandBuffer)
 
 RenderPipeline::~RenderPipeline()
 {
-    
+    vkDestroyPipeline(GlobalVkLogicDevice, graphicsPipeline, nullptr);
 }

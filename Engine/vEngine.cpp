@@ -2,6 +2,7 @@
 
 #include <chrono>
 
+#include "Core/CommonRenderCmd/CommonRenderCmd.h"
 #include "Core/Level/Level.h"
 #include "Level/Triangle0/Triangle0.h"
 #include "LogPrinter/Log.h"
@@ -87,8 +88,8 @@ void vEngine::Run()
 
         CurrentLevel->LateUpdate(DeltaTime);
         
-        CurrentLevel->Draw();
-
+        DrawFrame();
+        
         // MaxFpsControl
         {
             std::chrono::microseconds timeSpan = t.GetTimeSpan();
@@ -99,7 +100,24 @@ void vEngine::Run()
             DeltaTime = convertToSeconds(timeSpan);
         }
     }
+
+    vkHelper.WaitDeviceIdle();
+
+    CurrentLevel.reset();
+    
     vkHelper.CleanVk();
+}
+
+void vEngine::DrawFrame()
+{
+    const auto RenderInfo = vkHelper.BeginRecordCommandBuffer();
+
+    CommonRenderCmd::CmdSetFullWindow(RenderInfo);
+
+    CurrentLevel->Draw(RenderInfo);
+
+    vkHelper.EndRecordCommandBuffer(RenderInfo);
+    
 }
 
 void vEngine::SetLevel(int i)

@@ -10,6 +10,7 @@
 
 
 #include "Engine/TypeDef.h"
+#include "Engine/Core/FrameInfo/RenderInfo.h"
 
 class RenderPipeline;
 class vEngine;
@@ -31,10 +32,9 @@ struct SwapChainSupportDetails {
 
 class VkHelper
 {
-    friend vEngine;
     vEngine* Engine;
 
-private:
+public:
     VkDevice device;
     VkInstance Instance;
     GLFWwindow* window;
@@ -54,9 +54,10 @@ private:
     VkCommandPool commandPool;
     VkCommandBuffer commandBuffer;
 
-
-
-    
+    VkSemaphore imageAvailableSemaphore;
+    VkSemaphore renderFinishedSemaphore;
+    VkFence inFlightFence;
+private:
 
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
@@ -80,9 +81,15 @@ private:
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
 public:
-    VkHelper(vEngine* engine):Engine(engine){}
+    VkHelper(vEngine* engine);
+    void WaitDeviceIdle();
+
     GLFWwindow* InitWindow(uint32 X, uint32 Y);
     void InitVulkan();
     void CleanVk();
+    RenderInfo BeginRecordCommandBuffer();
+    void EndRecordCommandBuffer(const RenderInfo& RenderInfo);
 };
- 
+
+
+extern VkHelper* VkHelperInstance;

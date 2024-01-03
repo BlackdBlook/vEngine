@@ -2,9 +2,9 @@
 #include <functional>
 #include <GLFW/glfw3.h>
 #include <vulkan/vulkan_core.h>
-
-
 #include "VulkanHelper/VkHelper.h"
+
+
 class Level;
 class VkHelper;
 
@@ -25,6 +25,9 @@ class vEngine
     void UpdateLevel();
     void DrawLevel();
     void Run();
+
+    void DrawFrame();
+    
 public:
     GLFWwindow* GetWindow()
     {
@@ -45,6 +48,11 @@ public:
     {
         return vkHelper.renderPass;
     }
+
+    VkPipelineLayout GetVkPipeLineLayout()
+    {
+        return vkHelper.pipelineLayout;
+    }
     
     static constexpr uint32 WindowX = 2560;
     static constexpr uint32 WindowY = 1440;
@@ -57,3 +65,4 @@ public:
 #define GlobalVkLogicDevice vEngine::ins->GetVulkanDevice()
 #define GlobalVkSwapchain vEngine::ins->GetVkSwapchain()
 #define GlobalVkRenderPass vEngine::ins->GetVkRenderPass()
+#define GlobalVkPipeLineLayout vEngine::ins->GetVkPipeLineLayout()

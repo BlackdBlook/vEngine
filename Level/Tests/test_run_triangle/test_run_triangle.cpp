@@ -14,6 +14,7 @@
 #include <limits>
 #include <optional>
 #include <set>
+#include <vulkan/vulkan_core.h>
 
 #include "Engine/SubSystem/AssetSystem/AssetSystem.h"
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"

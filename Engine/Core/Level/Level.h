@@ -1,9 +1,11 @@
 #pragma once
 #include <unordered_map>
 #include <vector>
+#include <vulkan/vulkan_core.h>
 
 #include "Engine/TypeDef.h"
 
+class RenderInfo;
 class Object;
 struct ObjectHandle;
 
@@ -19,7 +21,8 @@ public:
     virtual void Start();
     virtual void Update(float DeltaTime);
     virtual void LateUpdate(float DeltaTime);
-    virtual void Draw();
+    virtual void Draw(const RenderInfo& RenderInfo);
+    Level();
     virtual ~Level();
 
     virtual SPtr<Object> NewObject();

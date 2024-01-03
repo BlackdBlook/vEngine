@@ -8,7 +8,7 @@ void Component::LateUpdate(float DeltaTime)
 {
 }
 
-void Component::Draw()
+void Component::Draw(const RenderInfo& RenderInfo)
 {
 }
 

@@ -151,11 +151,15 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.cpp" />
     <ClCompile Include="Engine\Core\Component\Component.cpp" />
     <ClCompile Include="Engine\Core\Fence\Fence.cpp" />
+    <ClCompile Include="Engine\Core\FrameInfo\RenderInfo.cpp" />
     <ClCompile Include="Engine\Core\Level\Level.cpp" />
     <ClCompile Include="Engine\Core\Object\Object.cpp" />
     <ClCompile Include="Engine\Core\Object\ObjectHandle\ObjectHandle.cpp" />
+    <ClCompile Include="Engine\Core\RenderCommandQueue\RenderCommand.cpp" />
+    <ClCompile Include="Engine\Core\RenderCommandQueue\RenderCommandQueue.cpp" />
     <ClCompile Include="Engine\Core\Semaphore\Semaphore.cpp" />
     <ClCompile Include="Engine\Core\ShaderModule\PipelineShader.cpp" />
     <ClCompile Include="Engine\Core\ShaderModule\Shader.cpp" />
@@ -248,11 +252,15 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.h" />
     <ClInclude Include="Engine\Core\Component\Component.h" />
     <ClInclude Include="Engine\Core\Fence\Fence.h" />
+    <ClInclude Include="Engine\Core\FrameInfo\RenderInfo.h" />
     <ClInclude Include="Engine\Core\Level\Level.h" />
     <ClInclude Include="Engine\Core\Object\Object.h" />
     <ClInclude Include="Engine\Core\Object\ObjectHandle\ObjectHandle.h" />
+    <ClInclude Include="Engine\Core\RenderCommandQueue\RenderCommand.h" />
+    <ClInclude Include="Engine\Core\RenderCommandQueue\RenderCommandQueue.h" />
     <ClInclude Include="Engine\Core\Semaphore\Semaphore.h" />
     <ClInclude Include="Engine\Core\ShaderModule\PipelineShader.h" />
     <ClInclude Include="Engine\Core\ShaderModule\Shader.h" />
@@ -271,6 +279,8 @@
   <ItemGroup>
     <Content Include="Shader\Triangle0\Triangle0.frag" />
     <Content Include="Shader\Triangle0\Triangle0.vert" />
+    <Content Include="Shader\Triangle1\Triangle1.frag" />
+    <Content Include="Shader\Triangle1\Triangle1.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

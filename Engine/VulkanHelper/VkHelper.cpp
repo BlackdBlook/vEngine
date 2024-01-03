@@ -11,6 +11,8 @@
 #include "Engine/vEngine.h"
 #include "LogPrinter/Log.h"
 
+extern VkHelper* VkHelperInstance = nullptr;
+
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
 #else
@@ -626,18 +628,6 @@ void VkHelper::createCommandPool()
     }
 }
 
-void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
-{
-    VkCommandBufferBeginInfo beginInfo{};
-    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-    beginInfo.flags = 0; // Optional
-    beginInfo.pInheritanceInfo = nullptr; // Optional
-
-    if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-        throw std::runtime_error("failed to begin recording command buffer!");
-    }
-}
-
 void VkHelper::createCommandBuffer()
 {
     VkCommandBufferAllocateInfo allocInfo{};
@@ -653,7 +643,18 @@ void VkHelper::createCommandBuffer()
 
 void VkHelper::createSyncObjects()
 {
-    
+    VkSemaphoreCreateInfo semaphoreInfo{};
+    semaphoreInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+
+    VkFenceCreateInfo fenceInfo{};
+    fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+    if (vkCreateSemaphore(device, &semaphoreInfo, nullptr, &imageAvailableSemaphore) != VK_SUCCESS ||
+        vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphore) != VK_SUCCESS ||
+        vkCreateFence(device, &fenceInfo, nullptr, &inFlightFence) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create synchronization objects for a frame!");
+    }
 }
 
 void VkHelper::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
@@ -668,38 +669,133 @@ void VkHelper::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
     }
 }
 
+VkHelper::VkHelper(vEngine* engine):Engine(engine)
+{
+    VkHelperInstance = this;
+}
+
+void VkHelper::WaitDeviceIdle()
+{
+    vkDeviceWaitIdle(device);
+}
+
 void VkHelper::CleanVk()
 {
+    vkDestroySemaphore(device, renderFinishedSemaphore, nullptr);
+    vkDestroySemaphore(device, imageAvailableSemaphore, nullptr);
+    vkDestroyFence(device, inFlightFence, nullptr);
+
     vkDestroyCommandPool(device, commandPool, nullptr);
-    
+
     for (auto framebuffer : swapChainFramebuffers) {
         vkDestroyFramebuffer(device, framebuffer, nullptr);
     }
     
     vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-    
     vkDestroyRenderPass(device, renderPass, nullptr);
-    
+
     for (auto imageView : swapChainImageViews) {
         vkDestroyImageView(device, imageView, nullptr);
     }
-    
-    vkDestroySwapchainKHR(device, swapChain, nullptr);
 
+    vkDestroySwapchainKHR(device, swapChain, nullptr);
     vkDestroyDevice(device, nullptr);
 
-    vkDestroySurfaceKHR(Instance, surface, nullptr);
-    
-    glfwDestroyWindow(Engine->window);
-
-    if(enableValidationLayers)
-    {
+    if (enableValidationLayers) {
         DestroyDebugUtilsMessengerEXT(Instance, debugMessenger, nullptr);
     }
-    
+
+    vkDestroySurfaceKHR(Instance, surface, nullptr);
     vkDestroyInstance(Instance, nullptr);
 
+    glfwDestroyWindow(window);
+
     glfwTerminate();
+
+}
+
+RenderInfo VkHelper::BeginRecordCommandBuffer()
+{
+    // Wait Last Task
+    vkWaitForFences(device, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
+    vkResetFences(device, 1, &inFlightFence);
+    // Get Next Image
+    uint32_t imageIndex;
+    vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+
+    // Build Command Buffer
+    vkResetCommandBuffer(commandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
+    
+    VkCommandBufferBeginInfo beginInfo{};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+
+    if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
+        throw std::runtime_error("failed to begin recording command buffer!");
+    }
+
+    VkRenderPassBeginInfo renderPassInfo{};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    renderPassInfo.renderPass = renderPass;
+    renderPassInfo.framebuffer = swapChainFramebuffers[imageIndex];
+    renderPassInfo.renderArea.offset = {0, 0};
+    renderPassInfo.renderArea.extent = swapChainExtent;
+
+    VkClearValue clearColor = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+    renderPassInfo.clearValueCount = 1;
+    renderPassInfo.pClearValues = &clearColor;
+
+    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+    return {
+        commandBuffer,
+        swapChainExtent,
+        imageIndex
+    };
+}
+
+void VkHelper::EndRecordCommandBuffer(const RenderInfo& RenderInfo)
+{
+    vkCmdEndRenderPass(commandBuffer);
+
+    if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
+        throw std::runtime_error("failed to record command buffer!");
+    }
+
+    VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+
+    VkSemaphore waitSemaphores[] = {imageAvailableSemaphore};
+    VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    submitInfo.waitSemaphoreCount = 1;
+    submitInfo.pWaitSemaphores = waitSemaphores;
+    submitInfo.pWaitDstStageMask = waitStages;
+
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffer;
+
+    VkSemaphore signalSemaphores[] = {renderFinishedSemaphore};
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = signalSemaphores;
+
+    // Submit Command Buffer
+    if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFence) != VK_SUCCESS) {
+        throw std::runtime_error("failed to submit draw command buffer!");
+    }
+
+    // Put On Screen
+    VkPresentInfoKHR presentInfo{};
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = signalSemaphores;
+
+    VkSwapchainKHR swapChains[] = {swapChain};
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = swapChains;
+
+    presentInfo.pImageIndices = &RenderInfo.ImageIndex;
+
+    vkQueuePresentKHR(presentQueue, &presentInfo);
 
 }
 

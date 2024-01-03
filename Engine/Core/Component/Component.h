@@ -1,6 +1,9 @@
 #pragma once
+#include <vulkan/vulkan_core.h>
+
 #include "Engine/TypeDef.h"
 
+class RenderInfo;
 class Object;
 
 class Component
@@ -12,6 +15,6 @@ public:
     virtual void OnDetach(){}
     virtual void Update(float DeltaTime);
     virtual void LateUpdate(float DeltaTime);
-    virtual void Draw();
+    virtual void Draw(const RenderInfo& RenderInfo);
     virtual ~Component();
 };
