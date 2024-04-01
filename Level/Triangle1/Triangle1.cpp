@@ -106,7 +106,7 @@ void Triangle1::Init()
 
     {
         auto obj = NewObject();
-        obj->AttachComponent(NewSPtr<Triangle1Comp>());
+        obj->Attach(NewSPtr<Triangle1Comp>());
     }
     
 }

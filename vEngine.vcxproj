@@ -151,6 +151,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\Core\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.cpp" />
     <ClCompile Include="Engine\Core\Component\Component.cpp" />
     <ClCompile Include="Engine\Core\Fence\Fence.cpp" />
@@ -167,10 +168,12 @@
     <ClCompile Include="Engine\SubSystem\AssetSystem\AssetSystem.cpp" />
     <ClCompile Include="Engine\Toolkit\Container\Queue.cpp" />
     <ClCompile Include="Engine\Toolkit\FileToolKit\FileToolKit.cpp" />
+    <ClCompile Include="Engine\Toolkit\math_utils.cpp" />
     <ClCompile Include="Engine\Toolkit\stb_img\stb_img.cpp" />
     <ClCompile Include="Engine\Toolkit\Timer\Timer.cpp" />
     <ClCompile Include="Engine\vEngine.cpp" />
     <ClCompile Include="Engine\VulkanHelper\VkHelper.cpp" />
+    <ClCompile Include="Level\Cube\DrawCube.cpp" />
     <ClCompile Include="Level\Tests\test_run_triangle\test_run_triangle.cpp" />
     <ClCompile Include="Level\Triangle0\Triangle0.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -254,6 +257,7 @@
     <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\Core\Camera\Camera.h" />
     <ClInclude Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.h" />
     <ClInclude Include="Engine\Core\Component\Component.h" />
     <ClInclude Include="Engine\Core\Fence\Fence.h" />
@@ -270,11 +274,14 @@
     <ClInclude Include="Engine\SubSystem\AssetSystem\AssetSystem.h" />
     <ClInclude Include="Engine\Toolkit\Container\Queue.h" />
     <ClInclude Include="Engine\Toolkit\FileToolKit\FileToolKit.h" />
+    <ClInclude Include="Engine\Toolkit\math_utils.h" />
     <ClInclude Include="Engine\Toolkit\stb_img\stb_img.h" />
     <ClInclude Include="Engine\Toolkit\Timer\Timer.h" />
     <ClInclude Include="Engine\TypeDef.h" />
     <ClInclude Include="Engine\vEngine.h" />
     <ClInclude Include="Engine\VulkanHelper\VkHelper.h" />
+    <ClInclude Include="Header.h" />
+    <ClInclude Include="Level\Cube\DrawCube.h" />
     <ClInclude Include="Level\Tests\test_run_triangle\test_run_triangle.h" />
     <ClInclude Include="Level\Triangle0\Triangle0.h" />
     <ClInclude Include="Level\Triangle1\Triangle1.h" />

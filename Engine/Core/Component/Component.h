@@ -1,20 +1,26 @@
 #pragma once
-#include <vulkan/vulkan_core.h>
-
-#include "Engine/TypeDef.h"
+#include <memory>
+#include "Header.h"
 
 class RenderInfo;
 class Object;
 
 class Component
 {
-    friend Object;
-    WPtr<Object> Parent;
 public:
-    virtual void OnAttach(){}
-    virtual void OnDetach(){}
-    virtual void Update(float DeltaTime);
-    virtual void LateUpdate(float DeltaTime);
-    virtual void Draw(const RenderInfo& RenderInfo);
-    virtual ~Component();
+    
+    std::weak_ptr<Object> Parent;
+    
+    bool operator==(Component* c);
+    bool operator==(const char* c);
+    virtual void OnAttached();
+    virtual void OnDettached();
+    virtual glm::vec3 GetPos();
+    virtual glm::quat GetRot();
+    virtual glm::vec3 GetScale();
+    virtual void Draw(const RenderInfo& RenderInfo) {}
+    virtual void Update(float DeltaTime) {}
+    virtual void Destory() {}
+    virtual ~Component() = default; 
 };
+

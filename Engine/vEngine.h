@@ -61,6 +61,7 @@ public:
     static vEngine* ins;
 };
 
+using Engine = vEngine;
 
 #define GlobalVkLogicDevice vEngine::ins->GetVulkanDevice()
 #define GlobalVkSwapchain vEngine::ins->GetVkSwapchain()

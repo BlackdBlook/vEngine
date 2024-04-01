@@ -1,7 +1,4 @@
 #include "Triangle0.h"
-
-#include <stdexcept>
-
 #include "Engine/vEngine.h"
 #include "Engine/Core/Component/Component.h"
 #include "Engine/Core/FrameInfo/RenderInfo.h"
@@ -39,10 +36,8 @@ void Triangle0::Init()
 {
     Level::Init();
 
-
-
     {
         auto obj = NewObject();
-        obj->AttachComponent(NewSPtr<Triangle0_Object>());
+        obj->Attach(NewSPtr<Triangle0_Object>());
     }
 }

@@ -1,42 +1,49 @@
 #pragma once
+#include <memory>
 #include <vector>
-#include "Engine/TypeDef.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 class RenderInfo;
+class Level;
+class Component;
+
 
 class Object
 {
-    std::vector<SPtr<class Component>> Components;
+protected:
+    bool needUpdateModelMat = true;
+    glm::vec3 pos;
+    glm::quat rot;
+    glm::vec3 scale;
     
+    glm::mat4 model;
+
+    std::vector<std::shared_ptr<Component>> Components;
+
 public:
-
-    virtual void AttachComponent(const SPtr<Component>& Target);
-    virtual void DetachComponent(const SPtr<Component>& Target);
-
-    template<typename T>
-    void GetComponents(std::vector<SPtr<T>>& out);
-    
+    Object();
+    virtual void Start();
     virtual void Update(float DeltaTime);
-    virtual void LateUpdate(float DeltaTime);
     virtual void Draw(const RenderInfo& RenderInfo);
+
+    virtual void Attach(std::shared_ptr<Component> Target);
+    virtual void Dettach(std::shared_ptr<Component> Target);
+
+    
     virtual ~Object();
+    virtual void SetPos(const glm::vec3& newPos);
+    virtual glm::vec3 GetPos();
+    virtual void SetRot(const glm::vec3& newRot);
+    virtual void SetRot(const glm::quat& newRot);
+    virtual void AddRot(const glm::vec3& newRot);
+    virtual glm::quat GetRot();
+    virtual void SetScale(const glm::vec3& newScale);
+    virtual glm::vec3 GetScale();
+
+    glm::mat4 GetModelMat();
+    void LateUpdate(float delta_time);
 };
 
-template <typename T>
-void Object::GetComponents(std::vector<SPtr<T>>& out)
-{
-    static_assert(std::is_base_of_v<Component, T>, "GetComponents Must Return Component");
-
-    std::vector<SPtr<T>> ans;
-
-    for(auto& c : Components)
-    {
-        auto p = std::dynamic_pointer_cast<T>(c);
-        if(p != nullptr)
-        {
-            out.emplace_back(std::move(p));
-        }
-    }
-    
-    out = std::move(ans);
-}

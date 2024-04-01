@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <memory>
 #include <string>
+#include <glm/glm.hpp>
 //basic type
 typedef short int16;
 typedef unsigned short uint16;
@@ -30,4 +31,10 @@ inline SPtr<T> NewSPtr(Args&&... args)
 {
     return std::make_shared<T>(args...);
 }
+
+#define MAT4(name) glm::mat4 name(1.0f)
+#define LOG(...) Log::NameSpacePrinter(__FILE__, __LINE__, __VA_ARGS__)
+#define LOG_ERROR(...) Error::NameSpacePrinter(__FILE__, __LINE__, __VA_ARGS__)
+#define VEC3_ZERO glm::vec3(0,0,0)
+
 

@@ -22,6 +22,7 @@ public:
     virtual void Update(float DeltaTime);
     virtual void LateUpdate(float DeltaTime);
     virtual void Draw(const RenderInfo& RenderInfo);
+    
     Level();
     virtual ~Level();
 
