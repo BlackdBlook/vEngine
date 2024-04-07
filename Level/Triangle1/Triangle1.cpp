@@ -46,6 +46,28 @@ const std::vector<Vertex> vertices = {
     {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
 };
 
+namespace
+{
+    class RenderPipelineInfo2 : public RenderPipelineInfo
+    {
+        VkPipelineVertexInputStateCreateInfo* PipelineVertexInputStateCreateInfo() override;
+    };
+}
+VkPipelineVertexInputStateCreateInfo* RenderPipelineInfo2::PipelineVertexInputStateCreateInfo()
+{
+    static VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
+    static auto bindingDescription = Vertex::getBindingDescription();
+    static auto attributeDescriptions =
+        Vertex::getAttributeDescriptions();
+    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
+    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+    
+    return &vertexInputInfo;
+}
+
 class Triangle1Comp : public Component
 {
 public:
@@ -57,14 +79,6 @@ public:
 
     MemoryBuffer buffer;
 };
-
-namespace
-{
-    class RenderPipelineInfo2 : public RenderPipelineInfo
-    {
-        VkPipelineVertexInputStateCreateInfo* PipelineVertexInputStateCreateInfo() override;
-    };
-}
 
 Triangle1Comp::Triangle1Comp() : buffer(sizeof(vertices[0]) * vertices.size(), vertices.data())
 {
@@ -85,20 +99,7 @@ void Triangle1Comp::Draw(const RenderInfo& RenderInfo)
     vkCmdDraw(RenderInfo.CommmandBuffer, 3, 1, 0, 0);
 }
 
-VkPipelineVertexInputStateCreateInfo* RenderPipelineInfo2::PipelineVertexInputStateCreateInfo()
-{
-    static VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-    static auto bindingDescription = Vertex::getBindingDescription();
-    static auto attributeDescriptions =
-        Vertex::getAttributeDescriptions();
-    vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 1;
-    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
-    vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
-    vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
-    
-    return &vertexInputInfo;
-}
+
 
 void Triangle1::Init()
 {

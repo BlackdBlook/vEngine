@@ -75,7 +75,6 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)\ThirdParty\VulkanSdk\Include;$(ProjectDir)\ThirdParty\Vulkan-Hpp\glfw\include;$(ProjectDir)\ThirdParty\Vulkan-Hpp\glm;$(ProjectDir);$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -156,6 +155,7 @@
     <ClCompile Include="Engine\Core\Component\Component.cpp" />
     <ClCompile Include="Engine\Core\Fence\Fence.cpp" />
     <ClCompile Include="Engine\Core\FrameInfo\RenderInfo.cpp" />
+    <ClCompile Include="Engine\Core\GlobalUniformBuffer\GlobalUniformBufferManager.cpp" />
     <ClCompile Include="Engine\Core\Level\Level.cpp" />
     <ClCompile Include="Engine\Core\MemoryBuffer\MemoryBuffer.cpp" />
     <ClCompile Include="Engine\Core\Object\Object.cpp" />
@@ -165,10 +165,12 @@
     <ClCompile Include="Engine\Core\Semaphore\Semaphore.cpp" />
     <ClCompile Include="Engine\Core\ShaderModule\PipelineShader.cpp" />
     <ClCompile Include="Engine\Core\ShaderModule\Shader.cpp" />
+    <ClCompile Include="Engine\Core\UniformBuffer\UniformBuffer.cpp" />
     <ClCompile Include="Engine\SubSystem\AssetSystem\AssetSystem.cpp" />
     <ClCompile Include="Engine\Toolkit\Container\Queue.cpp" />
     <ClCompile Include="Engine\Toolkit\FileToolKit\FileToolKit.cpp" />
     <ClCompile Include="Engine\Toolkit\math_utils.cpp" />
+    <ClCompile Include="Engine\Toolkit\SPIRV\ShaderDecoder.cpp" />
     <ClCompile Include="Engine\Toolkit\stb_img\stb_img.cpp" />
     <ClCompile Include="Engine\Toolkit\Timer\Timer.cpp" />
     <ClCompile Include="Engine\vEngine.cpp" />
@@ -255,6 +257,18 @@
     <ClCompile Include="Level\Triangle1\Triangle1.cpp" />
     <ClCompile Include="LogPrinter\Log.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Meshs\Box\BoxVertices.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_cfg.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_cpp.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_cross.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_cross_c.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_cross_parsed_ir.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_cross_util.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_glsl.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_hlsl.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_msl.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_parser.cpp" />
+    <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_reflect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Core\Camera\Camera.h" />
@@ -262,6 +276,7 @@
     <ClInclude Include="Engine\Core\Component\Component.h" />
     <ClInclude Include="Engine\Core\Fence\Fence.h" />
     <ClInclude Include="Engine\Core\FrameInfo\RenderInfo.h" />
+    <ClInclude Include="Engine\Core\GlobalUniformBuffer\GlobalUniformBufferManager.h" />
     <ClInclude Include="Engine\Core\Level\Level.h" />
     <ClInclude Include="Engine\Core\MemoryBuffer\MemoryBuffer.h" />
     <ClInclude Include="Engine\Core\Object\Object.h" />
@@ -271,10 +286,12 @@
     <ClInclude Include="Engine\Core\Semaphore\Semaphore.h" />
     <ClInclude Include="Engine\Core\ShaderModule\PipelineShader.h" />
     <ClInclude Include="Engine\Core\ShaderModule\Shader.h" />
+    <ClInclude Include="Engine\Core\UniformBuffer\UniformBuffer.h" />
     <ClInclude Include="Engine\SubSystem\AssetSystem\AssetSystem.h" />
     <ClInclude Include="Engine\Toolkit\Container\Queue.h" />
     <ClInclude Include="Engine\Toolkit\FileToolKit\FileToolKit.h" />
     <ClInclude Include="Engine\Toolkit\math_utils.h" />
+    <ClInclude Include="Engine\Toolkit\SPIRV\ShaderDecoder.h" />
     <ClInclude Include="Engine\Toolkit\stb_img\stb_img.h" />
     <ClInclude Include="Engine\Toolkit\Timer\Timer.h" />
     <ClInclude Include="Engine\TypeDef.h" />
@@ -286,8 +303,28 @@
     <ClInclude Include="Level\Triangle0\Triangle0.h" />
     <ClInclude Include="Level\Triangle1\Triangle1.h" />
     <ClInclude Include="LogPrinter\Log.h" />
+    <ClInclude Include="Meshs\Box\BoxVertices.h" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\GLSL.std.450.h" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv.h" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_cfg.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_common.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_cpp.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_cross.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_cross_c.h" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_cross_containers.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_cross_error_handling.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_cross_parsed_ir.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_cross_util.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_glsl.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_hlsl.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_msl.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_parser.hpp" />
+    <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_reflect.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Shader\DrawCube\DrawCube.frag" />
+    <Content Include="Shader\DrawCube\DrawCube.vert" />
     <Content Include="Shader\Triangle0\Triangle0.frag" />
     <Content Include="Shader\Triangle0\Triangle0.vert" />
     <Content Include="Shader\Triangle1\Triangle1.frag" />

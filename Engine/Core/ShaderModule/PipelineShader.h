@@ -2,6 +2,8 @@
 #include <string>
 #include <vulkan/vulkan_core.h>
 
+#include "Engine/TypeDef.h"
+
 
 class RenderPipelineInfo
 {
@@ -18,6 +20,8 @@ public:
     virtual VkPipelineDynamicStateCreateInfo* PipelineDynamicStateCreateInfo();
     virtual VkPipelineLayout PipelineLayout();
     virtual VkRenderPass PipelineRenderPass();
+    virtual uint32 PipelineSubpass();
+    virtual VkPipeline PipelineBasePipelineHandle();
     virtual ~RenderPipelineInfo(){}
 
     std::string GetName();
@@ -26,7 +30,7 @@ public:
 
 class RenderPipeline
 {
-    VkPipelineBindPoint PipelineBindPoint;
+    VkPipelineBindPoint PipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     VkPipeline graphicsPipeline = nullptr;
 public:
     RenderPipeline();

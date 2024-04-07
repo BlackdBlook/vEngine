@@ -108,9 +108,19 @@ VkRenderPass RenderPipelineInfo::PipelineRenderPass()
     return GlobalVkRenderPass;
 }
 
+uint32 RenderPipelineInfo::PipelineSubpass()
+{
+    return 0;
+}
+
+VkPipeline RenderPipelineInfo::PipelineBasePipelineHandle()
+{
+    return VK_NULL_HANDLE;
+}
+
 std::string RenderPipelineInfo::GetName()
 {
-    return VertShaderName + "__" + FragShaderName;
+    return VertShaderName + "_" + FragShaderName;
 }
 
 void RenderPipeline::Init(RenderPipelineInfo* Info)
@@ -153,19 +163,17 @@ void RenderPipeline::Init(RenderPipelineInfo* Info)
     pipelineInfo.pDynamicState = Info->PipelineDynamicStateCreateInfo();
     pipelineInfo.layout = Info->PipelineLayout();
     pipelineInfo.renderPass = Info->PipelineRenderPass();
-    pipelineInfo.subpass = 0;
-    pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
+    pipelineInfo.subpass = Info->PipelineSubpass();
+    pipelineInfo.basePipelineHandle = Info->PipelineBasePipelineHandle();
     
     if (vkCreateGraphicsPipelines(GlobalVkLogicDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 
-    PipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 }
 
-RenderPipeline::RenderPipeline(): graphicsPipeline(nullptr)
+RenderPipeline::RenderPipeline()
 {
-    PipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 }
 
 RenderPipeline::RenderPipeline(const char* ShaderName)

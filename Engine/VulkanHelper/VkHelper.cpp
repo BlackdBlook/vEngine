@@ -515,7 +515,8 @@ void VkHelper::createGraphicsPipeline()
     pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
     
     if (vkCreatePipelineLayout(device, &pipelineLayoutInfo,
-        nullptr, &pipelineLayout) != VK_SUCCESS) {
+        nullptr, &
+        pipelineLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create pipeline layout!");
     }
 }

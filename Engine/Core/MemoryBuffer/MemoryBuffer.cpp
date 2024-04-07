@@ -8,6 +8,11 @@
 
 MemoryBuffer::MemoryBuffer(size_t Size, const void* Data)
 {
+    if(Size == 0)
+    {
+        return;
+    }
+    
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = Size;

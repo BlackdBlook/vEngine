@@ -4,6 +4,7 @@
 
 #include "Core/CommonRenderCmd/CommonRenderCmd.h"
 #include "Core/Level/Level.h"
+#include "Level/Cube/DrawCube.h"
 #include "Level/Triangle0/Triangle0.h"
 #include "Level/Triangle1/Triangle1.h"
 #include "LogPrinter/Log.h"
@@ -59,6 +60,7 @@ void vEngine::InitLevelList()
 {
     addLevel(Triangle0);
     addLevel(Triangle1);
+    addLevel(DrawCube);
 }
 
 void vEngine::UpdateLevel()
