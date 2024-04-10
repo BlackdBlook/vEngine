@@ -7,6 +7,7 @@
 #include <cstdint> // Necessary for uint32_t
 #include <algorithm> // Necessary for std::clamp
 
+#include "Header.h"
 #include "Engine/TypeDef.h"
 #include "Engine/vEngine.h"
 #include "LogPrinter/Log.h"
@@ -734,7 +735,14 @@ RenderInfo VkHelper::BeginRecordCommandBuffer()
     vkResetFences(device, 1, &inFlightFence);
     // Get Next Image
     uint32_t imageIndex;
-    vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+    VkResult r = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphore, VK_NULL_HANDLE, &imageIndex);
+    if(r != VK_SUCCESS)
+    {
+        if (r == VK_ERROR_OUT_OF_DATE_KHR || r == VK_SUBOPTIMAL_KHR)
+        {
+            createSwapChain();
+        }
+    }
 
     // Build Command Buffer
     vkResetCommandBuffer(commandBuffer, /*VkCommandBufferResetFlagBits*/ 0);
@@ -808,7 +816,15 @@ void VkHelper::EndRecordCommandBuffer(const RenderInfo& RenderInfo)
 
     presentInfo.pImageIndices = &RenderInfo.ImageIndex;
 
-    vkQueuePresentKHR(presentQueue, &presentInfo);
+    auto result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        // recreateSwapChain();
+    } else if (result != VK_SUCCESS) {
+        throw std::runtime_error("failed to present swap chain image!");
+    }
+
+    currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHTS;
 
 }
 

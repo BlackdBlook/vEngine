@@ -6,11 +6,12 @@
 
 #include "Engine/Core/Component/Component.h"
 #include "Engine/Core/FrameInfo/RenderInfo.h"
-#include "Engine/Core/MemoryBuffer/MemoryBuffer.h"
+#include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
 #include "Engine/Core/Object/Object.h"
 #include "Engine/Core/ShaderModule/PipelineShader.h"
+#include "LogPrinter/Log.h"
 
-struct Vertex
+struct TriangleVertex
 {
     glm::vec2 pos;
     glm::vec3 color;
@@ -19,9 +20,12 @@ struct Vertex
         VkVertexInputBindingDescription bindingDescription {};
 
         bindingDescription.binding = 0;
-        bindingDescription.stride = sizeof(Vertex);
+        bindingDescription.stride = sizeof(TriangleVertex);
         bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
         
+        volatile auto x = bindingDescription.stride;
+        volatile auto x2 = bindingDescription.stride;
+
         return bindingDescription;
     }
 
@@ -30,20 +34,21 @@ struct Vertex
         attributeDescriptions[0].binding = 0;
         attributeDescriptions[0].location = 0;
         attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
-        attributeDescriptions[0].offset = offsetof(Vertex, pos);
+        attributeDescriptions[0].offset = offsetof(TriangleVertex, pos);
 
         attributeDescriptions[1].binding = 0;
         attributeDescriptions[1].location = 1;
         attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-        attributeDescriptions[1].offset = offsetof(Vertex, color);
+        attributeDescriptions[1].offset = offsetof(TriangleVertex, color);
+
         return attributeDescriptions;
     }
 };
 
-const std::vector<Vertex> vertices = {
-    {{0.0f, -0.5f}, {1.0f, 1.0f, 1.0f}},
+const std::vector<TriangleVertex> vertices = {
+    {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
     {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-    {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+    {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
 };
 
 namespace
@@ -56,12 +61,13 @@ namespace
 VkPipelineVertexInputStateCreateInfo* RenderPipelineInfo2::PipelineVertexInputStateCreateInfo()
 {
     static VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
-    static auto bindingDescription = Vertex::getBindingDescription();
+    
+    static auto bindingDescription = TriangleVertex::getBindingDescription();
     static auto attributeDescriptions =
-        Vertex::getAttributeDescriptions();
+        TriangleVertex::getAttributeDescriptions();
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertexInputInfo.vertexBindingDescriptionCount = 1;
-    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
+    vertexInputInfo.vertexAttributeDescriptionCount = 2;
     vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
     vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
     
@@ -77,15 +83,19 @@ public:
 
     RenderPipeline pipeline;
 
-    MemoryBuffer buffer;
+    MeshVertexBuffer buffer;
 };
 
-Triangle1Comp::Triangle1Comp() : buffer(sizeof(vertices[0]) * vertices.size(), vertices.data())
+Triangle1Comp::Triangle1Comp() : buffer(sizeof(TriangleVertex) * vertices.size(), vertices.data())
 {
     RenderPipelineInfo2 info;
     info.VertShaderName = "Triangle1";
     info.FragShaderName = "Triangle1";
     pipeline.Init(&info);
+
+
+
+    
 }
 
 void Triangle1Comp::Draw(const RenderInfo& RenderInfo)

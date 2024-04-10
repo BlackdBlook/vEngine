@@ -5,6 +5,7 @@
 #include <glm/fwd.hpp>
 
 
+std::ostream &operator<<(std::ostream &output, const glm::vec2 &D );
 std::ostream &operator<<(std::ostream &output, const glm::vec3 &D );
 std::ostream &operator<<(std::ostream &output, const glm::vec4 &D );
 std::ostream &operator<<(std::ostream &output, const glm::mat4 &D );

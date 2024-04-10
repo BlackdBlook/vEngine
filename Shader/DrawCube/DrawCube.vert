@@ -11,13 +11,18 @@ layout(location = 2) in vec2 texCoord;
 
 layout(set = 0, binding = 0) uniform Camera
 {
+    mat4 model;
     mat4 u_View;
     mat4 u_Projection;
 };
-
+    
 void main() {
-    FragPos = pos;
-    gl_Position = vec4(pos, 1.0); 
-    Normal = normal;
+
+    FragPos = vec3(model * vec4(pos, 1.0));
+    Normal = mat3(transpose(inverse(model))) * normal;
     TexCoords = texCoord;
+
+    gl_Position = u_Projection * u_View * vec4(FragPos, 1.0);
+
 }
+ 

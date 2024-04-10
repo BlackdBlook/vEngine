@@ -15,13 +15,13 @@ public:
         Create(createInfo);
     }
     Semaphore(Semaphore&& other) noexcept { handle = other.handle; }
-    ~Semaphore() { vkDestroySemaphore(GlobalVkLogicDevice, handle, nullptr); }
+    ~Semaphore() { vkDestroySemaphore(GDevice, handle, nullptr); }
     //Getter
     
     //Non-const Function
     VkResult Create(VkSemaphoreCreateInfo& createInfo) {
         createInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-        VkResult result = vkCreateSemaphore(GlobalVkLogicDevice, &createInfo, nullptr, &handle);
+        VkResult result = vkCreateSemaphore(GDevice, &createInfo, nullptr, &handle);
         if (result)
             LOG("[ semaphore ] ERROR\nFailed to create a semaphore!\nError code: ",result,"\n");
         return result;

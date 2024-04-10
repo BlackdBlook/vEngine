@@ -1,30 +1,32 @@
-#include "MemoryBuffer.h"
+#include "MeshVertexBuffer.h"
 
 #include <assert.h>
 #include <stdexcept>
 #include <vulkan/vulkan_core.h>
 
 #include "Engine/vEngine.h"
+#include "LogPrinter/Log.h"
 
-MemoryBuffer::MemoryBuffer(size_t Size, const void* Data)
+
+MeshVertexBuffer::MeshVertexBuffer(size_t Size, const void* Data)
 {
     if(Size == 0)
     {
         return;
     }
-    
+
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = Size;
     bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
     bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-    if (vkCreateBuffer(GlobalVkLogicDevice, &bufferInfo, nullptr, &Buffer) != VK_SUCCESS) {
+    if (vkCreateBuffer(GDevice, &bufferInfo, nullptr, &Buffer) != VK_SUCCESS) {
         throw std::runtime_error("failed to create vertex buffer!");
     }
 
     VkMemoryRequirements memRequirements;
-    vkGetBufferMemoryRequirements(GlobalVkLogicDevice, Buffer, &memRequirements);
+    vkGetBufferMemoryRequirements(GDevice, Buffer, &memRequirements);
 
     VkMemoryAllocateInfo allocInfo{};
     allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -32,25 +34,25 @@ MemoryBuffer::MemoryBuffer(size_t Size, const void* Data)
     allocInfo.memoryTypeIndex = VkHelperInstance->FindMemoryType(memRequirements.memoryTypeBits,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-    if (vkAllocateMemory(GlobalVkLogicDevice, &allocInfo, nullptr, &vertexBufferMemory) != VK_SUCCESS) {
+    if (vkAllocateMemory(GDevice, &allocInfo, nullptr, &vertexBufferMemory) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate vertex buffer memory!");
     }
 
-    vkBindBufferMemory(GlobalVkLogicDevice, Buffer, vertexBufferMemory, 0);
-
+    vkBindBufferMemory(GDevice, Buffer, vertexBufferMemory, 0);
+    
     void* data;
-    vkMapMemory(GlobalVkLogicDevice, vertexBufferMemory, 0, bufferInfo.size, 0, &data);
+    vkMapMemory(GDevice, vertexBufferMemory, 0, bufferInfo.size, 0, &data);
     memcpy(data, Data, Size);
-    vkUnmapMemory(GlobalVkLogicDevice, vertexBufferMemory);
+    vkUnmapMemory(GDevice, vertexBufferMemory);
 }
 
-MemoryBuffer::~MemoryBuffer()
+MeshVertexBuffer::~MeshVertexBuffer()
 {
-    vkDestroyBuffer(GlobalVkLogicDevice, Buffer, nullptr);
-    vkFreeMemory(GlobalVkLogicDevice, vertexBufferMemory, nullptr);
+    vkDestroyBuffer(GDevice, Buffer, nullptr);
+    vkFreeMemory(GDevice, vertexBufferMemory, nullptr);
 }
 
-void MemoryBuffer::CmdBind(VkCommandBuffer CommandBuffer)
+void MeshVertexBuffer::CmdBind(VkCommandBuffer CommandBuffer)
 {
     assert(CommandBuffer != nullptr);
     VkBuffer vertexBuffers[] = {Buffer};

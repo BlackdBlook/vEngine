@@ -1,15 +1,15 @@
 #pragma once
 #include <vulkan/vulkan_core.h>
 
-class MemoryBuffer
+class MeshVertexBuffer
 {
     VkBuffer Buffer;
 
     VkDeviceMemory vertexBufferMemory;
     
 public:
-    MemoryBuffer(size_t Size, const void* Data);
-    ~MemoryBuffer();
+    MeshVertexBuffer(size_t Size, const void* Data);
+    ~MeshVertexBuffer();
     
     void CmdBind(VkCommandBuffer CommandBuffer);
 

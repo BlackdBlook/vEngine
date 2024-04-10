@@ -7,5 +7,5 @@ layout(location = 2) in vec2 TexCoords;
 layout(location = 0) out vec4 outColor;
 
 void main() {
-    outColor = vec4(FragPos, 1.0);
+    outColor = vec4(TexCoords, 1.0, 1.0);
 } 

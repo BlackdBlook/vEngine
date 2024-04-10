@@ -35,6 +35,7 @@ class VkHelper
     vEngine* Engine;
 
 public:
+    uint8 currentFrame = 0;
     VkDevice device;
     VkInstance Instance;
     GLFWwindow* window;

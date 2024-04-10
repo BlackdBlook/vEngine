@@ -33,6 +33,7 @@ class RenderPipeline
     VkPipelineBindPoint PipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     VkPipeline graphicsPipeline = nullptr;
 public:
+    VkPipelineLayout layout;
     RenderPipeline();
     RenderPipeline(const char* ShaderName);
     RenderPipeline(const char* VertShaderName, const char* FragShaderName);

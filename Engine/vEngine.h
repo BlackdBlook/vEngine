@@ -53,6 +53,8 @@ public:
     {
         return vkHelper.pipelineLayout;
     }
+
+    size_t GetCurrentFrame();
     
     static constexpr uint32 WindowX = 2560;
     static constexpr uint32 WindowY = 1440;
@@ -63,7 +65,7 @@ public:
 
 using Engine = vEngine;
 
-#define GlobalVkLogicDevice vEngine::ins->GetVulkanDevice()
+#define GDevice vEngine::ins->GetVulkanDevice()
 #define GlobalVkSwapchain vEngine::ins->GetVkSwapchain()
 #define GlobalVkRenderPass vEngine::ins->GetVkRenderPass()
 #define GlobalVkPipeLineLayout vEngine::ins->GetVkPipeLineLayout()

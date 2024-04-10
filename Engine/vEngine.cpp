@@ -25,6 +25,11 @@ levelList.emplace_back([this]() \
 
 vEngine* vEngine::ins = nullptr;
 
+size_t vEngine::GetCurrentFrame()
+{
+    return vkHelper.currentFrame;
+}
+
 vEngine::vEngine(): vkHelper(this)
 {
     ins = this;

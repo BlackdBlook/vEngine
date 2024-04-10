@@ -1,6 +1,11 @@
 #include "Log.h"
 
 #include <glm/glm.hpp>
+std::ostream& operator<<(std::ostream& output, const glm::vec2& D)
+{
+    output << "X=" << D.x << " Y=" << D.y;
+    return output;
+}
 
 std::ostream& operator<<(std::ostream& output, const glm::vec3& D)
 {

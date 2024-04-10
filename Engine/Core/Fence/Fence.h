@@ -14,18 +14,18 @@ public:
         Create(createInfo);
     }
     Fence(Fence&& other) noexcept { handle = other.handle; }
-    ~Fence() { vkDestroyFence(GlobalVkLogicDevice, handle, nullptr); }
+    ~Fence() { vkDestroyFence(GDevice, handle, nullptr); }
     //Getter
 
     //Const Function
     VkResult Wait() const {
-        VkResult result = vkWaitForFences(GlobalVkLogicDevice, 1, &handle, false, UINT64_MAX);
+        VkResult result = vkWaitForFences(GDevice, 1, &handle, false, UINT64_MAX);
         if (result)
             LOG("[ fence ] ERROR\nFailed to wait for the fence!\nError code: ",result,"\n");
         return result;
     }
     VkResult Reset() const {
-        VkResult result = vkResetFences(GlobalVkLogicDevice, 1, &handle);
+        VkResult result = vkResetFences(GDevice, 1, &handle);
         if (result)
             LOG("[ fence ] ERROR\nFailed to reset the fence!\nError code: ",result,"\n");
         return result;
@@ -37,7 +37,7 @@ public:
         return result;
     }
     VkResult Status() const {
-        VkResult result = vkGetFenceStatus(GlobalVkLogicDevice, handle);
+        VkResult result = vkGetFenceStatus(GDevice, handle);
         if (result < 0)//vkGetFenceStatus(...)成功时有两种结果，所以不能仅仅判断result是否非0
             LOG("[ fence ] ERROR\nFailed to get the status of the fence!\nError code: ", result,"\n");
         return result;
@@ -45,7 +45,7 @@ public:
     //Non-const Function
     VkResult Create(VkFenceCreateInfo& createInfo) {
         createInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        VkResult result = vkCreateFence(GlobalVkLogicDevice, &createInfo, nullptr, &handle);
+        VkResult result = vkCreateFence(GDevice, &createInfo, nullptr, &handle);
         if (result)
             LOG("[ fence ] ERROR\nFailed to create a fence!\nError code: ", result,"\n");
         return result;

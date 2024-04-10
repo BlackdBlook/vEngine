@@ -161,12 +161,13 @@ void RenderPipeline::Init(RenderPipelineInfo* Info)
     pipelineInfo.pMultisampleState = Info->PipelineMultisampleStateCreateInfo();
     pipelineInfo.pColorBlendState = Info->PipelineColorBlendStateCreateInfo();
     pipelineInfo.pDynamicState = Info->PipelineDynamicStateCreateInfo();
-    pipelineInfo.layout = Info->PipelineLayout();
+    layout = Info->PipelineLayout();
+    pipelineInfo.layout = layout;
     pipelineInfo.renderPass = Info->PipelineRenderPass();
     pipelineInfo.subpass = Info->PipelineSubpass();
     pipelineInfo.basePipelineHandle = Info->PipelineBasePipelineHandle();
     
-    if (vkCreateGraphicsPipelines(GlobalVkLogicDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+    if (vkCreateGraphicsPipelines(GDevice, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
         throw std::runtime_error("failed to create graphics pipeline!");
     }
 
@@ -204,5 +205,6 @@ void RenderPipeline::CmdBind(VkCommandBuffer commandBuffer)
 
 RenderPipeline::~RenderPipeline()
 {
-    vkDestroyPipeline(GlobalVkLogicDevice, graphicsPipeline, nullptr);
+    vkDestroyPipeline(GDevice, graphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(GDevice, layout, nullptr);
 }

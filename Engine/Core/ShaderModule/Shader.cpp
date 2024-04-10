@@ -13,7 +13,7 @@ VkShaderModule createShaderModule(const std::vector<uint8>& code) {
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
     VkShaderModule shaderModule;
-    if (vkCreateShaderModule(GlobalVkLogicDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+    if (vkCreateShaderModule(GDevice, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
         throw std::runtime_error("failed to create shader module!");
     }
     return shaderModule;
@@ -54,7 +54,7 @@ vShader::vShader(const char* Name, ShaderType type):type(type)
 
 vShader::~vShader()
 {
-    vkDestroyShaderModule(GlobalVkLogicDevice, vkshadermodule, nullptr);
+    vkDestroyShaderModule(GDevice, vkshadermodule, nullptr);
 }
 
 VkPipelineShaderStageCreateInfo vShader::GetStageInfo()
