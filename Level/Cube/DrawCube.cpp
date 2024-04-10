@@ -79,9 +79,11 @@ class Cube : public Component
     DescriptorHelper descriptor;
 
     UniformBuffer ubuffer;
+    VkDescriptorSetLayout layout;
 
 public:
     Cube();
+    ~Cube() override;
 
     void Update(float DeltaTime) override;
     
@@ -92,21 +94,21 @@ VkPipelineLayout RenderPipelineInfo2::PipelineLayout()
 {
     //存储pipeline layout，用来指定创建管线时的uniform值
     VkPipelineLayout pipelineLayout;
-    VkDescriptorSetLayoutBinding uboLayoutBinding{};
-    uboLayoutBinding.binding = 0;
-    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    uboLayoutBinding.descriptorCount = 1;
-    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-    VkDescriptorSetLayoutCreateInfo layoutInfo{};
-    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layoutInfo.bindingCount = 1;
-    layoutInfo.pBindings = &uboLayoutBinding;
-
-    if (vkCreateDescriptorSetLayout(GDevice, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create descriptor set layout!");
-    }
+    // VkDescriptorSetLayoutBinding uboLayoutBinding{};
+    // uboLayoutBinding.binding = 0;
+    // uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    // uboLayoutBinding.descriptorCount = 1;
+    // uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    //
+    // VkDescriptorSetLayoutCreateInfo layoutInfo{};
+    // layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    // layoutInfo.bindingCount = 1;
+    // layoutInfo.pBindings = &uboLayoutBinding;
+    //
+    // if (vkCreateDescriptorSetLayout(GDevice, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS)
+    // {
+    //     throw std::runtime_error("failed to create descriptor set layout!");
+    // }
 
     //创建pipeline layout，指定shader uniform值
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -164,7 +166,7 @@ VkDescriptorSetLayout createDescriptorSetLayout() {
 
 Cube::Cube() : buffer(sizeof(BoxVertices), BoxVertices)
 {
-    auto layout = createDescriptorSetLayout();
+    layout = createDescriptorSetLayout();
 
     ubuffer.Init(sizeof(UniformBufferObject));
     
@@ -178,6 +180,12 @@ Cube::Cube() : buffer(sizeof(BoxVertices), BoxVertices)
     info.FragShaderName = "DrawCube";
     pipeline.Init(&info);
     
+}
+
+Cube::~Cube()
+{
+    descriptor.cleanUp();
+    vkDestroyDescriptorSetLayout(GDevice, layout, nullptr);
 }
 
 static auto startTime = std::chrono::high_resolution_clock::now();

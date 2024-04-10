@@ -43,8 +43,10 @@ VkPipelineRasterizationStateCreateInfo* RenderPipelineInfo::PipelineRasterizatio
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
+    // 背面剔除
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    // 逆时针为正面
+    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     return &rasterizer;
 }
@@ -206,5 +208,8 @@ void RenderPipeline::CmdBind(VkCommandBuffer commandBuffer)
 RenderPipeline::~RenderPipeline()
 {
     vkDestroyPipeline(GDevice, graphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(GDevice, layout, nullptr);
+    if(layout != GlobalVkPipeLineLayout)
+    {
+        vkDestroyPipelineLayout(GDevice, layout, nullptr);
+    }
 }
