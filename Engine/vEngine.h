@@ -65,6 +65,7 @@ public:
 
 using Engine = vEngine;
 
+#define GCurrentFrame vEngine::ins->GetCurrentFrame()
 #define GDevice vEngine::ins->GetVulkanDevice()
 #define GlobalVkSwapchain vEngine::ins->GetVkSwapchain()
 #define GlobalVkRenderPass vEngine::ins->GetVkRenderPass()

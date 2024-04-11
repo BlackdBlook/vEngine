@@ -1,5 +1,16 @@
 #pragma once
 #include <vulkan/vulkan_core.h>
+#include "Header.h"
+struct MeshVertex
+{
+    glm::vec3 Pos;
+    glm::vec3 Normal;
+    glm::vec2 TexCoords;
+
+    static VkVertexInputBindingDescription getBindingDescription();
+
+    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
+};
 
 class MeshVertexBuffer
 {

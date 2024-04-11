@@ -21,8 +21,10 @@ UniformBuffer::~UniformBuffer()
     
 }
 
-void UniformBuffer::Init(size_t size)
+void UniformBuffer::Init(size_t size, string Name, uint32 bind)
 {
+    BlockName = Name;
+    Bind = bind;
     BufferSize = size;
     uniformBuffers.resize(MAX_FRAMES_IN_FLIGHTS);
     uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHTS);

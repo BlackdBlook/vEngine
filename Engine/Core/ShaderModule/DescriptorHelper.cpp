@@ -11,6 +11,11 @@ DescriptorHelper::DescriptorHelper()
     createDescriptorPool();
 }
 
+DescriptorHelper::~DescriptorHelper()
+{
+    cleanUp();
+}
+
 void DescriptorHelper::createDescriptorPool()
 {
     VkDescriptorPoolSize poolSize{};
@@ -40,10 +45,7 @@ void DescriptorHelper::createDescriptorSets(
     allocInfo.descriptorPool = descriptorPool;
     allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHTS);
     allocInfo.pSetLayouts = layouts.data();
-
-
-
-
+    
     //为运行中的每一帧创建一个descriptor set
     descriptorSets.resize(MAX_FRAMES_IN_FLIGHTS);
     if (vkAllocateDescriptorSets(GDevice, &allocInfo, descriptorSets.data()) !=VK_SUCCESS)
@@ -53,31 +55,40 @@ void DescriptorHelper::createDescriptorSets(
 
 }
 
-void DescriptorHelper::BindMemoryBuffer(const UniformBuffer& buffer)
+void DescriptorHelper::BindMemoryBuffer(std::vector<UniformBuffer> buffers)
 {
-    
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
+    this->buffers = std::move(buffers);
+    for(auto& buffer : this->buffers)
     {
-        //为每个descriptor set配置其中的descriptor，每个descriptor引用一个uniform buffer
-        VkDescriptorBufferInfo bufferInfo{};
-        bufferInfo.buffer = *buffer.GetUniformBuffer(i);
-        bufferInfo.offset = 0;
-        bufferInfo.range = buffer.GetBufferSize();
-        //更新descriptor set
-        VkWriteDescriptorSet descriptorWrite{};
-        descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-        descriptorWrite.dstSet = descriptorSets[i];
-        descriptorWrite.dstBinding = 0;
-        descriptorWrite.dstArrayElement = 0;
-        descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        descriptorWrite.descriptorCount = 1;
-        descriptorWrite.pBufferInfo = &bufferInfo;
-        descriptorWrite.pImageInfo = nullptr; // Optional
-        descriptorWrite.pTexelBufferView = nullptr; // Optional
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
+        {
+            //为每个descriptor set配置其中的descriptor，每个descriptor引用一个uniform buffer
+            VkDescriptorBufferInfo bufferInfo{};
+            bufferInfo.buffer = *buffer.GetUniformBuffer(i);
+            bufferInfo.offset = 0;
+            bufferInfo.range = buffer.GetBufferSize();
+
+            //更新descriptor set
+            VkWriteDescriptorSet descriptorWrite{};
+            descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+            descriptorWrite.dstSet = descriptorSets[i];
+            descriptorWrite.dstBinding = buffer.Bind;
+            descriptorWrite.dstArrayElement = 0;
+            descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+            descriptorWrite.descriptorCount = 1;
+            descriptorWrite.pBufferInfo = &bufferInfo;
+            descriptorWrite.pImageInfo = nullptr; // Optional
+            descriptorWrite.pTexelBufferView = nullptr; // Optional
         
-        vkUpdateDescriptorSets(GDevice, 1, &descriptorWrite,
-            0, nullptr);
+            vkUpdateDescriptorSets(GDevice, 1, &descriptorWrite,
+                0, nullptr);
+        }
     }
+}
+
+const VkDescriptorSet* DescriptorHelper::GetDescriptorSetsByCurrentFrameIndex()
+{
+    return &descriptorSets[GCurrentFrame];
 }
 
 void DescriptorHelper::cleanUp()

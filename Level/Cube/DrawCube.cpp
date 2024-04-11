@@ -77,8 +77,7 @@ class Cube : public Component
     MeshVertexBuffer buffer;
 
     DescriptorHelper descriptor;
-
-    UniformBuffer ubuffer;
+    
     VkDescriptorSetLayout layout;
 
 public:
@@ -168,10 +167,14 @@ Cube::Cube() : buffer(sizeof(BoxVertices), BoxVertices)
 {
     layout = createDescriptorSetLayout();
 
-    ubuffer.Init(sizeof(UniformBufferObject));
+    std::vector<UniformBuffer> ubuffers;
+    
+    ubuffers.emplace_back();
+    
+    ubuffers[0].Init(sizeof(UniformBufferObject), "Camera", 0);
     
     descriptor.createDescriptorSets(layout);
-    descriptor.BindMemoryBuffer(ubuffer);
+    descriptor.BindMemoryBuffer(std::move(ubuffers));
 
     
     RenderPipelineInfo2 info;
@@ -184,7 +187,6 @@ Cube::Cube() : buffer(sizeof(BoxVertices), BoxVertices)
 
 Cube::~Cube()
 {
-    descriptor.cleanUp();
     vkDestroyDescriptorSetLayout(GDevice, layout, nullptr);
 }
 
@@ -225,7 +227,7 @@ void Cube::Update(float DeltaTime)
     
     ubo.proj[1][1] *= -1;
 
-    ubuffer.UpdateBuffer(&ubo, sizeof(ubo));
+    descriptor.buffers[0].UpdateBuffer(&ubo, sizeof(ubo));
 }
 
 void Cube::Draw(const RenderInfo& RenderInfo)

@@ -2,18 +2,24 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 
+#include "Engine/Core/UniformBuffer/UniformBuffer.h"
+
 class UniformBuffer;
 
 class DescriptorHelper
 {
 public:
     DescriptorHelper();
+
+    ~DescriptorHelper();
     
     void createDescriptorPool();
     
     void createDescriptorSets(const VkDescriptorSetLayout& descriptorSetLayout);
 
-    void BindMemoryBuffer(const UniformBuffer& buffer);
+    void BindMemoryBuffer(std::vector<UniformBuffer> buffers);
+
+    const VkDescriptorSet* GetDescriptorSetsByCurrentFrameIndex();
     
     void cleanUp();
 
@@ -22,4 +28,5 @@ public:
     
     //每个运行帧的descriptor set
     std::vector<VkDescriptorSet> descriptorSets;
+    std::vector<UniformBuffer> buffers;
 };
