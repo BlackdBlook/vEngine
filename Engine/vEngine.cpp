@@ -57,7 +57,7 @@ void vEngine::processInput()
     {
         if (glfwGetKey(window, i) == GLFW_PRESS)
         {
-            SetLevel(i - GLFW_KEY_0); 
+            SetLevel(i - GLFW_KEY_0);
         }
     }
 }

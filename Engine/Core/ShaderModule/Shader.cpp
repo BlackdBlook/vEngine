@@ -23,6 +23,10 @@ VkShaderModule createShaderModule(const std::vector<uint8>& code) {
 
 ShaderUniformBufferBlocks ShaderDecoder::decodeUniformBuffer(std::vector<uint8>* binaryShader)
 {
+    if(binaryShader->size() == 0)
+    {
+        throw new std::runtime_error("binaryShader is empty");
+    }
     ShaderUniformBufferBlocks ans;
     std::vector<uint32_t>& temp = reinterpret_cast<std::vector<uint32_t>&>(*binaryShader);
     spirv_cross::Compiler glsl(temp);
@@ -105,17 +109,34 @@ VkShaderStageFlagBits vShader::GetVkShaderStageFlagBits()
     return VK_SHADER_STAGE_ALL;
 }
 
-vShader::vShader(const char* Name, ShaderType type):type(type)
+vShader::vShader(const char* Name, ShaderType type, ShaderCodeType codeType): type(type)
 {
     string fileName = Name;
     
-    switch (type) {
-    case ShaderType::Vertex:
-        fileName += ".vert.spv";
-        break;
-    case ShaderType::Fragment:
-        fileName += ".frag.spv";
-        break;
+    if(codeType == ShaderCodeType::GLSL)
+    {
+        switch (type) {
+        case ShaderType::Vertex:
+            fileName += ".vert.spv";
+            break;
+        case ShaderType::Fragment:
+            fileName += ".frag.spv";
+            break;
+        }
+        EntryPointFunctionName = "main";
+    }
+    else
+    {
+        switch (type) {
+        case ShaderType::Vertex:
+            fileName += ".vs.spv";
+            EntryPointFunctionName = "VS";
+            break;
+        case ShaderType::Fragment:
+            fileName += ".ps.spv";
+            EntryPointFunctionName = "PS";
+            break;
+        }
     }
     
     auto Path = AssetSystem::GetInstance()->GetFilePathByName(fileName);
@@ -130,6 +151,7 @@ vShader::vShader(const char* Name, ShaderType type):type(type)
     
 }
 
+
 vShader::~vShader()
 {
     vkDestroyShaderModule(GDevice, vkshadermodule, nullptr);
@@ -141,7 +163,7 @@ VkPipelineShaderStageCreateInfo vShader::GetStageInfo()
     vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
     vertShaderStageInfo.stage = GetVkShaderStageFlagBits();
     vertShaderStageInfo.module = vkshadermodule;
-    vertShaderStageInfo.pName = "main";
+    vertShaderStageInfo.pName = EntryPointFunctionName.c_str();
     return vertShaderStageInfo;
 }
 

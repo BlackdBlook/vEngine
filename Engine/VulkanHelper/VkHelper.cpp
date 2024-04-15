@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 #include <cstdint> // Necessary for uint32_t
 #include <algorithm> // Necessary for std::clamp
+#include <unordered_set>
 
 #include "Header.h"
 #include "Engine/TypeDef.h"
@@ -79,13 +80,29 @@ namespace
         return extensions;
     }
 
+    bool debugMessageFilt(
+        VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
+        VkDebugUtilsMessageTypeFlagsEXT messageType,
+        const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
+        void* pUserData)
+    {
+        static std::unordered_set<int> ignore ={
+            0x2391ffb2, // VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
+        };
+        
+        return ignore.find(pCallbackData->messageIdNumber) == ignore.end();
+    }
+
     static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
         VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
         VkDebugUtilsMessageTypeFlagsEXT messageType,
         const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
         void* pUserData) {
 
-        std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+        if(debugMessageFilt(messageSeverity, messageType, pCallbackData, pUserData))
+        {
+            std::cerr << "validation layer: " << pCallbackData->pMessage << '\n';
+        }
 
         return VK_FALSE;
     }
@@ -337,6 +354,22 @@ void VkHelper::CreateVkInstance()
     if (enableValidationLayers) {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
         createInfo.ppEnabledLayerNames = validationLayers.data();
+
+        const std::vector<VkValidationFeatureEnableEXT> enabledValidationLayers = {
+            VK_VALIDATION_FEATURE_ENABLE_DEBUG_PRINTF_EXT
+        };
+
+        // debugPrintf
+        static VkValidationFeaturesEXT validationFeatures{};
+        validationFeatures.sType = VK_STRUCTURE_TYPE_VALIDATION_FEATURES_EXT;
+        validationFeatures.pNext = nullptr;
+        validationFeatures.pEnabledValidationFeatures = enabledValidationLayers.data();
+        validationFeatures.enabledValidationFeatureCount = enabledValidationLayers.size();
+        validationFeatures.pDisabledValidationFeatures = nullptr;
+        validationFeatures.disabledValidationFeatureCount = 0;
+
+        createInfo.pNext = &validationFeatures;
+
     } else {
         createInfo.enabledLayerCount = 0;
     }
@@ -384,7 +417,7 @@ bool VkHelper::isDeviceSuitable(VkPhysicalDevice device) {
     QueueFamilyIndices indices = findQueueFamilies(device);
 
     bool extensionsSupported = checkDeviceExtensionSupport(device);
-
+    
     bool swapChainAdequate = false;
     if (extensionsSupported) {
         SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
@@ -397,6 +430,7 @@ bool VkHelper::isDeviceSuitable(VkPhysicalDevice device) {
 void VkHelper::pickPhysicalDevice()
 {
     uint32_t deviceCount = 0;
+    
     vkEnumeratePhysicalDevices(Instance, &deviceCount, nullptr);
     if (deviceCount == 0) {       
         throw std::runtime_error("failed to find GPUs with Vulkan support!");
@@ -456,24 +490,9 @@ void VkHelper::createGraphicsPipeline()
     inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
     inputAssembly.primitiveRestartEnable = VK_FALSE;
     
-    VkViewport viewport{};
-    viewport.x = 0.0f;
-    viewport.y = 0.0f;
-    viewport.width = (float) vEngine::WindowX;
-    viewport.height = (float) vEngine::WindowY;
-    viewport.minDepth = 0.0f;
-    viewport.maxDepth = 1.0f;
-    
     VkRect2D scissor{};
     scissor.offset = {0, 0};
     scissor.extent = VkExtent2D{vEngine::WindowX, vEngine::WindowY};
-    
-    VkPipelineViewportStateCreateInfo viewportState{};
-    viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-    viewportState.viewportCount = 1;
-    viewportState.pViewports = &viewport;
-    viewportState.scissorCount = 1;
-    viewportState.pScissors = &scissor;
     
     VkPipelineRasterizationStateCreateInfo rasterizer{};
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;

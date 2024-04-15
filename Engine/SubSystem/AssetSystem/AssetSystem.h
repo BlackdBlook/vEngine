@@ -5,6 +5,17 @@
 #include <unordered_set>
 
 
+struct CaseInsensitiveHash {
+    size_t operator()(const std::string& key) const;
+};
+
+struct CaseInsensitiveEqual {
+    bool operator()(const std::string& key1, const std::string& key2) const;
+};
+
+template<typename T>
+using PathMap = std::unordered_map<std::string, T, CaseInsensitiveHash, CaseInsensitiveEqual>;
+
 class AssetSystem
 {
 public:
@@ -30,10 +41,10 @@ private:
     bool IsIgnoreToFileMap(const std::string& Name);
 
     // 加载缓存
-    std::unordered_map<std::string, std::weak_ptr<void>> AssetCache;
+    PathMap<std::weak_ptr<void>> AssetCache;
     
     // 文件映射表
-    std::unordered_map<std::string, std::string> FileMap;
+    PathMap<std::string> FileMap;
 
     // 忽略表
     std::unordered_set<std::string> IgnoreMap;

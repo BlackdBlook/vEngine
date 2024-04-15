@@ -10,6 +10,12 @@ enum class ShaderType
     Fragment
 };
 
+enum class ShaderCodeType : uint8
+{
+    HLSL,
+    GLSL,
+};
+
 struct ShaderUniformMember
 {
     string Name;
@@ -56,7 +62,10 @@ public:
     {
         return vkshadermodule;
     }
-    vShader(const char* Name, ShaderType type);
+
+    string EntryPointFunctionName;
+    
+    vShader(const char* Name, ShaderType type, ShaderCodeType codeType = ShaderCodeType::GLSL);
     
     ~vShader();
 

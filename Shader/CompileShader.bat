@@ -1,5 +1,4 @@
-@echo off
 
-cd .\Shader
+cd %cd%\Shader
 
 python Script/ShaderIc.py %cd%

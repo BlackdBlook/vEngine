@@ -44,7 +44,7 @@ namespace
     };
 }
 
-Cube::Cube() : material("DrawCube"), buffer(sizeof(BoxVertices), BoxVertices)
+Cube::Cube() : material("DrawCube", ShaderCodeType::HLSL), buffer(sizeof(BoxVertices), BoxVertices)
 {
 
 }
@@ -74,8 +74,8 @@ void Cube::Update(float DeltaTime)
     // 旋转
     glm::quat quat = VEC3_ZERO;
     // // quat *= glm::angleAxis(0, glm::vec3{0,0,1});
-    quat *= glm::angleAxis(time, glm::vec3{0, 1, 0});
-    quat *= glm::angleAxis(time, glm::vec3{1, 0, 0});
+    quat *= glm::angleAxis(time, glm::vec3{0, -1, 0});
+    // quat *= glm::angleAxis(time, glm::vec3{1, 0, 0});
     glm::mat4 rotationMatrix = glm::mat4_cast(quat);
     m *= rotationMatrix;
     //
@@ -84,12 +84,10 @@ void Cube::Update(float DeltaTime)
 
     ubo.model = m;
 
-    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.view = glm::lookAt(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     ubo.proj = glm::perspective(glm::radians(90.0f), Engine::ins->WindowX / (float)Engine::ins->WindowY, 0.1f, 100.0f);
-
-    ubo.proj[1][1] *= -1;
-
+    
     material.SetUniformData(0, (uint8*)&ubo, sizeof(ubo));
 }
 

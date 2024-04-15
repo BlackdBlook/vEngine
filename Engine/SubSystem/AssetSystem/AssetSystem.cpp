@@ -4,6 +4,22 @@
 #include "Engine/Toolkit/stb_img/stb_img.h"
 #include "LogPrinter/Log.h"
 
+size_t CaseInsensitiveHash::operator()(const std::string& key) const
+{
+    std::string lower_key = key;
+    std::transform(lower_key.begin(), lower_key.end(), lower_key.begin(), ::tolower);
+    return std::hash<std::string>()(lower_key);
+}
+
+bool CaseInsensitiveEqual::operator()(const std::string& key1, const std::string& key2) const
+{
+    std::string lower_key1 = key1;
+    std::string lower_key2 = key2;
+    std::transform(lower_key1.begin(), lower_key1.end(), lower_key1.begin(), ::tolower);
+    std::transform(lower_key2.begin(), lower_key2.end(), lower_key2.begin(), ::tolower);
+    return lower_key1 == lower_key2;
+}
+
 AssetSystem::AssetSystem()
 {
     InitFileMap(); 
@@ -87,6 +103,8 @@ void AssetSystem::InitFileMap()
         FilePaths.pop_back();
 
         std::string name = FileToolKit::GetFileName(p);
+
+        
 
         if(IsIgnoreToFileMap(name))
         {

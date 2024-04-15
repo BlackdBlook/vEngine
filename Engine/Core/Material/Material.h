@@ -6,6 +6,7 @@
 #include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
 #include "Engine/Core/ShaderModule/DescriptorHelper.h"
 #include "Engine/Core/ShaderModule/PipelineShader.h"
+#include "Engine/Core/ShaderModule/Shader.h"
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
 class MaterialRenderPipeline;
@@ -63,9 +64,9 @@ public:
     
     Material();
 
-    Material(const string& shaderName);
+    Material(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::GLSL);
     
-    Material(const string& VertShaderName, const string& FragShaderName);
+    Material(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType = ShaderCodeType::GLSL);
 
     Material(MaterialRenderPipelineInfo& info);
 

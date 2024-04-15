@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "Engine/Core/ShaderModule/PipelineShader.h"
+#include "Engine/Core/ShaderModule/Shader.h"
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
 
@@ -12,13 +13,14 @@ class MaterialRenderPipelineInfo
     mutable VkDescriptorSetLayout descriptorSetLayout = nullptr;
     mutable VkPipelineLayout pipelineLayout = nullptr;
 public:
+
     SPtr<vShader> VertShader;
     SPtr<vShader> FragShader;
     MaterialRenderPipelineInfo();
     
-    MaterialRenderPipelineInfo(const string& shaderName);
+    MaterialRenderPipelineInfo(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::GLSL);
     
-    MaterialRenderPipelineInfo(const string& VertShaderName, const string& FragShaderName);
+    MaterialRenderPipelineInfo(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType = ShaderCodeType::GLSL);
 
     virtual ~MaterialRenderPipelineInfo();
     

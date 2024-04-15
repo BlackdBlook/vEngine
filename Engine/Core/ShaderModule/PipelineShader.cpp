@@ -45,7 +45,7 @@ VkPipelineRasterizationStateCreateInfo* RenderPipelineInfo::PipelineRasterizatio
     rasterizer.lineWidth = 1.0f;
     // 背面剔除
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    // 逆时针为正面
+    // Vulkan默认情况下逆时针为正面
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     return &rasterizer;

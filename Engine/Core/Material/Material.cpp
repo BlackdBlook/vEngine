@@ -13,7 +13,7 @@ Material::Material()
     
 }
 
-Material::Material(const string& shaderName) : info{shaderName}
+Material::Material(const string& shaderName, ShaderCodeType codeType) : info{shaderName, codeType}
 {
     auto setLayout = info.MakeVkDescriptorSetLayout();
     
@@ -26,7 +26,7 @@ Material::Material(const string& shaderName) : info{shaderName}
     pipeline.Init(&info);
 }
 
-Material::Material(const string& VertShaderName, const string& FragShaderName) : info{VertShaderName, FragShaderName}
+Material::Material(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType) : info{VertShaderName, FragShaderName, codeType}
 {
     auto setLayout = info.MakeVkDescriptorSetLayout();
     

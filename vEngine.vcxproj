@@ -338,6 +338,7 @@
     <ClCompile Include="LogPrinter\Log.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Meshs\Box\BoxVertices.cpp" />
+    <None Include="Shader\DrawCube\DrawCube_vs_ps.hlsl" />
     <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_cfg.cpp" />
     <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_cpp.cpp" />
     <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_cross.cpp" />
@@ -388,6 +389,7 @@
     <ClInclude Include="Level\Triangle1\Triangle1.h" />
     <ClInclude Include="LogPrinter\Log.h" />
     <ClInclude Include="Meshs\Box\BoxVertices.h" />
+    <ClInclude Include="Shader\DrawCube\UboTest.hlsli" />
     <ClInclude Include="ThirdParty\SPIRV-Cross\GLSL.std.450.h" />
     <ClInclude Include="ThirdParty\SPIRV-Cross\spirv.h" />
     <ClInclude Include="ThirdParty\SPIRV-Cross\spirv.hpp" />

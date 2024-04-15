@@ -21,6 +21,8 @@ class FileToolKit
 {
 public:
 
+    static void ToLower(string& str);
+
     static std::string ReadFile(const char* path);
 
     static std::string ReadFile(const std::string& path);

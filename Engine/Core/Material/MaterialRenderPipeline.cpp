@@ -9,19 +9,19 @@
 
 MaterialRenderPipelineInfo::MaterialRenderPipelineInfo()
 {
-    
+     
 }
 
-MaterialRenderPipelineInfo::MaterialRenderPipelineInfo(const string& shaderName)
+MaterialRenderPipelineInfo::MaterialRenderPipelineInfo(const string& shaderName, ShaderCodeType codeType)
 {
-    VertShader = NewSPtr<vShader>(shaderName.c_str(), ShaderType::Vertex);
-    FragShader = NewSPtr<vShader>(shaderName.c_str(), ShaderType::Fragment);
+    VertShader = NewSPtr<vShader>(shaderName.c_str(), ShaderType::Vertex, codeType);
+    FragShader = NewSPtr<vShader>(shaderName.c_str(), ShaderType::Fragment, codeType);
 }
 
-MaterialRenderPipelineInfo::MaterialRenderPipelineInfo(const string& VertShaderName, const string& FragShaderName)
+MaterialRenderPipelineInfo::MaterialRenderPipelineInfo(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType)
 {
-    VertShader = NewSPtr<vShader>(VertShaderName.c_str(), ShaderType::Vertex);
-    FragShader = NewSPtr<vShader>(FragShaderName.c_str(), ShaderType::Fragment);
+    VertShader = NewSPtr<vShader>(VertShaderName.c_str(), ShaderType::Vertex, codeType);
+    FragShader = NewSPtr<vShader>(FragShaderName.c_str(), ShaderType::Fragment, codeType);
 }
 
 MaterialRenderPipelineInfo::~MaterialRenderPipelineInfo()
@@ -79,9 +79,12 @@ VkPipelineRasterizationStateCreateInfo* MaterialRenderPipelineInfo::PipelineRast
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
     // 背面剔除
+    // rasterizer.cullMode = VK_CULL_MODE_FRONT_BIT;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
     // 逆时针为正面
     rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
+    // rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    
     rasterizer.depthBiasEnable = VK_FALSE;
     return &rasterizer;
 }

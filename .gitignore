@@ -388,3 +388,4 @@ MigrationBackup/
 /.idea
 .idea
 .vs
+/Shader/ShaderCache

@@ -18,6 +18,6 @@ void ShaderDecoder::GetShaderResourceInfos(
 
         out.UniformBuffer.push_back(ResourceInfo{std::move(resource.name), set, binding});
     }
-
+ 
     
 }

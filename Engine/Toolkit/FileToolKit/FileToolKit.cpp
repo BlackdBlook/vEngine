@@ -44,6 +44,11 @@ string ReadFile_Internal(ifstream&& fs)
     return s;
 }
 
+void FileToolKit::ToLower(string& str)
+{
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+}
+
 string FileToolKit::ReadFile(const char* path)
 {
     LOG("读取文件", path);
