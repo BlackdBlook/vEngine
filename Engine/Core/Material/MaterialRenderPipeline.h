@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 
-#include "Engine/Core/ShaderModule/PipelineShader.h"
 #include "Engine/Core/ShaderModule/Shader.h"
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 

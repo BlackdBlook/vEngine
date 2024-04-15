@@ -5,9 +5,6 @@
 #include "Core/CommonRenderCmd/CommonRenderCmd.h"
 #include "Core/Level/Level.h"
 #include "Level/Cube/DrawCube.h"
-#include "Level/Cube/DrawCubeV2.h"
-#include "Level/Triangle0/Triangle0.h"
-#include "Level/Triangle1/Triangle1.h"
 #include "LogPrinter/Log.h"
 #include "Toolkit/Timer/Timer.h"
 #include "VulkanHelper/VkHelper.h"
@@ -64,10 +61,7 @@ void vEngine::processInput()
 
 void vEngine::InitLevelList()
 {
-    addLevel(Triangle0);
-    addLevel(Triangle1);
     addLevel(DrawCube);
-    addLevel(DrawCubeV2);
 }
 
 void vEngine::UpdateLevel()

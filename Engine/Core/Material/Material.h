@@ -5,7 +5,6 @@
 #include "Engine/TypeDef.h"
 #include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
 #include "Engine/Core/ShaderModule/DescriptorHelper.h"
-#include "Engine/Core/ShaderModule/PipelineShader.h"
 #include "Engine/Core/ShaderModule/Shader.h"
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
