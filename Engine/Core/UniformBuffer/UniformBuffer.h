@@ -1,5 +1,6 @@
 #pragma once
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 #include "Header.h"
@@ -16,7 +17,7 @@ public:
     ~UniformBuffer();
     void Init(size_t size, string Name, uint32 bind);
 
-    void UpdateBuffer(void* data, size_t size, uint32 offset = 0);
+    void UpdateBuffer(void* data, size_t size, size_t offset = 0);
 
     VkDeviceSize GetBufferSize() const {return BufferSize;}
 

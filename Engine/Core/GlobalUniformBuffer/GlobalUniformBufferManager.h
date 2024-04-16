@@ -11,7 +11,7 @@ public:
     
     UniformBuffer buffer;
 
-    std::unordered_map<string, uint32> MemberOffset;
+    std::unordered_map<string, size_t> MemberOffset;
 
     
 

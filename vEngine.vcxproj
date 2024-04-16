@@ -172,7 +172,6 @@
     <ClCompile Include="Engine\Toolkit\Container\Queue.cpp" />
     <ClCompile Include="Engine\Toolkit\FileToolKit\FileToolKit.cpp" />
     <ClCompile Include="Engine\Toolkit\math_utils.cpp" />
-    <ClCompile Include="Engine\Toolkit\SPIRV\ShaderDecoder.cpp" />
     <ClCompile Include="Engine\Toolkit\stb_img\stb_img.cpp" />
     <ClCompile Include="Engine\Toolkit\Timer\Timer.cpp" />
     <ClCompile Include="Engine\vEngine.cpp" />
@@ -293,7 +292,6 @@
     <ClInclude Include="Engine\Toolkit\Container\Queue.h" />
     <ClInclude Include="Engine\Toolkit\FileToolKit\FileToolKit.h" />
     <ClInclude Include="Engine\Toolkit\math_utils.h" />
-    <ClInclude Include="Engine\Toolkit\SPIRV\ShaderDecoder.h" />
     <ClInclude Include="Engine\Toolkit\stb_img\stb_img.h" />
     <ClInclude Include="Engine\Toolkit\Timer\Timer.h" />
     <ClInclude Include="Engine\TypeDef.h" />

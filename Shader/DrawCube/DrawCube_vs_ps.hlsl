@@ -7,7 +7,12 @@ struct VSInput
 [[vk::location(2)]] float2 texCoord : TEXCOORD;
 };
 
-
+struct UBO
+{
+	float4x4 model;
+	float4x4 u_View;
+	float4x4 u_Projection;
+};
 
 cbuffer ubo : register(b0, space0) { UBO ubo; }
 

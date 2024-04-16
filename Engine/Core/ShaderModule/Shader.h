@@ -65,7 +65,7 @@ public:
 
     string EntryPointFunctionName;
     
-    vShader(const char* Name, ShaderType type, ShaderCodeType codeType = ShaderCodeType::GLSL);
+    vShader(const char* Name, ShaderType type, ShaderCodeType codeType = ShaderCodeType::HLSL);
     
     ~vShader();
 

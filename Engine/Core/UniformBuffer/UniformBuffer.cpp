@@ -63,7 +63,7 @@ void UniformBuffer::Init(size_t size, string Name, uint32 bind)
     }
 }
 
-void UniformBuffer::UpdateBuffer(void* data, size_t size, uint32 offset)
+void UniformBuffer::UpdateBuffer(void* data, size_t size, size_t offset)
 {
     assert(pData);
 

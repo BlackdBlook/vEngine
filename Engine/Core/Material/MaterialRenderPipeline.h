@@ -17,9 +17,9 @@ public:
     SPtr<vShader> FragShader;
     MaterialRenderPipelineInfo();
     
-    MaterialRenderPipelineInfo(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::GLSL);
+    MaterialRenderPipelineInfo(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
     
-    MaterialRenderPipelineInfo(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType = ShaderCodeType::GLSL);
+    MaterialRenderPipelineInfo(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
 
     virtual ~MaterialRenderPipelineInfo();
     

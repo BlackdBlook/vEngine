@@ -63,15 +63,28 @@ public:
     
     Material();
 
-    Material(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::GLSL);
+    Material(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
     
-    Material(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType = ShaderCodeType::GLSL);
+    Material(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
 
     Material(MaterialRenderPipelineInfo& info);
 
     ~Material();
 
-    void SetUniformData(uint32 index, uint8* Src, size_t Size, uint32 Offset = 0);
+    void SetUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset = 0);
+    
+    void SetUniformData(string BlockName, uint8* Src, size_t Size, size_t Offset = 0);
+    
+    void SetUniformData(string BlockName, string MemberName, uint8* Src, size_t Size);
+
+    template<typename T>
+    void SetUniformData(string BlockName, string MemberName, const T& Src);
 
     void Draw(const RenderInfo& RenderInfo);
 };
+
+template <typename T>
+void Material::SetUniformData(string BlockName, string MemberName, const T& Src)
+{
+    SetUniformData(BlockName, MemberName, (uint8*)&Src, sizeof(T));
+}

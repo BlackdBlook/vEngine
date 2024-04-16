@@ -23,41 +23,57 @@ VkShaderModule createShaderModule(const std::vector<uint8>& code) {
 
 ShaderUniformBufferBlocks ShaderDecoder::decodeUniformBuffer(std::vector<uint8>* binaryShader)
 {
-    if(binaryShader->size() == 0)
+    if(binaryShader->empty())
     {
-        throw new std::runtime_error("binaryShader is empty");
+        throw std::runtime_error("binaryShader is empty");
     }
     ShaderUniformBufferBlocks ans;
     std::vector<uint32_t>& temp = reinterpret_cast<std::vector<uint32_t>&>(*binaryShader);
-    spirv_cross::Compiler glsl(temp);
+    spirv_cross::Compiler compiler(temp);
     
     // 获取反射数据
-    spirv_cross::ShaderResources resources = glsl.get_shader_resources();
+    spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
     // 遍历所有的uniform变量
     for (auto& resource : resources.uniform_buffers)
     {
         ShaderUniformBufferBlock block;
-        const spirv_cross::SPIRType& type = glsl.get_type(resource.base_type_id);
+        const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
         
         // 遍历uniform变量的所有成员
         for (size_t i = 0; i < type.member_types.size(); i++)
         {
-            const spirv_cross::SPIRType& memberType = glsl.get_type(type.member_types[i]);
+            const spirv_cross::SPIRType& memberType = compiler.get_type(type.member_types[i]);
+
+            if(memberType.basetype == spirv_cross::SPIRType::BaseType::Struct)
+            {
+                for (size_t j = 0; j < memberType.member_types.size(); j++)
+                {
+                    ShaderUniformMember member;
+                    member.Name = compiler.get_member_name(memberType.self, static_cast<uint32_t>(j));
+                    member.Size = compiler.get_declared_struct_member_size(memberType, static_cast<uint32_t>(j));
+                    member.Offset = compiler.type_struct_member_offset(memberType, static_cast<uint32_t>(j));
+                    block.Members.insert({member.Name, std::move(member)});
+                }
+            }
+            else
+            {
+                ShaderUniformMember member;
+                member.Name = compiler.get_member_name(type.self, static_cast<uint32_t>(i));
+                member.Size = compiler.get_declared_struct_member_size(type, static_cast<uint32_t>(i));
+                member.Offset = compiler.type_struct_member_offset(type, static_cast<uint32_t>(i));
             
-            ShaderUniformMember member;
-            member.Name = glsl.get_member_name(type.self, static_cast<uint32_t>(i));
-            member.Size = glsl.get_declared_struct_member_size(type, static_cast<uint32_t>(i));
-            member.Offset = glsl.type_struct_member_offset(type, static_cast<uint32_t>(i));
+                block.Members.insert({member.Name, std::move(member)});
+            }
             
-            block.Members.insert({member.Name, std::move(member)});
         }
 
 
-        uint32_t set = glsl.get_decoration(resource.id, spv::DecorationDescriptorSet);
-        uint32_t binding = glsl.get_decoration(resource.id, spv::DecorationBinding);
-        
-        block.Size = glsl.get_declared_struct_size(type);
+        uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+        uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+
+        block.Name = resource.name;
+        block.Size = compiler.get_declared_struct_size(type);
         block.Bind = binding;
         block.Set = set;
         

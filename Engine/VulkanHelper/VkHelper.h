@@ -53,11 +53,10 @@ public:
     VkRenderPass renderPass;
     std::vector<VkFramebuffer> swapChainFramebuffers;
     VkCommandPool commandPool;
-    VkCommandBuffer commandBuffer;
-
-    VkSemaphore imageAvailableSemaphore;
-    VkSemaphore renderFinishedSemaphore;
-    VkFence inFlightFence;
+    std::vector<VkCommandBuffer> commandBuffer;
+    std::vector<VkSemaphore> imageAvailableSemaphores;
+    std::vector<VkSemaphore> renderFinishedSemaphores;
+    std::vector<VkFence> inFlightFences;
 private:
 
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
@@ -77,9 +76,11 @@ private:
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     void createFramebuffers();
     void createCommandPool();
-    void createCommandBuffer();
+    void createCommandBuffers();
     void createSyncObjects();
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+    void recreateSwapChain();
+    
 public:
     VkHelper(vEngine* engine);
     void InitVulkan();
@@ -87,6 +88,7 @@ public:
     void CleanVk();
 
     void WaitDeviceIdle();
+    void cleanupSwapChain();
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
     RenderInfo BeginRecordCommandBuffer();

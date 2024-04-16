@@ -33,10 +33,11 @@ vEngine::vEngine(): vkHelper(this)
     ins = this;
     window = vkHelper.InitWindow(2560, 1440);
     vkHelper.InitVulkan();
+    
+
     InitLevelList();
+
     levelList[0]();
-
-
     
     Run();
 }

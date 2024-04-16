@@ -88,6 +88,7 @@ void Cube::Update(float DeltaTime)
     ubo.proj = glm::perspective(glm::radians(90.0f), Engine::ins->WindowX / (float)Engine::ins->WindowY, 0.1f, 100.0f);
     
     material.SetUniformData(0, (uint8*)&ubo, sizeof(ubo));
+    // material.SetUniformData("");
 }
 
 void Cube::Draw(const RenderInfo& RenderInfo)

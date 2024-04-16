@@ -49,9 +49,28 @@ Material::~Material()
     
 }
 
-void Material::SetUniformData(uint32 index, uint8* Src, size_t Size, uint32 Offset)
+void Material::SetUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset)
 {
     descriptor.buffers[index].UpdateBuffer(Src, Size, Offset);
+}
+
+void Material::SetUniformData(string BlockName, uint8* Src, size_t Size, size_t Offset)
+{
+    for (auto& block : descriptor.buffers)
+    {
+        if(block.BlockName != BlockName)
+        {
+            continue;
+        }
+
+        block.UpdateBuffer(Src, Size, Offset);
+    }
+}
+
+void Material::SetUniformData(string BlockName, string MemberName, uint8* Src, size_t Size)
+{
+    SetUniformData(BlockName, Src, Size,
+        info.VertShader->ShaderUniformBufferBlocks.UniformBlocks[BlockName].Members[MemberName].Offset);
 }
 
 void Material::Draw(const RenderInfo& RenderInfo)
