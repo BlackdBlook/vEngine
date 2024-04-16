@@ -75,9 +75,6 @@
     <ClCompile Include="Engine\Core\Semaphore\Semaphore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\ShaderModule\PipelineShader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\ShaderModule\Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -93,19 +90,7 @@
     <ClCompile Include="Level\Cube\DrawCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Level\Tests\test_run_triangle\test_run_triangle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Level\Triangle0\Triangle0.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Level\Triangle1\Triangle1.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Meshs\Box\BoxVertices.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Toolkit\SPIRV\ShaderDecoder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\Material\Material.cpp">
@@ -148,6 +133,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ThirdParty\SPIRV-Cross\spirv_reflect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Material\MaterialRenderPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -212,9 +200,6 @@
     <ClInclude Include="Engine\Core\Semaphore\Semaphore.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\ShaderModule\PipelineShader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Core\ShaderModule\Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -233,19 +218,7 @@
     <ClInclude Include="Level\Cube\DrawCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Level\Tests\test_run_triangle\test_run_triangle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Level\Triangle0\Triangle0.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Level\Triangle1\Triangle1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Meshs\Box\BoxVertices.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Toolkit\SPIRV\ShaderDecoder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Material\Material.h">
@@ -308,5 +281,11 @@
     <ClInclude Include="ThirdParty\SPIRV-Cross\spirv_reflect.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Core\Material\MaterialRenderPipeline.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\DrawCube\DrawCube_vs_ps.hlsl" />
   </ItemGroup>
 </Project>

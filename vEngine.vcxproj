@@ -114,6 +114,8 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\ThirdParty\VulkanSdk\Include;$(ProjectDir)\ThirdParty\lib-glfw\include\GLFW;$(ProjectDir)\ThirdParty\Vulkan-Hpp\glm;$(ProjectDir)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <EnableEnhancedInstructionSet>AdvancedVectorExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -122,7 +124,7 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>$(ProjectDir)Shader\CompileShader.bat</Command>
+      <Command>call $(ProjectDir)Shader\CompileShader.bat</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -136,14 +138,17 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)\ThirdParty\VulkanSdk\Include;$(ProjectDir)\ThirdParty\lib-glfw\include\GLFW;$(ProjectDir)\ThirdParty\Vulkan-Hpp\glm;$(ProjectDir)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <Optimization>MaxSpeed</Optimization>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)\ThirdParty\VulkanSdk\Lib;$(ProjectDir)\ThirdParty\lib-glfw\Release</AdditionalLibraryDirectories>
-      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(ProjectDir)\ThirdParty\VulkanSdk\Lib;$(ProjectDir)\ThirdParty\lib-glfw\Release;$(UniversalCRT_LibraryPath_x64)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;ucrtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
       <Command>$(ProjectDir)Shader\CompileShader.bat</Command>
@@ -301,7 +306,6 @@
     <ClInclude Include="Level\Cube\DrawCube.h" />
     <ClInclude Include="LogPrinter\Log.h" />
     <ClInclude Include="Meshs\Box\BoxVertices.h" />
-    <ClInclude Include="Shader\DrawCube\UboTest.hlsli" />
     <ClInclude Include="ThirdParty\SPIRV-Cross\GLSL.std.450.h" />
     <ClInclude Include="ThirdParty\SPIRV-Cross\spirv.h" />
     <ClInclude Include="ThirdParty\SPIRV-Cross\spirv.hpp" />

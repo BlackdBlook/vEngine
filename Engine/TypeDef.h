@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include <memory>
 #include <string>
 #include <glm/glm.hpp>

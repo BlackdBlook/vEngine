@@ -389,3 +389,4 @@ MigrationBackup/
 .idea
 .vs
 /Shader/ShaderCache
+/Shader/file_modification_times.json

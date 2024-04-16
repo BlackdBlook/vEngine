@@ -34,6 +34,8 @@ namespace
         MeshVertexBuffer buffer;
 
     public:
+
+        bool Flag = false;
         Cube();
         ~Cube() override;
 
@@ -49,8 +51,9 @@ Cube::Cube() : material("DrawCube", ShaderCodeType::HLSL), buffer(sizeof(BoxVert
     
     ubo.view = glm::lookAt(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    ubo.proj = glm::perspective(glm::radians(90.0f), Engine::ins->WindowX / (float)Engine::ins->WindowY, 0.1f, 100.0f);
+    ubo.proj = glm::perspective(glm::radians(90.0f), Engine::ins->WindowX / (float)Engine::ins->WindowY, 1.f, 10.0f);
 
+    material.SetAllUniformData("type.ubo", "model", MAT4());
     material.SetAllUniformData("type.ubo", "u_View", ubo.view);
     material.SetAllUniformData("type.ubo", "u_Projection", ubo.proj);
 }
@@ -60,31 +63,26 @@ Cube::~Cube()
 
 }
 
-static auto startTime = std::chrono::high_resolution_clock::now();
-
 void Cube::Update(float DeltaTime)
 {
     Component::Update(DeltaTime);
-
-
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
     
     MAT4(m);
 
     // 平移
-    m = glm::translate(m, VEC3_ZERO);
-
-    // 旋转
+    m = glm::translate(m, GetPos());
+    
+    //
+    // // 旋转
     glm::quat quat = VEC3_ZERO;
     // // quat *= glm::angleAxis(0, glm::vec3{0,0,1});
-    quat *= glm::angleAxis(time, glm::vec3{0, -1, 0});
+    quat *= glm::angleAxis((float)glfwGetTime(), glm::vec3{1, 0, 0});
     // quat *= glm::angleAxis(time, glm::vec3{1, 0, 0});
     glm::mat4 rotationMatrix = glm::mat4_cast(quat);
     m *= rotationMatrix;
-    //
-    // // 缩放
-    // m = glm::scale(m, glm::vec3{1,1,1});
+    // //
+    // // // 缩放
+    // // m = glm::scale(m, glm::vec3{1,1,1});
 
     
     // material.SetCurrentUniformData(0, (uint8*)&ubo, sizeof(ubo));
@@ -111,5 +109,19 @@ void DrawCube::Init()
     {
         auto obj = NewObject();
         obj->Attach(NewSPtr<Cube>());
+        obj->SetPos(glm::vec3{2,0,0});
+    }
+
+    {
+        auto obj = NewObject();
+        auto cube = NewSPtr<Cube>();
+        obj->Attach(cube);
+        cube->Flag = true;
+    }
+
+    {
+        auto obj = NewObject();
+        obj->Attach(NewSPtr<Cube>());
+        obj->SetPos(glm::vec3{-2,0,0});
     }
 }

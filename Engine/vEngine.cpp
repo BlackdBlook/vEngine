@@ -95,8 +95,8 @@ void vEngine::Run()
         
         DrawLevel();
         
-        // MaxFpsControl
         {
+            // MaxFpsControl
             std::chrono::microseconds timeSpan = t.GetTimeSpan();
             while(timeSpan < MinFreamTime)
             {
@@ -104,6 +104,8 @@ void vEngine::Run()
             }
             DeltaTime = convertToSeconds(timeSpan);
         }
+
+        FrameCount += 1;
     }
 
     vkHelper.WaitDeviceIdle();

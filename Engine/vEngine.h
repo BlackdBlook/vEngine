@@ -18,6 +18,8 @@ class vEngine
     std::vector<std::function<void()>> levelList;
     float DeltaTime = 0;
 
+    uint64 FrameCount = 0;
+
     void processInput();
 
     void InitLevelList();
@@ -58,6 +60,11 @@ public:
     {
         return vkHelper.currentFrame;
     }
+
+    FORCEINLINE uint64 GetFrameCount()
+    {
+        return FrameCount;
+    }
     
     static uint32 WindowX;
     static uint32 WindowY;
@@ -73,3 +80,4 @@ using Engine = vEngine;
 #define GlobalVkSwapchain vEngine::ins->GetVkSwapchain()
 #define GlobalVkRenderPass vEngine::ins->GetVkRenderPass()
 #define GlobalVkPipeLineLayout vEngine::ins->GetVkPipeLineLayout()
+#define GFrameCount vEngine::ins->GetFrameCount()

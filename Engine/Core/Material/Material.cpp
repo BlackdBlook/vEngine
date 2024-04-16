@@ -22,7 +22,7 @@ Material::Material(const string& shaderName, ShaderCodeType codeType) : info{sha
     std::vector<UniformBuffer> buffers = info.MakeUniformBuffers();
 
     descriptor.BindMemoryBuffer(std::move(buffers));
-    
+     
     pipeline.Init(&info);
 }
 

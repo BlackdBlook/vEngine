@@ -52,7 +52,7 @@ import os
 import subprocess
 from hlsl_utils import *
 
-def compile_shaders(shader_files):
+def compile_shaders(path, shader_files):
     if not os.path.exists('ShaderCache'):
         os.mkdir('ShaderCache')
     for shader_file in shader_files:
@@ -65,13 +65,18 @@ def compile_shaders(shader_files):
             if len(shader_types) == 0:
                 print(file_name, 'unknow hlsl shader type')
                 continue
+            
+            hlslc_path = os.path.join(sys.argv[1], 'hlslc.exe')
+            print(hlslc_path)
 
             # 调用dxc.exe编译shader
             # dxc.exe -spirv -T vs_6_1 -E main .\input.vert -Fo .\output.vert.spv -fspv-extension=SPV_EXT_descriptor_indexin
             for shader_type in shader_types:
-                output_file_name = f'{base_name}.{hlsl_entry_Point[shader_type]}.spv'
-                output_file_path = os.path.join('ShaderCache', output_file_name).lower()
-                subprocess.run(['./dxc.exe', '-spirv', '-T', hlsl_shader_config[shader_type], '-E', hlsl_entry_Point[shader_type], shader_file, '-Fo', output_file_path])
+                output_file_name = f'{base_name}.{hlsl_entry_Point[shader_type]}.spv'.lower()
+                output_file_path = os.path.join(path, 'ShaderCache', output_file_name)
+                print(output_file_path)
+                ret = subprocess.run([hlslc_path, '-spirv', '-T', hlsl_shader_config[shader_type], '-E', hlsl_entry_Point[shader_type], shader_file, '-Fo', output_file_path])
+                print(ret)
 
 
         else:
@@ -87,10 +92,8 @@ def main(path):
     old_times = load_modification_times()
     new_times = get_modification_times(path)
     modified = print_modified_files(old_times, new_times)
-    compile_shaders(modified)
+    compile_shaders(path, modified)
     record_modification_times(new_times)
 
 if __name__ == '__main__':
-    global debug
-    debug = True
     main(sys.argv[1])

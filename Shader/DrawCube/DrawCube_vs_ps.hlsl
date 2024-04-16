@@ -1,4 +1,3 @@
-#include "./UboTest.hlsli"
 
 struct VSInput
 {
@@ -16,13 +15,13 @@ struct UBO
 
 cbuffer ubo : register(b0, space0) { UBO ubo; }
 
-struct VSOutput
+struct VSOutput    
 {
 	float4 Position : SV_POSITION;
 	float4 FragPos : POSITION;
 	float3 Normal : NORMAL;
 	float2 TexCoords : TEXCOORD;
-};
+};        
 
 float4x4 inverse(float4x4 m)
 {
@@ -45,19 +44,20 @@ float4x4 inverse(float4x4 m)
 VSOutput VS(VSInput input)
 {
     VSOutput output;
-    output.FragPos = mul(float4(input.pos , 1.0), ubo.model);
-	float3 transformedNormal = mul(float4(input.normal, 0.0), ubo.model).xyz;
+    output.FragPos = mul(ubo.model, float4(input.pos , 1.0));
+    float4x4 modelInverseTranspose = transpose(inverse(ubo.model));
+    float3 transformedNormal = mul(float4(input.normal, 0.0), modelInverseTranspose).xyz;
     output.Normal = transformedNormal;
     output.TexCoords = input.texCoord;
     float4 pos = output.FragPos;
-	pos = mul(mul(ubo.u_Projection, ubo.u_View), pos);
-	output.Position = pos;
-	
+    pos = mul(ubo.u_View, pos);
+    pos = mul(ubo.u_Projection, pos);
+    output.Position = pos;
+
     return output;
 }
 
 float4 PS(VSOutput input) : SV_TARGET
 {
-	
 	return float4(input.Normal, 1.0);
 }
