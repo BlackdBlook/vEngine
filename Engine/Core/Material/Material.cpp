@@ -49,12 +49,17 @@ Material::~Material()
     
 }
 
-void Material::SetUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset)
+void Material::SetCurrentUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset)
 {
-    descriptor.buffers[index].UpdateBuffer(Src, Size, Offset);
+    descriptor.buffers[index].UpdateCurrentBuffer(Src, Size, Offset);
 }
 
-void Material::SetUniformData(string BlockName, uint8* Src, size_t Size, size_t Offset)
+void Material::SetAllUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset)
+{
+    descriptor.buffers[index].UpdateAllBuffer(Src, Size, Offset);
+}
+
+void Material::SetCurrentUniformData(const string& BlockName, uint8* Src, size_t Size, size_t Offset)
 {
     for (auto& block : descriptor.buffers)
     {
@@ -63,13 +68,32 @@ void Material::SetUniformData(string BlockName, uint8* Src, size_t Size, size_t 
             continue;
         }
 
-        block.UpdateBuffer(Src, Size, Offset);
+        block.UpdateCurrentBuffer(Src, Size, Offset);
     }
 }
 
-void Material::SetUniformData(string BlockName, string MemberName, uint8* Src, size_t Size)
+void Material::SetAllUniformData(const string& BlockName, uint8* Src, size_t Size, size_t Offset)
 {
-    SetUniformData(BlockName, Src, Size,
+    for (auto& block : descriptor.buffers)
+    {
+        if(block.BlockName != BlockName)
+        {
+            continue;
+        }
+
+        block.UpdateAllBuffer(Src, Size, Offset);
+    }
+}
+
+void Material::SetCurrentUniformData(const string& BlockName, const string& MemberName, uint8* Src, size_t Size)
+{
+    SetCurrentUniformData(BlockName, Src, Size,
+        info.VertShader->ShaderUniformBufferBlocks.UniformBlocks[BlockName].Members[MemberName].Offset);
+}
+
+void Material::SetAllUniformData(const string& BlockName, const string& MemberName, uint8* Src, size_t Size)
+{
+    SetAllUniformData(BlockName, Src, Size,
         info.VertShader->ShaderUniformBufferBlocks.UniformBlocks[BlockName].Members[MemberName].Offset);
 }
 

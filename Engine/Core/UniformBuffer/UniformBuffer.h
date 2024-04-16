@@ -17,7 +17,9 @@ public:
     ~UniformBuffer();
     void Init(size_t size, string Name, uint32 bind);
 
-    void UpdateBuffer(void* data, size_t size, size_t offset = 0);
+    void UpdateCurrentBuffer(void* data, size_t size, size_t offset = 0);
+    
+    void UpdateAllBuffer(void* data, size_t size, size_t offset = 0);
 
     VkDeviceSize GetBufferSize() const {return BufferSize;}
 

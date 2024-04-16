@@ -71,20 +71,31 @@ public:
 
     ~Material();
 
-    void SetUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset = 0);
+    void SetCurrentUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset = 0);
+    void SetAllUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset = 0);
     
-    void SetUniformData(string BlockName, uint8* Src, size_t Size, size_t Offset = 0);
+    void SetCurrentUniformData(const string& BlockName, uint8* Src, size_t Size, size_t Offset = 0);
+    void SetAllUniformData(const string& BlockName, uint8* Src, size_t Size, size_t Offset = 0);
     
-    void SetUniformData(string BlockName, string MemberName, uint8* Src, size_t Size);
+    void SetCurrentUniformData(const string& BlockName, const string& MemberName, uint8* Src, size_t Size);
+    void SetAllUniformData(const string& BlockName, const string& MemberName, uint8* Src, size_t Size);
 
     template<typename T>
-    void SetUniformData(string BlockName, string MemberName, const T& Src);
+    void SetCurrentUniformData(const string& BlockName, const string& MemberName, const T& Src);
+    template<typename T>
+    void SetAllUniformData(const string& BlockName, const string& MemberName, const T& Src);
 
     void Draw(const RenderInfo& RenderInfo);
 };
 
 template <typename T>
-void Material::SetUniformData(string BlockName, string MemberName, const T& Src)
+void Material::SetCurrentUniformData(const string& BlockName, const string& MemberName, const T& Src)
 {
-    SetUniformData(BlockName, MemberName, (uint8*)&Src, sizeof(T));
+    SetCurrentUniformData(BlockName, MemberName, (uint8*)&Src, sizeof(T));
+}
+
+template <typename T>
+void Material::SetAllUniformData(const string& BlockName, const string& MemberName, const T& Src)
+{
+    SetAllUniformData(BlockName, MemberName, (uint8*)&Src, sizeof(T));
 }

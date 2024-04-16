@@ -29,35 +29,38 @@ class vEngine
     void DrawFrame();
     
 public:
-    GLFWwindow* GetWindow()
+    FORCEINLINE GLFWwindow* GetWindow()
     {
         return window;
     }
     
-    VkDevice GetVulkanDevice()
+    FORCEINLINE VkDevice GetVulkanDevice()
     {
         return vkHelper.device;
     }
     
-    VkSwapchainKHR GetVkSwapchain()
+    FORCEINLINE VkSwapchainKHR GetVkSwapchain()
     {
         return vkHelper.swapChain; 
     }
     
-    VkRenderPass GetVkRenderPass()
+    FORCEINLINE VkRenderPass GetVkRenderPass()
     {
         return vkHelper.renderPass;
     }
 
-    VkPipelineLayout GetVkPipeLineLayout()
+    FORCEINLINE VkPipelineLayout GetVkPipeLineLayout()
     {
         return vkHelper.pipelineLayout;
     }
 
-    size_t GetCurrentFrame();
+    FORCEINLINE size_t GetCurrentFrame()
+    {
+        return vkHelper.currentFrame;
+    }
     
-    static constexpr uint32 WindowX = 2560;
-    static constexpr uint32 WindowY = 1440;
+    static uint32 WindowX;
+    static uint32 WindowY;
     vEngine();
     void SetLevel(int i);
     static vEngine* ins;

@@ -9,6 +9,9 @@
 #include "Toolkit/Timer/Timer.h"
 #include "VulkanHelper/VkHelper.h"
 
+uint32 vEngine::WindowX = 2560;
+uint32 vEngine::WindowY = 1440;
+
 #define makeLevel(s) \
 CurrentLevel.reset();\
 CurrentLevel = std::shared_ptr<s>(new s());\
@@ -23,10 +26,6 @@ levelList.emplace_back([this]() \
 
 vEngine* vEngine::ins = nullptr;
 
-size_t vEngine::GetCurrentFrame()
-{
-    return vkHelper.currentFrame;
-}
 
 vEngine::vEngine(): vkHelper(this)
 {
@@ -67,12 +66,14 @@ void vEngine::InitLevelList()
 
 void vEngine::UpdateLevel()
 {
-    
+    CurrentLevel->Update(DeltaTime);
+
+    CurrentLevel->LateUpdate(DeltaTime);
 }
 
 void vEngine::DrawLevel()
 {
-    
+    DrawFrame();
 }
 
 void vEngine::Run()
@@ -90,11 +91,9 @@ void vEngine::Run()
         
         processInput();
         
-        CurrentLevel->Update(DeltaTime);
-
-        CurrentLevel->LateUpdate(DeltaTime);
+        UpdateLevel();
         
-        DrawFrame();
+        DrawLevel();
         
         // MaxFpsControl
         {

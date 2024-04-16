@@ -45,7 +45,14 @@ namespace
 
 Cube::Cube() : material("DrawCube", ShaderCodeType::HLSL), buffer(sizeof(BoxVertices), BoxVertices)
 {
+    UniformBufferObject ubo{};
+    
+    ubo.view = glm::lookAt(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
+    ubo.proj = glm::perspective(glm::radians(90.0f), Engine::ins->WindowX / (float)Engine::ins->WindowY, 0.1f, 100.0f);
+
+    material.SetAllUniformData("type.ubo", "u_View", ubo.view);
+    material.SetAllUniformData("type.ubo", "u_Projection", ubo.proj);
 }
 
 Cube::~Cube()
@@ -62,9 +69,7 @@ void Cube::Update(float DeltaTime)
 
     auto currentTime = std::chrono::high_resolution_clock::now();
     float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-    UniformBufferObject ubo{};
-
+    
     MAT4(m);
 
     // 平移
@@ -81,14 +86,11 @@ void Cube::Update(float DeltaTime)
     // // 缩放
     // m = glm::scale(m, glm::vec3{1,1,1});
 
-    ubo.model = m;
-
-    ubo.view = glm::lookAt(glm::vec3(0.0f, 1.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    ubo.proj = glm::perspective(glm::radians(90.0f), Engine::ins->WindowX / (float)Engine::ins->WindowY, 0.1f, 100.0f);
     
-    material.SetUniformData(0, (uint8*)&ubo, sizeof(ubo));
-    // material.SetUniformData("");
+    // material.SetCurrentUniformData(0, (uint8*)&ubo, sizeof(ubo));
+    // material.SetCurrentUniformData("type.ubo", (uint8*)&ubo, sizeof(ubo));
+    material.SetCurrentUniformData("type.ubo", "model", m);
+
 }
 
 void Cube::Draw(const RenderInfo& RenderInfo)

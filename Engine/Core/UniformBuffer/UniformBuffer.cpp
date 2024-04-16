@@ -63,11 +63,26 @@ void UniformBuffer::Init(size_t size, string Name, uint32 bind)
     }
 }
 
-void UniformBuffer::UpdateBuffer(void* data, size_t size, size_t offset)
+void UniformBuffer::UpdateCurrentBuffer(void* data, size_t size, size_t offset)
 {
     assert(pData);
 
-    assert(this->BufferSize <= offset + size);
+    assert(this->BufferSize >= offset + size);
+
+    uint8* dist = static_cast<uint8*>(pData[Engine::ins->GetCurrentFrame()]);
     
-    memcpy(pData[Engine::ins->GetCurrentFrame()], data, size);
+    memcpy(dist + offset, data, size);
+}
+
+void UniformBuffer::UpdateAllBuffer(void* data, size_t size, size_t offset)
+{
+    assert(pData);
+
+    assert(this->BufferSize >= offset + size);
+
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
+    {
+        uint8* dist = static_cast<uint8*>(pData[i]);
+        memcpy(dist + offset, data, size);
+    }
 }
