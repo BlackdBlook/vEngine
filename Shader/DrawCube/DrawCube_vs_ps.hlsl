@@ -45,10 +45,13 @@ VSOutput VS(VSInput input)
 {
     VSOutput output;
     output.FragPos = mul(ubo.model, float4(input.pos , 1.0));
+	
     float4x4 modelInverseTranspose = transpose(inverse(ubo.model));
-    float3 transformedNormal = mul(float4(input.normal, 0.0), modelInverseTranspose).xyz;
+    float3 transformedNormal = mul(modelInverseTranspose, float4(input.normal, 0.0)).xyz;
     output.Normal = transformedNormal;
+	
     output.TexCoords = input.texCoord;
+	
     float4 pos = output.FragPos;
     pos = mul(ubo.u_View, pos);
     pos = mul(ubo.u_Projection, pos);
