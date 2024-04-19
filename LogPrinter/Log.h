@@ -45,7 +45,7 @@ public:
     template<typename ... TS>
     static void NameSpacePrinterLog(const char* FileName, int Line, TS ... args)
     {
-        std::cout << "\033[43m";
+        std::cout << "\033[44m";
         std::cout << FileName << " Line:" << Line ;
         std::cout << ' ' << '\n';
         std::cout << "\033[0m";
@@ -56,7 +56,7 @@ public:
     template<typename ... TS>
     static void NameSpacePrinterWaring(const char* FileName, int Line, TS ... args)
     {
-        std::cout << "\033[44m";
+        std::cout << "\033[43m";
         std::cout << FileName << " Line:" << Line ;
         std::cout << ' ' << '\n';
         std::cout << "\033[0m";
@@ -67,7 +67,7 @@ public:
     template<typename ... TS>
     static void NameSpacePrinterError(const char* FileName, int Line, TS ... args)
     {
-        std::cout << "\033[43m";
+        std::cout << "\033[45m";
         std::cout << FileName << " Line:" << Line ;
         std::cout << ' ' << '\n';
         std::cout << "\033[0m";
