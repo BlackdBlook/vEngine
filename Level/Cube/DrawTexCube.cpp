@@ -56,8 +56,6 @@ TexCube::TexCube() :
         SPtr<MaterialRenderPipelineInfo> info = NewSPtr<MaterialRenderPipelineInfoTexCube>("DrawTexCube");
      
         material = std::make_shared<Material>(info);
-
-        material->descriptor.BindImageView(texture, VkHelperInstance->textureSampler);
     }
     
     ubo.view = glm::lookAt(glm::vec3(0.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -92,6 +90,17 @@ void TexCube::Update(float DeltaTime)
     m *= rotationMatrix;
     
     material->SetCurrentUniformData("type.ConstantBuffer.UBO", "model", m);
+
+
+    if(GFrameCount % 240 == 0)
+    {
+        material->SetTexture("texture0", "default.jpg");
+    }
+
+    if(GFrameCount % 240 == 120)
+    {
+        material->SetTexture("texture0", "container2.png");
+    }
 }
 
 void TexCube::Draw(const RenderInfo& RenderInfo)

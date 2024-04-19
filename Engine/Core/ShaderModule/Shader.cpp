@@ -21,6 +21,23 @@ VkShaderModule createShaderModule(const std::vector<uint8>& code) {
     return shaderModule;
 }
 
+VkDescriptorType ShaderTextureInput::GetDescriptorType()
+{
+    switch (type) {
+    case spirv_cross::SPIRType::Image:
+        return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        break;
+    case spirv_cross::SPIRType::SampledImage:
+        return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        break;
+    case spirv_cross::SPIRType::Sampler:
+        return VK_DESCRIPTOR_TYPE_SAMPLER;
+        break;
+    default:
+        throw std::runtime_error("type error");
+    }
+}
+
 std::string ShaderTextureInput::Log()
 {
     string ans = "Texture Input " + name +

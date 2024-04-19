@@ -18,7 +18,7 @@ public:
     
     void createDescriptorSets(const VkDescriptorSetLayout& descriptorSetLayout);
 
-    void BindInputBuffer(std::vector<UniformBuffer> buffers);
+    void BindInputBuffer();
 
     void BindImageView(const Texture2D& texture, VkSampler textureSampler);
 
@@ -31,5 +31,8 @@ public:
     
     //每个运行帧的descriptor set
     std::vector<VkDescriptorSet> descriptorSets;
+
     std::vector<UniformBuffer> buffers;
+    
+    std::unordered_map<string, SPtr<Texture2D>> Texture2Ds;
 };

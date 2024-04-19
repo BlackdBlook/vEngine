@@ -6,6 +6,7 @@
 #include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
 #include "Engine/Core/ShaderModule/Shader.h"
 #include "LogPrinter/Log.h"
+#include "../Texture2D/Texture2D.h"
 
 MaterialRenderPipelineInfo::MaterialRenderPipelineInfo()
 {
@@ -220,6 +221,29 @@ std::vector<UniformBuffer> MaterialRenderPipelineInfo::MakeUniformBuffers() cons
     }
     
     return out;
+}
+
+void MaterialRenderPipelineInfo::MakeInputTextures(std::unordered_map<string, SPtr<Texture2D>>& out) const
+{
+    for(auto& tex :
+        VertShader->ShaderTextureInputs.Members)
+    {
+        auto texture = NewSPtr<Texture2D>("default.jpg");
+        texture->InputInfo.bind = tex.second.bind;
+        texture->InputInfo.set = tex.second.set;
+        texture->InputInfo.type = tex.second.type;
+        out.emplace(tex.first, texture);
+    }
+
+    for(auto& tex :
+    FragShader->ShaderTextureInputs.Members)
+    {
+        auto texture = NewSPtr<Texture2D>("default.jpg");
+        texture->InputInfo.bind = tex.second.bind;
+        texture->InputInfo.set = tex.second.set;
+        texture->InputInfo.type = tex.second.type;
+        out.emplace(tex.first, texture);
+    }
 }
 
 MaterialRenderPipeline::MaterialRenderPipeline()

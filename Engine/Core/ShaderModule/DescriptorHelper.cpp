@@ -57,15 +57,16 @@ void DescriptorHelper::createDescriptorSets(
 
 }
 
-void DescriptorHelper::BindInputBuffer(std::vector<UniformBuffer> buffers)
+void DescriptorHelper::BindInputBuffer()
 {
-    this->buffers = std::move(buffers);
-    for(auto& buffer : this->buffers)
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
     {
-        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
+        std::vector<VkWriteDescriptorSet> descriptorWrites;
+        std::vector<VkDescriptorBufferInfo> bufferInfos;
+        for(auto& buffer : this->buffers)
         {
             //为每个descriptor set配置其中的descriptor，每个descriptor引用一个uniform buffer
-            VkDescriptorBufferInfo bufferInfo{};
+            VkDescriptorBufferInfo& bufferInfo = bufferInfos.emplace_back();
             bufferInfo.buffer = *buffer.GetUniformBuffer(i);
             bufferInfo.offset = 0;
             bufferInfo.range = buffer.GetBufferSize();
@@ -73,7 +74,7 @@ void DescriptorHelper::BindInputBuffer(std::vector<UniformBuffer> buffers)
             
 
             //更新descriptor set
-            VkWriteDescriptorSet descriptorWrite{};
+            VkWriteDescriptorSet& descriptorWrite = descriptorWrites.emplace_back();
             descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrite.dstSet = descriptorSets[i];
             descriptorWrite.dstBinding = buffer.Bind;
@@ -83,10 +84,30 @@ void DescriptorHelper::BindInputBuffer(std::vector<UniformBuffer> buffers)
             descriptorWrite.pBufferInfo = &bufferInfo;
             descriptorWrite.pImageInfo = nullptr; // Optional
             descriptorWrite.pTexelBufferView = nullptr; // Optional
-        
-            vkUpdateDescriptorSets(GDevice, 1, &descriptorWrite,
-                0, nullptr);
         }
+
+        //在descriptor set中绑定实际的image和sampler资源到descriptors
+        std::vector<VkDescriptorImageInfo> imageInfos{};
+        for(auto& image : this->Texture2Ds)
+        {
+            auto& imageInfo = imageInfos.emplace_back();
+            imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            imageInfo.imageView = image.second->textureImageView;
+            imageInfo.sampler = VkHelperInstance->textureSampler;
+        
+            {
+                VkWriteDescriptorSet& descriptorWrite = descriptorWrites.emplace_back();
+                descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+                descriptorWrite.dstSet = descriptorSets[i];
+                descriptorWrite.dstBinding = image.second->InputInfo.bind;
+                descriptorWrite.dstArrayElement = 0;
+                descriptorWrite.descriptorType = image.second->InputInfo.GetDescriptorType();
+                descriptorWrite.descriptorCount = 1;
+                descriptorWrite.pImageInfo = &imageInfo;
+            }
+        }
+
+        vkUpdateDescriptorSets(GDevice, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
     }
 }
 

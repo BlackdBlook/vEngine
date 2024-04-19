@@ -48,6 +48,8 @@ struct ShaderTextureInput
     uint32 set;
     spirv_cross::SPIRType::BaseType type;
 
+    VkDescriptorType GetDescriptorType();
+
     std::string Log();
 };
 

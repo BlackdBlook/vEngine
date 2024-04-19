@@ -55,6 +55,8 @@ struct Vertex
 class Material
 {
     Material();
+
+    void Init();
     
 public:
     MaterialRenderPipeline pipeline;
@@ -63,8 +65,6 @@ public:
 
     SPtr<MaterialRenderPipelineInfo> info;
 
-    std::unordered_map<string, SPtr<Texture2D>> Texture2Ds;
-
     Material(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
     
     Material(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
@@ -72,6 +72,8 @@ public:
     Material(SPtr<MaterialRenderPipelineInfo> Info);
 
     ~Material();
+
+    void SetTexture(const string& TargetName, const string& NewTextureName);
 
     void SetCurrentUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset = 0);
     void SetAllUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset = 0);

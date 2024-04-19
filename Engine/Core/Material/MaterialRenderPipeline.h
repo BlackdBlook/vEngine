@@ -5,6 +5,7 @@
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
 
+class Texture2D;
 class vShader;
 
 class MaterialRenderPipelineInfo
@@ -43,6 +44,7 @@ public:
 
     virtual VkDescriptorSetLayout MakeVkDescriptorSetLayout() const;
     virtual std::vector<UniformBuffer> MakeUniformBuffers() const;
+    virtual void MakeInputTextures(std::unordered_map<string, SPtr<Texture2D>>& out) const;
 };
 
 class MaterialRenderPipeline

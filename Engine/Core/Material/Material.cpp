@@ -4,8 +4,9 @@
 #include "Engine/vEngine.h"
 #include "Engine/Core/FrameInfo/RenderInfo.h"
 #include "Engine/Core/ShaderModule/Shader.h"
+#include "Engine/Core/Texture2D/Texture2D.h"
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"
-
+#include "LogPrinter/Log.h"
 
 
 Material::Material()
@@ -13,51 +14,56 @@ Material::Material()
     
 }
 
-Material::Material(const string& shaderName, ShaderCodeType codeType)
-: info(NewSPtr<MaterialRenderPipelineInfo>(shaderName, codeType))
+void Material::Init()
 {
     auto setLayout = info->MakeVkDescriptorSetLayout();
+    
+    info->MakeInputTextures(descriptor.Texture2Ds);
     
     descriptor.createDescriptorSets(setLayout);
 
     std::vector<UniformBuffer> buffers = info->MakeUniformBuffers();
 
-    descriptor.BindInputBuffer(std::move(buffers));
+    descriptor.buffers = std::move(buffers);
+
+    descriptor.BindInputBuffer();
     
     pipeline.Init(info.get());
+}
+
+Material::Material(const string& shaderName, ShaderCodeType codeType)
+: info(NewSPtr<MaterialRenderPipelineInfo>(shaderName, codeType))
+{
+    Init();
 }
 
 Material::Material(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType)
 : info(NewSPtr<MaterialRenderPipelineInfo>(VertShaderName, FragShaderName, codeType))
 {
-    auto setLayout = info->MakeVkDescriptorSetLayout();
-    
-    descriptor.createDescriptorSets(setLayout);
-
-    std::vector<UniformBuffer> buffers = info->MakeUniformBuffers();
-
-    descriptor.BindInputBuffer(std::move(buffers));
-    
-    pipeline.Init(info.get());
+    Init();
 }
 
 Material::Material(SPtr<MaterialRenderPipelineInfo> Info)
     :info(std::move(Info))
 {
-    auto setLayout = info->MakeVkDescriptorSetLayout();
-    
-    descriptor.createDescriptorSets(setLayout);
-
-    std::vector<UniformBuffer> buffers = info->MakeUniformBuffers();
-
-    descriptor.BindInputBuffer(std::move(buffers));
-    
-    pipeline.Init(info.get());
+    Init();
 }
 
 Material::~Material()
 {
     
+}
+
+void Material::SetTexture(const string& TargetName, const string& NewTextureName)
+{
+    auto target = descriptor.Texture2Ds.find(TargetName);
+    if(target == descriptor.Texture2Ds.end())
+    {
+        ERR("Texture not found");
+        return;
+    }
+    target->second->SetTexture(NewTextureName);
+    descriptor.BindImageView(*target->second, VkHelperInstance->textureSampler);
 }
 
 void Material::SetCurrentUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset)

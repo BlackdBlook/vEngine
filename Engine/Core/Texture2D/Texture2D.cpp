@@ -256,7 +256,7 @@ SPtr<TexutreFile> TexutreFileSourceManager::GetTextureFile(const string& Texture
     }
 }
 
-Texture2D::Texture2D(const string& TextureName)
+void Texture2D::SetTexture_Internel(const string& TextureName)
 {
     SourceFile = TexutreFileSourceManager::GetTextureFile(TextureName);
 
@@ -268,14 +268,17 @@ Texture2D::Texture2D(const string& TextureName)
     auto cmd = VkHelperInstance->BeginSingleTimeCommands();
 
     //将texture image转换到VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-    transitionImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    transitionImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB,
+        VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     //执行buffer到image的copy函数
-    copyBufferToImage(cmd, buffer->stagingBuffer, textureImage, SourceFile->texWidth, SourceFile->texHeight);
+    copyBufferToImage(cmd, buffer->stagingBuffer, textureImage,
+        SourceFile->texWidth, SourceFile->texHeight);
 
     //在copy之后进行一次transition来准备让shader访问
     transitionImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB,
-        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
         
 
     VkHelperInstance->EndSingleTimeCommands(cmd);
@@ -283,12 +286,37 @@ Texture2D::Texture2D(const string& TextureName)
     textureImageView = VkHelperInstance->createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
 }
 
-Texture2D::~Texture2D()
+void Texture2D::cleanUp()
 {
     //销毁texture image view
-    vkDestroyImageView(GDevice, textureImageView, nullptr);
-        
+    if(textureImageView)
+    {
+        vkDestroyImageView(GDevice, textureImageView, nullptr);
+    }
     //销毁texture image和对应memory
-    vkDestroyImage(GDevice, textureImage, nullptr);
-    vkFreeMemory(GDevice, textureImageMemory, nullptr);
+    if(textureImage)
+    {
+        vkDestroyImage(GDevice, textureImage, nullptr);
+    }
+    if(textureImageMemory)
+    {
+        vkFreeMemory(GDevice, textureImageMemory, nullptr);
+    }
+}
+
+Texture2D::Texture2D(const string& TextureName)
+{
+    SetTexture_Internel(TextureName);
+}
+
+Texture2D::~Texture2D()
+{
+    cleanUp();
+}
+
+void Texture2D::SetTexture(const string& TextureName)
+{
+    cleanUp();
+    
+    SetTexture_Internel(TextureName);
 }

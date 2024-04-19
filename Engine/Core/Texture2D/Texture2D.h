@@ -3,6 +3,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "Header.h"
+#include "Engine/Core/ShaderModule/Shader.h"
 #include "ThirdParty/stb/stb_image.h"
 
 class TexutreFileSourceManager;
@@ -60,8 +61,16 @@ class Texture2D
     VkDeviceMemory textureImageMemory = nullptr;
 
     //Texture iamge对应的image view
-    VkImageView textureImageView;
+    VkImageView textureImageView = nullptr;
+
+    void SetTexture_Internel(const string& TextureName);
+    void cleanUp();
 public:
     Texture2D(const string& TextureName);
     ~Texture2D();
+
+    // TODO
+    ShaderTextureInput InputInfo;
+
+    void SetTexture(const string& TextureName);
 };
