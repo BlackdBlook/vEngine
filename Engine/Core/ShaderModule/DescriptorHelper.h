@@ -4,6 +4,7 @@
 
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
+class Texture2D;
 class UniformBuffer;
 
 class DescriptorHelper
@@ -19,7 +20,7 @@ public:
 
     void BindMemoryBuffer(std::vector<UniformBuffer> buffers);
 
-    void BindImageView(VkImageView textureImageView, VkSampler textureSampler);
+    void BindImageView(const Texture2D& texture, VkSampler textureSampler);
 
     const VkDescriptorSet* GetDescriptorSetsByCurrentFrameIndex();
     

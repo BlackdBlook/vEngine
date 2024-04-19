@@ -5,6 +5,7 @@
 
 #include "Header.h"
 #include "Engine/vEngine.h"
+#include "Engine/Core/Texture2D/Texture2D.h"
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
 DescriptorHelper::DescriptorHelper()
@@ -89,7 +90,7 @@ void DescriptorHelper::BindMemoryBuffer(std::vector<UniformBuffer> buffers)
     }
 }
 
-void DescriptorHelper::BindImageView(VkImageView textureImageView, VkSampler textureSampler)
+void DescriptorHelper::BindImageView(const Texture2D& texture, VkSampler textureSampler)
 {
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
     {
@@ -121,7 +122,7 @@ void DescriptorHelper::BindImageView(VkImageView textureImageView, VkSampler tex
         //在descriptor set中绑定实际的image和sampler资源到descriptors
         VkDescriptorImageInfo imageInfo{};
         imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-        imageInfo.imageView = textureImageView;
+        imageInfo.imageView = texture.textureImageView;
         imageInfo.sampler = textureSampler;
         
         {

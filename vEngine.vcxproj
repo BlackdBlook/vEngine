@@ -172,6 +172,7 @@
     <ClCompile Include="Engine\Core\Semaphore\Semaphore.cpp" />
     <ClCompile Include="Engine\Core\ShaderModule\DescriptorHelper.cpp" />
     <ClCompile Include="Engine\Core\ShaderModule\Shader.cpp" />
+    <ClCompile Include="Engine\Core\Texture2D\Texture2D.cpp" />
     <ClCompile Include="Engine\Core\UniformBuffer\UniformBuffer.cpp" />
     <ClCompile Include="Engine\SubSystem\AssetSystem\AssetSystem.cpp" />
     <ClCompile Include="Engine\Toolkit\Container\Queue.cpp" />
@@ -294,6 +295,7 @@
     <ClInclude Include="Engine\Core\Semaphore\Semaphore.h" />
     <ClInclude Include="Engine\Core\ShaderModule\DescriptorHelper.h" />
     <ClInclude Include="Engine\Core\ShaderModule\Shader.h" />
+    <ClInclude Include="Engine\Core\Texture2D\Texture2D.h" />
     <ClInclude Include="Engine\Core\UniformBuffer\UniformBuffer.h" />
     <ClInclude Include="Engine\SubSystem\AssetSystem\AssetSystem.h" />
     <ClInclude Include="Engine\Toolkit\Container\Queue.h" />

@@ -93,6 +93,8 @@ public:
     void WaitDeviceIdle();
     void cleanupSwapChain();
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    VkCommandBuffer BeginSingleTimeCommands();
+    void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
     VkImageView createImageView(VkImage image, VkFormat format);
 
     RenderInfo BeginRecordCommandBuffer();

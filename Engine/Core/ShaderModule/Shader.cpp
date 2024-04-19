@@ -275,32 +275,32 @@ void vShader::FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutBi
     for(auto& block :
         ShaderTextureInputs.Members)
     {
-        VkDescriptorSetLayoutBinding uboLayoutBinding = {};
+        VkDescriptorSetLayoutBinding ImageBinding = {};
 
         // 绑定点
-        uboLayoutBinding.binding = block.second.bind;
+        ImageBinding.binding = block.second.bind;
         // 类型
         switch (block.second.type)
         {
         case spirv_cross::SPIRType::Image:
-            uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+            ImageBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
             break;
         case spirv_cross::SPIRType::SampledImage:
-            uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            ImageBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
             break;
         case spirv_cross::SPIRType::Sampler:
-            uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+            ImageBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
             break;
         default:
             continue;
         }
         // 数组数量
-        uboLayoutBinding.descriptorCount = 1;
+        ImageBinding.descriptorCount = 1;
         // 作用阶段
-        uboLayoutBinding.stageFlags = GetVkShaderStageFlagBits();
+        ImageBinding.stageFlags = GetVkShaderStageFlagBits();
         // 纹理采样器
-        uboLayoutBinding.pImmutableSamplers = nullptr;
+        ImageBinding.pImmutableSamplers = nullptr;
         
-        out.emplace_back(uboLayoutBinding);
+        out.emplace_back(ImageBinding);
     }
 }
