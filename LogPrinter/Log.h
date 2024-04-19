@@ -43,9 +43,35 @@ public:
     }
 
     template<typename ... TS>
-    static void NameSpacePrinter(const char* FileName, int Line, TS ... args)
+    static void NameSpacePrinterLog(const char* FileName, int Line, TS ... args)
     {
-        std::cout << get_filename(FileName) << " Line:" << Line << ' ' << "\n\t" ;
+        std::cout << "\033[43m";
+        std::cout << FileName << " Line:" << Line ;
+        std::cout << ' ' << '\n';
+        std::cout << "\033[0m";
+        std::cout << '\t';
+        printer(args...);
+    }
+
+    template<typename ... TS>
+    static void NameSpacePrinterWaring(const char* FileName, int Line, TS ... args)
+    {
+        std::cout << "\033[44m";
+        std::cout << FileName << " Line:" << Line ;
+        std::cout << ' ' << '\n';
+        std::cout << "\033[0m";
+        std::cout << '\t';
+        printer(args...);
+    }
+
+    template<typename ... TS>
+    static void NameSpacePrinterError(const char* FileName, int Line, TS ... args)
+    {
+        std::cout << "\033[43m";
+        std::cout << FileName << " Line:" << Line ;
+        std::cout << ' ' << '\n';
+        std::cout << "\033[0m";
+        std::cout << '\t';
         printer(args...);
     }
     
@@ -60,4 +86,6 @@ public:
     static void print<bool>(bool arg);
 };
 
-#define LOG(...) Log::NameSpacePrinter(__FILE__, __LINE__, __VA_ARGS__)
+#define LOG(...) Log::NameSpacePrinterLog(get_filename(__FILE__), __LINE__, __VA_ARGS__)
+#define WARING(...) Log::NameSpacePrinterWaring(get_filename(__FILE__), __LINE__, __VA_ARGS__)
+#define ERR(...) Log::NameSpacePrinterError(get_filename(__FILE__), __LINE__, __VA_ARGS__)

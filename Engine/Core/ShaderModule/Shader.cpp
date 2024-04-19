@@ -21,6 +21,32 @@ VkShaderModule createShaderModule(const std::vector<uint8>& code) {
     return shaderModule;
 }
 
+std::string ShaderTextureInput::Log()
+{
+    string ans = "Texture Input " + name +
+        ",Set:" + std::to_string(set) +
+        ",Bind:" + std::to_string(bind) +
+        ",type:" + std::to_string(type) +
+        '\n';
+    return ans;
+}
+
+void ShaderTextureInputs::Log()
+{
+#ifdef _DEBUG
+    string log;
+    for(auto& b : Members)
+    {
+        log += b.second.Log();
+        log += '\n';
+    }
+    if(!log.empty())
+    {
+        LOG(log);
+    }
+#endif
+}
+
 ShaderUniformBufferBlocks ShaderDecoder::decodeUniformBuffer(std::vector<uint8>* binaryShader)
 {
     if(binaryShader->empty())
@@ -175,7 +201,10 @@ void ShaderUniformBufferBlocks::Log()
     {
         log += b.second.Log() + '\n';
     }
-    LOG(log);
+    if(!log.empty())
+    {
+        LOG(log);
+    }
 #endif
 }
 
@@ -230,6 +259,8 @@ vShader::vShader(const char* Name, ShaderType type, ShaderCodeType codeType): ty
     ShaderTextureInputs = ShaderDecoder::decodeTextures(&data);
 
     ShaderUniformBufferBlocks.Log();
+    
+    ShaderTextureInputs.Log();
 
     vkshadermodule = createShaderModule(data);
     

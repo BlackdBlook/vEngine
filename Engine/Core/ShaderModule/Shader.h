@@ -47,11 +47,14 @@ struct ShaderTextureInput
     uint32 bind;
     uint32 set;
     spirv_cross::SPIRType::BaseType type;
+
+    std::string Log();
 };
 
 struct ShaderTextureInputs
 {
     std::unordered_map<string, ShaderTextureInput> Members;
+    void Log();
 };
 
 class ShaderDecoder

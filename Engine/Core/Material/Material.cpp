@@ -22,7 +22,7 @@ Material::Material(const string& shaderName, ShaderCodeType codeType)
 
     std::vector<UniformBuffer> buffers = info->MakeUniformBuffers();
 
-    descriptor.BindMemoryBuffer(std::move(buffers));
+    descriptor.BindInputBuffer(std::move(buffers));
     
     pipeline.Init(info.get());
 }
@@ -36,7 +36,7 @@ Material::Material(const string& VertShaderName, const string& FragShaderName, S
 
     std::vector<UniformBuffer> buffers = info->MakeUniformBuffers();
 
-    descriptor.BindMemoryBuffer(std::move(buffers));
+    descriptor.BindInputBuffer(std::move(buffers));
     
     pipeline.Init(info.get());
 }
@@ -50,7 +50,7 @@ Material::Material(SPtr<MaterialRenderPipelineInfo> Info)
 
     std::vector<UniformBuffer> buffers = info->MakeUniformBuffers();
 
-    descriptor.BindMemoryBuffer(std::move(buffers));
+    descriptor.BindInputBuffer(std::move(buffers));
     
     pipeline.Init(info.get());
 }

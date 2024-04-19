@@ -34,8 +34,6 @@ inline SPtr<T> NewSPtr(Args&&... args)
 }
 
 #define MAT4(name) glm::mat4 name(1.0f)
-#define LOG(...) Log::NameSpacePrinter(__FILE__, __LINE__, __VA_ARGS__)
-#define LOG_ERROR(...) Error::NameSpacePrinter(__FILE__, __LINE__, __VA_ARGS__)
 #define VEC3_ZERO glm::vec3(0,0,0)
 
 

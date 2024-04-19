@@ -18,7 +18,7 @@ public:
     
     void createDescriptorSets(const VkDescriptorSetLayout& descriptorSetLayout);
 
-    void BindMemoryBuffer(std::vector<UniformBuffer> buffers);
+    void BindInputBuffer(std::vector<UniformBuffer> buffers);
 
     void BindImageView(const Texture2D& texture, VkSampler textureSampler);
 

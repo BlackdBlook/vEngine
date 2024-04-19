@@ -57,7 +57,7 @@ void DescriptorHelper::createDescriptorSets(
 
 }
 
-void DescriptorHelper::BindMemoryBuffer(std::vector<UniformBuffer> buffers)
+void DescriptorHelper::BindInputBuffer(std::vector<UniformBuffer> buffers)
 {
     this->buffers = std::move(buffers);
     for(auto& buffer : this->buffers)

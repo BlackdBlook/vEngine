@@ -54,14 +54,16 @@ struct Vertex
 
 class Material
 {
+    Material();
+    
 public:
     MaterialRenderPipeline pipeline;
 
     DescriptorHelper descriptor;
 
     SPtr<MaterialRenderPipelineInfo> info;
-    
-    Material();
+
+    std::unordered_map<string, SPtr<Texture2D>> Texture2Ds;
 
     Material(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
     
