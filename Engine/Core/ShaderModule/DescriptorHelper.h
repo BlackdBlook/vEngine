@@ -19,6 +19,8 @@ public:
 
     void BindMemoryBuffer(std::vector<UniformBuffer> buffers);
 
+    void BindImageView(VkImageView textureImageView, VkSampler textureSampler);
+
     const VkDescriptorSet* GetDescriptorSetsByCurrentFrameIndex();
     
     void cleanUp();

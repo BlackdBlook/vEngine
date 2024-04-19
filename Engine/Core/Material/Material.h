@@ -54,12 +54,12 @@ struct Vertex
 
 class Material
 {
+public:
     MaterialRenderPipeline pipeline;
 
     DescriptorHelper descriptor;
 
-    MaterialRenderPipelineInfo info;
-public:
+    SPtr<MaterialRenderPipelineInfo> info;
     
     Material();
 
@@ -67,7 +67,7 @@ public:
     
     Material(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
 
-    Material(MaterialRenderPipelineInfo& info);
+    Material(SPtr<MaterialRenderPipelineInfo> Info);
 
     ~Material();
 

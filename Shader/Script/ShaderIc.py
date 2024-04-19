@@ -6,8 +6,11 @@ import sys
 # 文件修改时间记录文件
 record_file = 'file_modification_times.json'
 
-shader_file_type={'.frag','.vert','.hlsl'}
+shader_file_type={'.frag','.vert','.hlsl','.glsl'}
 
+# 定义ANSI转义码
+RED = "\033[31m"
+RESET = "\033[0m"
 
 def is_shader_source_file(file_name : str):
     # 获取文件名和扩展名
@@ -51,6 +54,22 @@ def print_modified_files(old_times, new_times):
 import os
 import subprocess
 from hlsl_utils import *
+from glsl_utils import *
+
+def run_command(cmd : list):
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+    # 获取stdout和stderr
+    stdout, stderr = p.communicate()
+
+    # 如果有stdout，直接输出
+    if stdout:
+        print(stdout.decode())
+
+    # 如果有stderr，添加ANSI转义码后输出
+    if stderr:
+        print(cmd)
+        print(f"{RED}{stderr.decode('gbk')}{RESET}")
 
 def compile_shaders(path, shader_files):
     if not os.path.exists('ShaderCache'):
@@ -67,7 +86,6 @@ def compile_shaders(path, shader_files):
                 continue
             
             hlslc_path = os.path.join(sys.argv[1], 'hlslc.exe')
-            print(hlslc_path)
 
             # 调用dxc.exe编译shader
             # dxc.exe -spirv -T vs_6_1 -E main .\input.vert -Fo .\output.vert.spv -fspv-extension=SPV_EXT_descriptor_indexin
@@ -75,17 +93,20 @@ def compile_shaders(path, shader_files):
                 output_file_name = f'{base_name}.{hlsl_entry_Point[shader_type]}.spv'.lower()
                 output_file_path = os.path.join(path, 'ShaderCache', output_file_name)
                 print(output_file_path)
-                ret = subprocess.run([hlslc_path, '-spirv', '-T', hlsl_shader_config[shader_type], '-E', hlsl_entry_Point[shader_type], shader_file, '-Fo', output_file_path])
-                print(ret)
+                command = [hlslc_path, '-spirv', '-T', hlsl_shader_config[shader_type], '-E', hlsl_entry_Point[shader_type], shader_file, '-Fo', output_file_path]
+                run_command(command)
+                # print(ret)
 
 
         else:
             #glsl代码
-            # 设置输出文件名
-            output_file = os.path.join('ShaderCache', name + ext + '.spv').lower()
+            commands = gen_compile_command(shader_file)
 
             # 调用glslc.exe编译shader
-            subprocess.run(['./glslc.exe', shader_file, '-o', output_file])
+            for command in commands:
+                # subprocess.run(command)
+                run_command(command)
+                
 
 
 def main(path):

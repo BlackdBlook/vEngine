@@ -1,8 +1,8 @@
 #include "AssetSystem.h"
 #include <stack>
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"
-#include "Engine/Toolkit/stb_img/stb_img.h"
 #include "LogPrinter/Log.h"
+#include "ThirdParty/stb/stb_image.h"
 
 size_t CaseInsensitiveHash::operator()(const std::string& key) const
 {

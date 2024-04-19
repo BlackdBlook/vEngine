@@ -65,6 +65,16 @@ public:
     {
         return FrameCount;
     }
+
+    FORCEINLINE VkCommandPool GetCommandPool()
+    {
+        return vkHelper.commandPool;
+    }
+
+    FORCEINLINE VkQueue GetGraphicsQueue()
+    {
+        return vkHelper.graphicsQueue;
+    }
     
     static uint32 WindowX;
     static uint32 WindowY;
@@ -81,3 +91,5 @@ using Engine = vEngine;
 #define GlobalVkRenderPass vEngine::ins->GetVkRenderPass()
 #define GlobalVkPipeLineLayout vEngine::ins->GetVkPipeLineLayout()
 #define GFrameCount vEngine::ins->GetFrameCount()
+#define GCommandPool vEngine::ins->GetCommandPool()
+#define GGraphicsQueue vEngine::ins->GetGraphicsQueue()

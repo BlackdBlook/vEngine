@@ -9,6 +9,7 @@ class vShader;
 
 class MaterialRenderPipelineInfo
 {
+protected:
     mutable VkDescriptorSetLayout descriptorSetLayout = nullptr;
     mutable VkPipelineLayout pipelineLayout = nullptr;
 public:
@@ -16,6 +17,10 @@ public:
     SPtr<vShader> VertShader;
     SPtr<vShader> FragShader;
     MaterialRenderPipelineInfo();
+
+    MaterialRenderPipelineInfo(const MaterialRenderPipelineInfo& other) = delete;
+    
+    MaterialRenderPipelineInfo(MaterialRenderPipelineInfo&& other) = default;
     
     MaterialRenderPipelineInfo(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
     

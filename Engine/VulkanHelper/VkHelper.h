@@ -37,6 +37,8 @@ class VkHelper
 public:
     uint8 currentFrame = 0;
     VkDevice device;
+    //Texture image对应的sampler
+    VkSampler textureSampler;
     VkInstance Instance;
     GLFWwindow* window;
     VkDebugUtilsMessengerEXT debugMessenger;
@@ -63,6 +65,7 @@ private:
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
     void createSwapChain();
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+    void createTextureSampler();
     void createImageViews();
     void createLogicalDevice();
     void createWindowSurface();
@@ -90,6 +93,7 @@ public:
     void WaitDeviceIdle();
     void cleanupSwapChain();
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    VkImageView createImageView(VkImage image, VkFormat format);
 
     RenderInfo BeginRecordCommandBuffer();
     void EndRecordCommandBuffer(const RenderInfo& RenderInfo);

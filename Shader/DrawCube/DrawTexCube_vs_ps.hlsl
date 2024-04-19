@@ -13,12 +13,11 @@ struct UBO
 	float4x4 u_Projection;
 };
 
-cbuffer ubo : register(b0, space0) { UBO ubo; }
+[[vk::binding(0, 0)]]
+ConstantBuffer<UBO> ubo;
 
-// [[vk::binding(0, 0)]]
-// ConstantBuffer<UBO> ubo;
-
-// ConstantBuffer<UBO> ubo : register(b0, space0);
+Texture2D texture0 : register(t1, space0);
+SamplerState sampler0 : register(s2, space0);
 
 struct VSOutput    
 {
@@ -67,5 +66,8 @@ VSOutput VS(VSInput input)
 
 float4 PS(VSOutput input) : SV_TARGET
 {
-	return float4(input.Normal, 1.0);
+	volatile float4 tex = texture0.Sample(sampler0, input.TexCoords);
+    
+	// return float4(input.TexCoords, 0, 1);
+	return tex;
 }

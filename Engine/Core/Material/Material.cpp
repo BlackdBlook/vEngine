@@ -13,35 +13,46 @@ Material::Material()
     
 }
 
-Material::Material(const string& shaderName, ShaderCodeType codeType) : info{shaderName, codeType}
+Material::Material(const string& shaderName, ShaderCodeType codeType)
+: info(NewSPtr<MaterialRenderPipelineInfo>(shaderName, codeType))
 {
-    auto setLayout = info.MakeVkDescriptorSetLayout();
+    auto setLayout = info->MakeVkDescriptorSetLayout();
     
     descriptor.createDescriptorSets(setLayout);
 
-    std::vector<UniformBuffer> buffers = info.MakeUniformBuffers();
+    std::vector<UniformBuffer> buffers = info->MakeUniformBuffers();
 
     descriptor.BindMemoryBuffer(std::move(buffers));
-     
-    pipeline.Init(&info);
+    
+    pipeline.Init(info.get());
 }
 
-Material::Material(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType) : info{VertShaderName, FragShaderName, codeType}
+Material::Material(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType)
+: info(NewSPtr<MaterialRenderPipelineInfo>(VertShaderName, FragShaderName, codeType))
 {
-    auto setLayout = info.MakeVkDescriptorSetLayout();
+    auto setLayout = info->MakeVkDescriptorSetLayout();
     
     descriptor.createDescriptorSets(setLayout);
 
-    std::vector<UniformBuffer> buffers = info.MakeUniformBuffers();
+    std::vector<UniformBuffer> buffers = info->MakeUniformBuffers();
 
     descriptor.BindMemoryBuffer(std::move(buffers));
     
-    pipeline.Init(&info);
+    pipeline.Init(info.get());
 }
 
-Material::Material(MaterialRenderPipelineInfo& info)
+Material::Material(SPtr<MaterialRenderPipelineInfo> Info)
+    :info(std::move(Info))
 {
-    pipeline.Init(&info);
+    auto setLayout = info->MakeVkDescriptorSetLayout();
+    
+    descriptor.createDescriptorSets(setLayout);
+
+    std::vector<UniformBuffer> buffers = info->MakeUniformBuffers();
+
+    descriptor.BindMemoryBuffer(std::move(buffers));
+    
+    pipeline.Init(info.get());
 }
 
 Material::~Material()
@@ -88,13 +99,13 @@ void Material::SetAllUniformData(const string& BlockName, uint8* Src, size_t Siz
 void Material::SetCurrentUniformData(const string& BlockName, const string& MemberName, uint8* Src, size_t Size)
 {
     SetCurrentUniformData(BlockName, Src, Size,
-        info.VertShader->ShaderUniformBufferBlocks.UniformBlocks[BlockName].Members[MemberName].Offset);
+        info->VertShader->ShaderUniformBufferBlocks.UniformBlocks[BlockName].Members[MemberName].Offset);
 }
 
 void Material::SetAllUniformData(const string& BlockName, const string& MemberName, uint8* Src, size_t Size)
 {
     SetAllUniformData(BlockName, Src, Size,
-        info.VertShader->ShaderUniformBufferBlocks.UniformBlocks[BlockName].Members[MemberName].Offset);
+        info->VertShader->ShaderUniformBufferBlocks.UniformBlocks[BlockName].Members[MemberName].Offset);
 }
 
 void Material::Draw(const RenderInfo& RenderInfo)
@@ -103,7 +114,7 @@ void Material::Draw(const RenderInfo& RenderInfo)
 
     vkCmdBindDescriptorSets(
         RenderInfo.CommmandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
-        info.PipelineLayout(), 0, 1,
+        info->PipelineLayout(), 0, 1,
         descriptor.GetDescriptorSetsByCurrentFrameIndex(),
         0, nullptr);
 }

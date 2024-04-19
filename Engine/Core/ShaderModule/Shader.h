@@ -3,6 +3,7 @@
 #include <vector>
 #include <vulkan/vulkan_core.h>
 #include "Header.h"
+#include "ThirdParty/SPIRV-Cross/spirv_common.hpp"
 
 enum class ShaderType
 {
@@ -40,10 +41,24 @@ struct ShaderUniformBufferBlocks
     void Log();
 };
 
+struct ShaderTextureInput
+{
+    string name;
+    uint32 bind;
+    uint32 set;
+    spirv_cross::SPIRType::BaseType type;
+};
+
+struct ShaderTextureInputs
+{
+    std::unordered_map<string, ShaderTextureInput> Members;
+};
+
 class ShaderDecoder
 {
 public:
     static ShaderUniformBufferBlocks decodeUniformBuffer(std::vector<uint8>* binaryShader);
+    static ShaderTextureInputs decodeTextures(std::vector<uint8>* binaryShader);
 };
 
 
@@ -57,6 +72,8 @@ class vShader
     
 public:
     ShaderUniformBufferBlocks ShaderUniformBufferBlocks;
+
+    ShaderTextureInputs ShaderTextureInputs;
     
     VkShaderModule GetShaderModule()
     {

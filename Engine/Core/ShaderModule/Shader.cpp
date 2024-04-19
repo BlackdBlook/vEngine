@@ -83,6 +83,72 @@ ShaderUniformBufferBlocks ShaderDecoder::decodeUniformBuffer(std::vector<uint8>*
     return ans;
 }
 
+ShaderTextureInputs ShaderDecoder::decodeTextures(std::vector<uint8>* binaryShader)
+{
+    ShaderTextureInputs ret;
+
+    if(binaryShader->empty())
+    {
+        throw std::runtime_error("binaryShader is empty");
+    }
+    
+    std::vector<uint32_t>& temp = reinterpret_cast<std::vector<uint32_t>&>(*binaryShader);
+    spirv_cross::Compiler compiler(temp);
+
+    auto getResource = [&ret, &compiler](
+        const spirv_cross::Resource& resource,
+        spirv_cross::SPIRType::BaseType type)
+    {
+        // 打印资源名称
+        uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
+        uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
+
+        ShaderTextureInput input;
+        input.name = resource.name;
+        input.bind = binding;
+        input.set = set;
+        input.type = type;
+
+        ret.Members.insert({resource.name, input});
+    };
+
+    // 获取反射数据
+    spirv_cross::ShaderResources resources = compiler.get_shader_resources();
+
+    // 遍历所有的Image变量
+    for (auto& resource : resources.separate_samplers)
+    {
+        const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+
+        if(type.basetype == spirv_cross::SPIRType::Sampler)
+        {
+            getResource(resource, type.basetype);
+        }
+    }
+    
+    for (auto& resource : resources.separate_images)
+    {
+        const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+        if (type.basetype == spirv_cross::SPIRType::SampledImage ||
+            type.basetype == spirv_cross::SPIRType::Image)
+        {
+            getResource(resource, type.basetype);
+        }
+    }
+
+    for (auto& resource : resources.sampled_images)
+    {
+        const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+        if (type.basetype == spirv_cross::SPIRType::SampledImage ||
+            type.basetype == spirv_cross::SPIRType::Image)
+        {
+            getResource(resource, type.basetype);
+        }
+    }
+    
+    return ret;
+}
+
 std::string ShaderUniformMember::Log()
 {
     return "Name:" + Name + " ,Size:" + std::to_string(Size) + " ,Offset:" + std::to_string(Offset);
@@ -161,6 +227,8 @@ vShader::vShader(const char* Name, ShaderType type, ShaderCodeType codeType): ty
 
     ShaderUniformBufferBlocks = ShaderDecoder::decodeUniformBuffer(&data);
 
+    ShaderTextureInputs = ShaderDecoder::decodeTextures(&data);
+
     ShaderUniformBufferBlocks.Log();
 
     vkshadermodule = createShaderModule(data);
@@ -194,6 +262,38 @@ void vShader::FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutBi
         uboLayoutBinding.binding = block.second.Bind;
         // 类型
         uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        // 数组数量
+        uboLayoutBinding.descriptorCount = 1;
+        // 作用阶段
+        uboLayoutBinding.stageFlags = GetVkShaderStageFlagBits();
+        // 纹理采样器
+        uboLayoutBinding.pImmutableSamplers = nullptr;
+        
+        out.emplace_back(uboLayoutBinding);
+    }
+
+    for(auto& block :
+        ShaderTextureInputs.Members)
+    {
+        VkDescriptorSetLayoutBinding uboLayoutBinding = {};
+
+        // 绑定点
+        uboLayoutBinding.binding = block.second.bind;
+        // 类型
+        switch (block.second.type)
+        {
+        case spirv_cross::SPIRType::Image:
+            uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+            break;
+        case spirv_cross::SPIRType::SampledImage:
+            uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+            break;
+        case spirv_cross::SPIRType::Sampler:
+            uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
+            break;
+        default:
+            continue;
+        }
         // 数组数量
         uboLayoutBinding.descriptorCount = 1;
         // 作用阶段
