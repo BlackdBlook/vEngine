@@ -22,6 +22,10 @@ struct ShaderUniformMember
     string Name;
     size_t Size;
     size_t Offset;
+
+    bool operator==(const ShaderUniformMember& other);
+    bool operator!=(const ShaderUniformMember& other);
+    
     std::string Log();
 };
 
@@ -32,6 +36,9 @@ struct ShaderUniformBufferBlock
     uint32 Set;
     uint32 Bind;
     std::unordered_map<std::string, ShaderUniformMember> Members;
+
+    bool operator==(const ShaderUniformBufferBlock& other);
+    bool operator!=(const ShaderUniformBufferBlock& other);
     std::string Log();
 };
 
@@ -62,8 +69,10 @@ struct ShaderTextureInputs
 class ShaderDecoder
 {
 public:
-    static ShaderUniformBufferBlocks decodeUniformBuffer(std::vector<uint8>* binaryShader);
-    static ShaderTextureInputs decodeTextures(std::vector<uint8>* binaryShader);
+    static void ProcessShaderMemberName(string& name);
+    
+    static ShaderUniformBufferBlocks DecodeUniformBuffer(std::vector<uint8>* binaryShader);
+    static ShaderTextureInputs DecodeTextures(std::vector<uint8>* binaryShader);
 };
 
 

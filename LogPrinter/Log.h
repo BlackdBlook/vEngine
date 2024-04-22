@@ -5,10 +5,16 @@
 #include <glm/fwd.hpp>
 
 
+namespace Container
+{
+    class Name;
+}
+
 std::ostream &operator<<(std::ostream &output, const glm::vec2 &D );
 std::ostream &operator<<(std::ostream &output, const glm::vec3 &D );
 std::ostream &operator<<(std::ostream &output, const glm::vec4 &D );
 std::ostream &operator<<(std::ostream &output, const glm::mat4 &D );
+std::ostream &operator<<(std::ostream &output, const Container::Name &D );
 std::ostream &operator<<(std::ostream &output, const std::chrono::microseconds &D );
 std::ostream &operator<<(std::ostream &output, const glm::quat &D );
 std::ostream &operator<<(std::ostream &output, const std::vector<std::string> &D );
@@ -87,5 +93,5 @@ public:
 };
 
 #define LOG(...) Log::NameSpacePrinterLog(get_filename(__FILE__), __LINE__, __VA_ARGS__)
-#define WARING(...) Log::NameSpacePrinterWaring(get_filename(__FILE__), __LINE__, __VA_ARGS__)
+#define WARNING(...) Log::NameSpacePrinterWaring(get_filename(__FILE__), __LINE__, __VA_ARGS__)
 #define ERR(...) Log::NameSpacePrinterError(get_filename(__FILE__), __LINE__, __VA_ARGS__)

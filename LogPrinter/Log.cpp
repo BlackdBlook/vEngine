@@ -1,6 +1,9 @@
 #include "Log.h"
 
 #include <glm/glm.hpp>
+
+#include "Engine/Core/Container/Name.h"
+
 std::ostream& operator<<(std::ostream& output, const glm::vec2& D)
 {
     output << "X=" << D.x << " Y=" << D.y;
@@ -22,6 +25,12 @@ std::ostream& operator<<(std::ostream& output, const glm::vec4& D)
 std::ostream& operator<<(std::ostream& output, const glm::mat4& D)
 {
     output << '\n' << D[0] << '\n' << D[1] << '\n' << D[2] << '\n' << D[3] << '\n';
+    return output;
+}
+
+std::ostream& operator<<(std::ostream& output, const Container::Name& D)
+{
+    output << D.ToString() << '\n';
     return output;
 }
 

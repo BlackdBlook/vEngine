@@ -119,7 +119,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(ProjectDir)\ThirdParty\VulkanSdk\Lib;$(ProjectDir)\ThirdParty\lib-glfw\Debug</AdditionalLibraryDirectories>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -158,6 +157,7 @@
     <ClCompile Include="Engine\Core\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.cpp" />
     <ClCompile Include="Engine\Core\Component\Component.cpp" />
+    <ClCompile Include="Engine\Core\Container\Name.cpp" />
     <ClCompile Include="Engine\Core\Fence\Fence.cpp" />
     <ClCompile Include="Engine\Core\FrameInfo\RenderInfo.cpp" />
     <ClCompile Include="Engine\Core\GlobalUniformBuffer\GlobalUniformBufferManager.cpp" />
@@ -281,6 +281,7 @@
     <ClInclude Include="Engine\Core\Camera\Camera.h" />
     <ClInclude Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.h" />
     <ClInclude Include="Engine\Core\Component\Component.h" />
+    <ClInclude Include="Engine\Core\Container\Name.h" />
     <ClInclude Include="Engine\Core\Fence\Fence.h" />
     <ClInclude Include="Engine\Core\FrameInfo\RenderInfo.h" />
     <ClInclude Include="Engine\Core\GlobalUniformBuffer\GlobalUniformBufferManager.h" />
@@ -310,6 +311,7 @@
     <ClInclude Include="Level\Cube\DrawTexCube.h" />
     <ClInclude Include="LogPrinter\Log.h" />
     <ClInclude Include="Meshs\Box\BoxVertices.h" />
+    <ClInclude Include="Shader\GlobalUniformBuffer.hlsli" />
     <ClInclude Include="ThirdParty\SPIRV-Cross\GLSL.std.450.h" />
     <ClInclude Include="ThirdParty\SPIRV-Cross\spirv.h" />
     <ClInclude Include="ThirdParty\SPIRV-Cross\spirv.hpp" />

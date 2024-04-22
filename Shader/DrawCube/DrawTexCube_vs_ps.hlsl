@@ -1,4 +1,6 @@
 
+#include "../GlobalUniformBuffer.hlsli"
+
 struct VSInput
 {
 [[vk::location(0)]] float3 pos : POSITION0;
@@ -6,18 +8,16 @@ struct VSInput
 [[vk::location(2)]] float2 texCoord : TEXCOORD;
 };
 
-struct UBO
+struct ModelBuffer
 {
 	float4x4 model;
-	float4x4 u_View;
-	float4x4 u_Projection;
 };
 
-[[vk::binding(0, 0)]]
-ConstantBuffer<UBO> ubo;
+[[vk::binding(1, 0)]]
+ConstantBuffer<ModelBuffer> model;
 
-Texture2D texture0 : register(t1, space0);
-SamplerState sampler0 : register(s2, space0);
+Texture2D texture0 : register(t2, space0);
+SamplerState sampler0 : register(s3, space0);
 
 struct VSOutput    
 {
@@ -48,17 +48,17 @@ float4x4 inverse(float4x4 m)
 VSOutput VS(VSInput input)
 {
     VSOutput output;
-    output.FragPos = mul(ubo.model, float4(input.pos , 1.0));
+    output.FragPos = mul(model.model, float4(input.pos , 1.0));
 	
-    float4x4 modelInverseTranspose = transpose(inverse(ubo.model));
+    float4x4 modelInverseTranspose = transpose(inverse(model.model));
     float3 transformedNormal = mul(modelInverseTranspose, float4(input.normal, 0.0)).xyz;
     output.Normal = transformedNormal;
 	
     output.TexCoords = input.texCoord;
 	
     float4 pos = output.FragPos;
-    pos = mul(ubo.u_View, pos);
-    pos = mul(ubo.u_Projection, pos);
+    pos = mul(GlobalUniformBuffer.u_View, pos);
+    pos = mul(GlobalUniformBuffer.u_Projection, pos);
     output.Position = pos;
 
     return output;

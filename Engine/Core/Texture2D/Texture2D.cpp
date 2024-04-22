@@ -286,43 +286,9 @@ void Texture2D::SetTexture_Internel(const string& TextureName)
     textureImageView = VkHelperInstance->createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB);
 }
 
-void Texture2D::cleanUp()
+void Texture2D::cleanUp(VkImageView tempTextureImageView, VkImage tempTextureImage,
+    VkDeviceMemory tempTextureImageMemory)
 {
-    //销毁texture image view
-    if(textureImageView)
-    {
-        vkDestroyImageView(GDevice, textureImageView, nullptr);
-    }
-    //销毁texture image和对应memory
-    if(textureImage)
-    {
-        vkDestroyImage(GDevice, textureImage, nullptr);
-    }
-    if(textureImageMemory)
-    {
-        vkFreeMemory(GDevice, textureImageMemory, nullptr);
-    }
-}
-
-Texture2D::Texture2D(const string& TextureName)
-{
-    SetTexture_Internel(TextureName);
-}
-
-Texture2D::~Texture2D()
-{
-    cleanUp();
-}
-
-void Texture2D::SetTexture(const string& TextureName)
-{
-    auto tempTextureImageView = textureImageView;
-    auto tempTextureImage = textureImage;
-    auto tempTextureImageMemory = textureImageMemory;
-    
-    
-    SetTexture_Internel(TextureName);
-
     //销毁texture image view
     if(tempTextureImageView)
     {
@@ -337,4 +303,26 @@ void Texture2D::SetTexture(const string& TextureName)
     {
         vkFreeMemory(GDevice, tempTextureImageMemory, nullptr);
     }
+}
+
+Texture2D::Texture2D(const string& TextureName)
+{
+    SetTexture_Internel(TextureName);
+}
+
+Texture2D::~Texture2D()
+{
+    cleanUp(textureImageView, textureImage, textureImageMemory);
+}
+
+void Texture2D::SetTexture(const string& TextureName)
+{
+    auto tempTextureImageView = textureImageView;
+    auto tempTextureImage = textureImage;
+    auto tempTextureImageMemory = textureImageMemory;
+    
+    
+    SetTexture_Internel(TextureName);
+
+    cleanUp(tempTextureImageView, tempTextureImage, tempTextureImageMemory);
 }

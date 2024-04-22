@@ -53,9 +53,9 @@ Cube::Cube() : material("DrawCube", ShaderCodeType::HLSL), buffer(sizeof(BoxVert
 
     ubo.proj = glm::perspective(glm::radians(90.0f), Engine::ins->WindowX / (float)Engine::ins->WindowY, 1.f, 10.0f);
 
-    material.SetAllUniformData("type.ubo", "model", MAT4());
-    material.SetAllUniformData("type.ubo", "u_View", ubo.view);
-    material.SetAllUniformData("type.ubo", "u_Projection", ubo.proj);
+    material.SetAllUniformData("ubo", "model", MAT4());
+    material.SetAllUniformData("ubo", "u_View", ubo.view);
+    material.SetAllUniformData("ubo", "u_Projection", ubo.proj);
 }
 
 Cube::~Cube()
@@ -87,7 +87,7 @@ void Cube::Update(float DeltaTime)
     
     // material.SetCurrentUniformData(0, (uint8*)&ubo, sizeof(ubo));
     // material.SetCurrentUniformData("type.ubo", (uint8*)&ubo, sizeof(ubo));
-    material.SetCurrentUniformData("type.ubo", "model", m);
+    material.SetCurrentUniformData("ubo", "model", m);
 
 }
 

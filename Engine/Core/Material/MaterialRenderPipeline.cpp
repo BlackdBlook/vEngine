@@ -7,6 +7,7 @@
 #include "Engine/Core/ShaderModule/Shader.h"
 #include "LogPrinter/Log.h"
 #include "../Texture2D/Texture2D.h"
+#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 
 MaterialRenderPipelineInfo::MaterialRenderPipelineInfo()
 {
@@ -201,23 +202,48 @@ VkDescriptorSetLayout MaterialRenderPipelineInfo::MakeVkDescriptorSetLayout() co
     return descriptorSetLayout;
 }
 
-std::vector<UniformBuffer> MaterialRenderPipelineInfo::MakeUniformBuffers() const
+std::vector<SPtr<UniformBuffer>> MaterialRenderPipelineInfo::MakeUniformBuffers() const
 {
-    std::vector<UniformBuffer> out;
+    std::vector<SPtr<UniformBuffer>> out;
+
+    static const Container::Name GlobalUniformBuffer {"GlobalUniformBuffer"};
 
     for(auto& blocks :
         VertShader->ShaderUniformBufferBlocks.UniformBlocks)
     {
-        UniformBuffer& buffer = out.emplace_back();
-        buffer.Init(blocks.second.Size, blocks.first, blocks.second.Bind);
+        if(GlobalUniformBuffer == blocks.first)
+        {
+            auto buffer =
+                GlobalUniformBufferManager::Get()->GetBuffer(blocks.second.Size, &blocks.second);
+            
+            out.push_back(buffer);
+            continue;
+        }
+        SPtr<UniformBuffer> buffer = NewSPtr<UniformBuffer>();
+        buffer->BlockName = blocks.first;
+        buffer->Init(blocks.second.Size, blocks.first, blocks.second.Bind);
+        buffer->UniformBlockCache = blocks.second;
+        
+        out.emplace_back(std::move(buffer));
     }
 
     for(auto& blocks :
         FragShader->ShaderUniformBufferBlocks.UniformBlocks)
     {
-        UniformBuffer& buffer = out.emplace_back();
-        buffer.BlockName = blocks.first;
-        buffer.Init(blocks.second.Size, blocks.first, blocks.second.Bind);
+        if(GlobalUniformBuffer == blocks.first)
+        {
+            auto buffer =
+                GlobalUniformBufferManager::Get()->GetBuffer(blocks.second.Size, &blocks.second);
+            
+            out.push_back(buffer);
+            continue;
+        }
+        SPtr<UniformBuffer> buffer = NewSPtr<UniformBuffer>();
+        buffer->BlockName = blocks.first;
+        buffer->Init(blocks.second.Size, blocks.first, blocks.second.Bind);
+        buffer->UniformBlockCache = blocks.second;
+        
+        out.emplace_back(std::move(buffer));
     }
     
     return out;

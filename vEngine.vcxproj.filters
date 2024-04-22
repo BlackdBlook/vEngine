@@ -27,9 +27,6 @@
     <ClCompile Include="Engine\Toolkit\Container\Queue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Toolkit\stb_img\stb_img.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\VulkanHelper\VkHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -138,6 +135,18 @@
     <ClCompile Include="Engine\Core\Material\MaterialRenderPipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Core\Container\Name.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Texture2D\Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Cube\DrawTexCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\stb\stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\vEngine.h">
@@ -147,9 +156,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Toolkit\Container\Queue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Toolkit\stb_img\stb_img.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\TypeDef.h">
@@ -284,8 +290,21 @@
     <ClInclude Include="Engine\Core\Material\MaterialRenderPipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\Core\Container\Name.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Texture2D\Texture2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\Cube\DrawTexCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\stb\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\DrawCube\DrawCube_vs_ps.hlsl" />
+    <None Include="Shader\DrawCube\DrawTexCube_vs_ps.hlsl" />
   </ItemGroup>
 </Project>

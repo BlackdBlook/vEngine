@@ -22,9 +22,7 @@ void Material::Init()
     
     descriptor.createDescriptorSets(setLayout);
 
-    std::vector<UniformBuffer> buffers = info->MakeUniformBuffers();
-
-    descriptor.buffers = std::move(buffers);
+    descriptor.buffers = info->MakeUniformBuffers();
 
     descriptor.BindInputBuffer();
     
@@ -68,24 +66,24 @@ void Material::SetTexture(const string& TargetName, const string& NewTextureName
 
 void Material::SetCurrentUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset)
 {
-    descriptor.buffers[index].UpdateCurrentBuffer(Src, Size, Offset);
+    descriptor.buffers[index]->UpdateCurrentBuffer(Src, Size, Offset);
 }
 
 void Material::SetAllUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset)
 {
-    descriptor.buffers[index].UpdateAllBuffer(Src, Size, Offset);
+    descriptor.buffers[index]->UpdateAllBuffer(Src, Size, Offset);
 }
 
 void Material::SetCurrentUniformData(const string& BlockName, uint8* Src, size_t Size, size_t Offset)
 {
     for (auto& block : descriptor.buffers)
     {
-        if(block.BlockName != BlockName)
+        if(block->BlockName != BlockName)
         {
             continue;
         }
 
-        block.UpdateCurrentBuffer(Src, Size, Offset);
+        block->UpdateCurrentBuffer(Src, Size, Offset);
     }
 }
 
@@ -93,12 +91,12 @@ void Material::SetAllUniformData(const string& BlockName, uint8* Src, size_t Siz
 {
     for (auto& block : descriptor.buffers)
     {
-        if(block.BlockName != BlockName)
+        if(block->BlockName != BlockName)
         {
             continue;
         }
 
-        block.UpdateAllBuffer(Src, Size, Offset);
+        block->UpdateAllBuffer(Src, Size, Offset);
     }
 }
 

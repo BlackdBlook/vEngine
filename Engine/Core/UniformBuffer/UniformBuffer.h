@@ -5,7 +5,9 @@
 
 #include "Header.h"
 #include "Engine/TypeDef.h"
+#include "Engine/Core/Container/Name.h"
 #include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
+#include "Engine/Core/ShaderModule/Shader.h"
 
 class UniformBuffer
 {
@@ -13,21 +15,24 @@ class UniformBuffer
 public:
     UniformBuffer();
     UniformBuffer(const UniformBuffer& other) = delete;
-    UniformBuffer(UniformBuffer&& other) = default;
-    ~UniformBuffer();
-    void Init(size_t size, string Name, uint32 bind);
-
-    void UpdateCurrentBuffer(void* data, size_t size, size_t offset = 0);
+    UniformBuffer(UniformBuffer&& other) noexcept;
+    virtual ~UniformBuffer();
     
-    void UpdateAllBuffer(void* data, size_t size, size_t offset = 0);
+    virtual void Init(size_t size, string Name, uint32 bind);
+
+    void UpdateCurrentBuffer(const void* data, size_t size, size_t offset = 0);
+    
+    void UpdateAllBuffer(const void* data, size_t size, size_t offset = 0);
 
     VkDeviceSize GetBufferSize() const {return BufferSize;}
 
     const VkBuffer* GetUniformBuffer(size_t index) const {return &uniformBuffers[index];}
 
-    string BlockName;
+    Container::Name BlockName;
 
     uint32 Bind = 0;
+
+    ShaderUniformBufferBlock UniformBlockCache;
 
 private:
     VkDeviceSize BufferSize = 0;

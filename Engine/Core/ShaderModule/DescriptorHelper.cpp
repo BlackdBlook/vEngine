@@ -69,17 +69,15 @@ void DescriptorHelper::BindInputBuffer()
         {
             //为每个descriptor set配置其中的descriptor，每个descriptor引用一个uniform buffer
             VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
-            bufferInfo.buffer = *buffer.GetUniformBuffer(i);
+            bufferInfo.buffer = *buffer->GetUniformBuffer(i);
             bufferInfo.offset = 0;
-            bufferInfo.range = buffer.GetBufferSize();
-
+            bufferInfo.range = buffer->GetBufferSize();
             
-
             //更新descriptor set
             VkWriteDescriptorSet& descriptorWrite = descriptorWrites[bufferCount++];
             descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrite.dstSet = descriptorSets[i];
-            descriptorWrite.dstBinding = buffer.Bind;
+            descriptorWrite.dstBinding = buffer->Bind;
             descriptorWrite.dstArrayElement = 0;
             descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptorWrite.descriptorCount = 1;

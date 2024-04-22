@@ -43,7 +43,7 @@ public:
     virtual VkPipeline PipelineBasePipelineHandle()const;
 
     virtual VkDescriptorSetLayout MakeVkDescriptorSetLayout() const;
-    virtual std::vector<UniformBuffer> MakeUniformBuffers() const;
+    virtual std::vector<SPtr<UniformBuffer>> MakeUniformBuffers() const;
     virtual void MakeInputTextures(std::unordered_map<string, SPtr<Texture2D>>& out) const;
 };
 

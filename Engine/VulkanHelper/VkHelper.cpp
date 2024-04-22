@@ -11,6 +11,7 @@
 #include "Header.h"
 #include "Engine/TypeDef.h"
 #include "Engine/vEngine.h"
+#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "LogPrinter/Log.h"
 
 extern VkHelper* VkHelperInstance = nullptr;
@@ -866,6 +867,8 @@ void VkHelper::CleanVk()
 
     //销毁sampler
     vkDestroySampler(device, textureSampler, nullptr);
+
+    GlobalUniformBufferManager::Get()->cleanUp();
 
     for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
     {

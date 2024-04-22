@@ -64,7 +64,18 @@ void ShaderTextureInputs::Log()
 #endif
 }
 
-ShaderUniformBufferBlocks ShaderDecoder::decodeUniformBuffer(std::vector<uint8>* binaryShader)
+void ShaderDecoder::ProcessShaderMemberName(string& name)
+{
+    size_t pos = name.find_last_of('.');
+    if (pos == std::string::npos) {
+        // '.' not found, return the original string
+        return;
+    }
+    // Return the substring from the position after '.'
+    name.erase(0, pos + 1);
+}
+
+ShaderUniformBufferBlocks ShaderDecoder::DecodeUniformBuffer(std::vector<uint8>* binaryShader)
 {
     if(binaryShader->empty())
     {
@@ -94,6 +105,7 @@ ShaderUniformBufferBlocks ShaderDecoder::decodeUniformBuffer(std::vector<uint8>*
                 {
                     ShaderUniformMember member;
                     member.Name = compiler.get_member_name(memberType.self, static_cast<uint32_t>(j));
+                    ProcessShaderMemberName(member.Name);
                     member.Size = compiler.get_declared_struct_member_size(memberType, static_cast<uint32_t>(j));
                     member.Offset = compiler.type_struct_member_offset(memberType, static_cast<uint32_t>(j));
                     block.Members.insert({member.Name, std::move(member)});
@@ -103,6 +115,7 @@ ShaderUniformBufferBlocks ShaderDecoder::decodeUniformBuffer(std::vector<uint8>*
             {
                 ShaderUniformMember member;
                 member.Name = compiler.get_member_name(type.self, static_cast<uint32_t>(i));
+                ProcessShaderMemberName(member.Name);
                 member.Size = compiler.get_declared_struct_member_size(type, static_cast<uint32_t>(i));
                 member.Offset = compiler.type_struct_member_offset(type, static_cast<uint32_t>(i));
             
@@ -116,17 +129,20 @@ ShaderUniformBufferBlocks ShaderDecoder::decodeUniformBuffer(std::vector<uint8>*
         uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 
         block.Name = resource.name;
+        ProcessShaderMemberName(block.Name);
         block.Size = compiler.get_declared_struct_size(type);
         block.Bind = binding;
         block.Set = set;
+        string resourceName = resource.name;
+        ProcessShaderMemberName(resourceName);
         
-        ans.UniformBlocks.insert({resource.name, block});
+        ans.UniformBlocks.insert({resourceName, block});
     }
 
     return ans;
 }
 
-ShaderTextureInputs ShaderDecoder::decodeTextures(std::vector<uint8>* binaryShader)
+ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShader)
 {
     ShaderTextureInputs ret;
 
@@ -148,11 +164,13 @@ ShaderTextureInputs ShaderDecoder::decodeTextures(std::vector<uint8>* binaryShad
 
         ShaderTextureInput input;
         input.name = resource.name;
+        ProcessShaderMemberName(input.name);
         input.bind = binding;
         input.set = set;
         input.type = type;
-
-        ret.Members.insert({resource.name, input});
+        string resourceName = resource.name;
+        ProcessShaderMemberName(resourceName);
+        ret.Members.insert({resourceName, input});
     };
 
     // 获取反射数据
@@ -192,9 +210,29 @@ ShaderTextureInputs ShaderDecoder::decodeTextures(std::vector<uint8>* binaryShad
     return ret;
 }
 
+bool ShaderUniformMember::operator==(const ShaderUniformMember& other)
+{
+    return Name == other.Name && Size == other.Size && Offset == other.Offset;
+}
+
+bool ShaderUniformMember::operator!=(const ShaderUniformMember& other)
+{
+    return !(*this == other);
+}
+
 std::string ShaderUniformMember::Log()
 {
     return "Name:" + Name + " ,Size:" + std::to_string(Size) + " ,Offset:" + std::to_string(Offset);
+}
+
+bool ShaderUniformBufferBlock::operator==(const ShaderUniformBufferBlock& other)
+{
+    return Name == other.Name && Size == other.Size && Set == other.Set && Bind == other.Bind;
+}
+
+bool ShaderUniformBufferBlock::operator!=(const ShaderUniformBufferBlock& other)
+{
+    return !(*this == other);
 }
 
 std::string ShaderUniformBufferBlock::Log()
@@ -271,9 +309,9 @@ vShader::vShader(const char* Name, ShaderType type, ShaderCodeType codeType): ty
 
     auto data = FileToolKit::ReadFileAsBinary(Path);
 
-    ShaderUniformBufferBlocks = ShaderDecoder::decodeUniformBuffer(&data);
+    ShaderUniformBufferBlocks = ShaderDecoder::DecodeUniformBuffer(&data);
 
-    ShaderTextureInputs = ShaderDecoder::decodeTextures(&data);
+    ShaderTextureInputs = ShaderDecoder::DecodeTextures(&data);
 
     ShaderUniformBufferBlocks.Log();
     

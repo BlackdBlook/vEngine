@@ -10,6 +10,21 @@ UniformBuffer::UniformBuffer()
     
 }
 
+UniformBuffer::UniformBuffer(UniformBuffer&& other) noexcept
+{
+    BlockName = other.BlockName;
+    Bind = other.Bind;
+    BufferSize = other.BufferSize;
+    uniformBuffers = std::move(other.uniformBuffers);
+    uniformBuffersMemory = std::move(other.uniformBuffersMemory);
+    uniformBuffersMapped = std::move(other.uniformBuffersMapped);
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
+    {
+        pData[i] = other.pData[i];
+        other.pData[i] = nullptr;
+    }
+}
+
 UniformBuffer::~UniformBuffer()
 {
     //销毁Uniform buffer和对应Memory
@@ -63,7 +78,7 @@ void UniformBuffer::Init(size_t size, string Name, uint32 bind)
     }
 }
 
-void UniformBuffer::UpdateCurrentBuffer(void* data, size_t size, size_t offset)
+void UniformBuffer::UpdateCurrentBuffer(const void* data, size_t size, size_t offset)
 {
     assert(pData);
 
@@ -74,7 +89,7 @@ void UniformBuffer::UpdateCurrentBuffer(void* data, size_t size, size_t offset)
     memcpy(dist + offset, data, size);
 }
 
-void UniformBuffer::UpdateAllBuffer(void* data, size_t size, size_t offset)
+void UniformBuffer::UpdateAllBuffer(const void* data, size_t size, size_t offset)
 {
     assert(pData);
 

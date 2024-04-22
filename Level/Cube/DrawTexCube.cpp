@@ -4,6 +4,7 @@
 
 #include "Engine/vEngine.h"
 #include "Engine/Core/Component/Component.h"
+#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/Core/Material/Material.h"
 #include "Engine/Core/Object/Object.h"
 #include "Engine/Core/Texture2D/Texture2D.h"
@@ -62,9 +63,12 @@ TexCube::TexCube() :
 
     ubo.proj = glm::perspective(glm::radians(90.0f), (float)Engine::ins->WindowX / (float)Engine::ins->WindowY, 1.f, 10.0f);
 
-    material->SetAllUniformData("type.ConstantBuffer.UBO", "model", MAT4());
-    material->SetAllUniformData("type.ConstantBuffer.UBO", "u_View", ubo.view);
-    material->SetAllUniformData("type.ConstantBuffer.UBO", "u_Projection", ubo.proj);
+    material->SetAllUniformData("ModelBuffer", "model", MAT4());
+    // material->SetAllUniformData("GlobalUniformBuffer", "u_View", ubo.view);
+    // material->SetAllUniformData("GlobalUniformBuffer", "u_Projection", ubo.proj);
+
+    GlobalUniformBufferManager::Get()->SetAllBuffer("u_View", ubo.view);
+    GlobalUniformBufferManager::Get()->SetAllBuffer("u_Projection", ubo.proj);
 }
 
 TexCube::~TexCube()
@@ -89,9 +93,8 @@ void TexCube::Update(float DeltaTime)
     glm::mat4 rotationMatrix = glm::mat4_cast(quat);
     m *= rotationMatrix;
     
-    material->SetCurrentUniformData("type.ConstantBuffer.UBO", "model", m);
-
-
+    material->SetCurrentUniformData("ModelBuffer", "model", m);
+    
     if(GFrameCount % 240 == 0)
     {
         material->SetTexture("texture0", "default.jpg");

@@ -64,7 +64,8 @@ class Texture2D
     VkImageView textureImageView = nullptr;
 
     void SetTexture_Internel(const string& TextureName);
-    void cleanUp();
+    void cleanUp(VkImageView tempTextureImageView,
+    VkImage tempTextureImage, VkDeviceMemory tempTextureImageMemory);
 public:
     Texture2D(const string& TextureName);
     ~Texture2D();
