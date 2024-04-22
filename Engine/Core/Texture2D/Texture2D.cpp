@@ -316,7 +316,25 @@ Texture2D::~Texture2D()
 
 void Texture2D::SetTexture(const string& TextureName)
 {
-    cleanUp();
+    auto tempTextureImageView = textureImageView;
+    auto tempTextureImage = textureImage;
+    auto tempTextureImageMemory = textureImageMemory;
+    
     
     SetTexture_Internel(TextureName);
+
+    //销毁texture image view
+    if(tempTextureImageView)
+    {
+        vkDestroyImageView(GDevice, tempTextureImageView, nullptr);
+    }
+    //销毁texture image和对应memory
+    if(tempTextureImage)
+    {
+        vkDestroyImage(GDevice, tempTextureImage, nullptr);
+    }
+    if(tempTextureImageMemory)
+    {
+        vkFreeMemory(GDevice, tempTextureImageMemory, nullptr);
+    }
 }

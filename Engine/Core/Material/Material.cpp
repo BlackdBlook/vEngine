@@ -63,7 +63,7 @@ void Material::SetTexture(const string& TargetName, const string& NewTextureName
         return;
     }
     target->second->SetTexture(NewTextureName);
-    descriptor.BindImageView(*target->second, VkHelperInstance->textureSampler);
+    descriptor.BindInputBuffer();
 }
 
 void Material::SetCurrentUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset)

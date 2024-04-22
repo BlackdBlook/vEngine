@@ -20,8 +20,6 @@ public:
 
     void BindInputBuffer();
 
-    void BindImageView(const Texture2D& texture, VkSampler textureSampler);
-
     const VkDescriptorSet* GetDescriptorSetsByCurrentFrameIndex();
     
     void cleanUp();
