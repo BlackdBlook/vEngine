@@ -1,9 +1,12 @@
 #pragma once
+#include <functional>
 #include <memory>
 #include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include "Engine/TypeDef.h"
 
 
 class RenderInfo;
@@ -14,7 +17,6 @@ class Component;
 class Object
 {
 protected:
-    bool needUpdateModelMat = true;
     glm::vec3 pos;
     glm::quat rot;
     glm::vec3 scale;
@@ -24,12 +26,21 @@ protected:
     std::vector<std::shared_ptr<Component>> Components;
 
 public:
+    bool needUpdateModelMat = true;
     Object();
     virtual void Start();
     virtual void Update(float DeltaTime);
     virtual void Draw(const RenderInfo& RenderInfo);
 
+    template<typename T, typename ...Args>
+    SPtr<T> CreateAttach(Args&&... args)
+    {
+        auto ret = std::make_shared<T>(args...);
+        Attach(ret);
+        return ret; 
+    }
     virtual void Attach(std::shared_ptr<Component> Target);
+    
     virtual void Dettach(std::shared_ptr<Component> Target);
 
     
@@ -43,7 +54,7 @@ public:
     virtual void SetScale(const glm::vec3& newScale);
     virtual glm::vec3 GetScale();
 
-    glm::mat4 GetModelMat();
+    const glm::mat4& GetModelMat();
     void LateUpdate(float delta_time);
 };
 

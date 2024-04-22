@@ -8,16 +8,12 @@ class Object;
 class Component
 {
 public:
-    
-    std::weak_ptr<Object> Parent;
+    Object* Parent = nullptr;
     
     bool operator==(Component* c);
     bool operator==(const char* c);
     virtual void OnAttached();
     virtual void OnDettached();
-    virtual glm::vec3 GetPos();
-    virtual glm::quat GetRot();
-    virtual glm::vec3 GetScale();
     virtual void Draw(const RenderInfo& RenderInfo) {}
     virtual void Update(float DeltaTime) {}
     virtual void Destory() {}

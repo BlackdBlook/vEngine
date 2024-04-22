@@ -38,12 +38,12 @@ void Object::Draw(const RenderInfo& RenderInfo)
 
 void Object::Attach(std::shared_ptr<Component> Target)
 {
-    if(!Target->Parent.expired())
+    if(Target->Parent != nullptr)
     {
-        auto oldParent = Target->Parent.lock();
+        auto oldParent = Target->Parent;
         oldParent->Dettach(Target);
     }
-    Target->Parent = Level::CurrentLevel->GetObjectSPtr(this); 
+    Target->Parent = this; 
     Components.emplace_back(Target);
     Target->OnAttached();
 }
@@ -59,7 +59,7 @@ void Object::Dettach(std::shared_ptr<Component> Target)
             LOG(L"移除组件");
             Target->OnDettached();
             Components.erase(it);
-            Target->Parent.reset();
+            Target->Parent = nullptr;
             return;
         }
     }
@@ -73,7 +73,7 @@ Object::~Object()
     for(auto it : Components)
     {
         it->OnDettached();
-        it->Parent.reset();
+        it->Parent = nullptr;
     }
     Components = {};
 }
@@ -136,12 +136,10 @@ glm::vec3 Object::GetScale()
     return scale;
 }
 
-glm::mat4 Object::GetModelMat()
+const glm::mat4& Object::GetModelMat()
 {
     if(needUpdateModelMat)
     {
-        needUpdateModelMat = false;
-        
         MAT4(m);
 
         // 平移
@@ -157,7 +155,7 @@ glm::mat4 Object::GetModelMat()
         this->model = m;
     }
 
-    return model;
+    return this->model;
 }
 
 void Object::LateUpdate(float delta_time)

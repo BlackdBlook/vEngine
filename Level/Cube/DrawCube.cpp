@@ -70,7 +70,7 @@ void Cube::Update(float DeltaTime)
     MAT4(m);
 
     // 平移
-    m = glm::translate(m, GetPos());
+    m = glm::translate(m, Parent->GetPos());
     
     //
     // // 旋转
@@ -125,3 +125,4 @@ void DrawCube::Init()
         obj->SetPos(glm::vec3{-2,0,0});
     }
 }
+LevelRegister(DrawCube);

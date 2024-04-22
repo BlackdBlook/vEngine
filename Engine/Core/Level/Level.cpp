@@ -4,6 +4,7 @@
 #include "Engine/Core/Object/Object.h"
 
 Level* Level::CurrentLevel = nullptr;
+LevelRegisterList* Level::GlobalLevelRegisterList = nullptr;
 
 void Level::Init()
 {

@@ -37,7 +37,7 @@ vEngine::vEngine(): vkHelper(this)
 
     InitLevelList();
 
-    levelList[0]();
+    (*levelList)[0](CurrentLevel);
     
     Run();
 }
@@ -51,7 +51,7 @@ void vEngine::processInput()
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     
-    for (int i = GLFW_KEY_0; i < GLFW_KEY_0 + levelList.size() + 1; i++)
+    for (int i = GLFW_KEY_0; i < GLFW_KEY_0 + levelList->size() + 1; i++)
     {
         if (glfwGetKey(window, i) == GLFW_PRESS)
         {
@@ -62,8 +62,7 @@ void vEngine::processInput()
 
 void vEngine::InitLevelList()
 {
-    addLevel(DrawCube);
-    addLevel(DrawTexCube);
+    levelList = Level::GlobalLevelRegisterList;
 }
 
 void vEngine::UpdateLevel()
@@ -132,9 +131,9 @@ void vEngine::DrawFrame()
 void vEngine::SetLevel(int i)
 {
     vkHelper.WaitDeviceIdle();
-    if(levelList.size() + 1 < i)
+    if(levelList->size() + 1 < i)
     {
         return;
     }
-    levelList[i - 1](); 
+    (*levelList)[i - 1](CurrentLevel); 
 }

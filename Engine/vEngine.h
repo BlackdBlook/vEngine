@@ -15,7 +15,7 @@ class vEngine
     VkHelper vkHelper;
 
     SPtr<Level> CurrentLevel;
-    std::vector<std::function<void()>> levelList;
+    std::vector<std::function<void(std::shared_ptr<Level>& CurrentLevel)>>* levelList;
     float DeltaTime = 0;
 
     uint64 FrameCount = 0;

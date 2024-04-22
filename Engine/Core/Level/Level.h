@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include <unordered_map>
 #include <vector>
 #include <vulkan/vulkan_core.h>
@@ -9,6 +10,7 @@ class RenderInfo;
 class Object;
 struct ObjectHandle;
 
+using LevelRegisterList = std::vector<std::function<void(std::shared_ptr<class Level>& CurrentLevel)>>;
 class Level
 {
 
@@ -31,4 +33,34 @@ public:
     SPtr<Object> GetObjectSPtr(Object* object);
 
     static Level* CurrentLevel;
+    
+    static LevelRegisterList* GlobalLevelRegisterList;
 };
+
+
+
+template<typename T>
+struct StaticLevelRegister
+{
+    std::function<void(std::shared_ptr<Level>& CurrentLevel)> CreateLevel = [](std::shared_ptr<Level>& CurrentLevel)
+    {
+        CurrentLevel.reset();
+        CurrentLevel = std::shared_ptr<Level>(new T());
+        CurrentLevel->Init();
+        CurrentLevel->Start();
+    };
+    
+    StaticLevelRegister()
+    {
+        static_assert(std::is_base_of<Level, T>::value, "T must be derived from Level");
+
+        if(Level::GlobalLevelRegisterList == nullptr)
+        {
+            Level::GlobalLevelRegisterList = new LevelRegisterList();
+        }
+        
+        Level::GlobalLevelRegisterList->emplace_back(CreateLevel);
+    }
+};
+
+#define LevelRegister(Level) static const StaticLevelRegister<Level> Level##LevelRegister;
