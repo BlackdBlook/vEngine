@@ -69,7 +69,6 @@ struct ShaderTextureInputs
 class ShaderDecoder
 {
 public:
-    static void ProcessShaderMemberName(string& name);
     
     static ShaderUniformBufferBlocks DecodeUniformBuffer(std::vector<uint8>* binaryShader);
     static ShaderTextureInputs DecodeTextures(std::vector<uint8>* binaryShader);

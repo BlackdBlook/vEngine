@@ -50,7 +50,7 @@ TexCube::TexCube() :
     //
     // ubo.proj = glm::perspective(glm::radians(90.0f), (float)Engine::ins->WindowX / (float)Engine::ins->WindowY, 1.f, 10.0f);
 
-    material->SetAllUniformData("ModelBuffer", "model", glm::mat4(1.f));
+    material->SetAllUniformData("model", "model", glm::mat4(1.f));
     // material->SetAllUniformData("GlobalUniformBuffer", "u_View", ubo.view);
     // material->SetAllUniformData("GlobalUniformBuffer", "u_Projection", ubo.proj);
 
@@ -80,7 +80,7 @@ void TexCube::Update(float DeltaTime)
     glm::mat4 rotationMatrix = glm::mat4_cast(quat);
     m *= rotationMatrix;
     
-    material->SetCurrentUniformData("ModelBuffer", "model", m);
+    material->SetCurrentUniformData("model", "model", m);
     
     if(GFrameCount % 240 == 0)
     {

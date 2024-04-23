@@ -26,7 +26,7 @@ void CubeComponent::Draw(const RenderInfo& RenderInfo)
 
     auto model = Parent->GetModelMat();
 
-    material->SetCurrentUniformData("ModelBuffer", "model", model);
+    material->SetCurrentUniformData("model", "model", model);
     
     material->Draw(RenderInfo);
 

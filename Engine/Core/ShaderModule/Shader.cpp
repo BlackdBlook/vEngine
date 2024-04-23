@@ -64,17 +64,6 @@ void ShaderTextureInputs::Log()
 #endif
 }
 
-void ShaderDecoder::ProcessShaderMemberName(string& name)
-{
-    size_t pos = name.find_last_of('.');
-    if (pos == std::string::npos) {
-        // '.' not found, return the original string
-        return;
-    }
-    // Return the substring from the position after '.'
-    name.erase(0, pos + 1);
-}
-
 ShaderUniformBufferBlocks ShaderDecoder::DecodeUniformBuffer(std::vector<uint8>* binaryShader)
 {
     if(binaryShader->empty())
@@ -105,7 +94,6 @@ ShaderUniformBufferBlocks ShaderDecoder::DecodeUniformBuffer(std::vector<uint8>*
                 {
                     ShaderUniformMember member;
                     member.Name = compiler.get_member_name(memberType.self, static_cast<uint32_t>(j));
-                    ProcessShaderMemberName(member.Name);
                     member.Size = compiler.get_declared_struct_member_size(memberType, static_cast<uint32_t>(j));
                     member.Offset = compiler.type_struct_member_offset(memberType, static_cast<uint32_t>(j));
                     block.Members.insert({member.Name, std::move(member)});
@@ -115,7 +103,6 @@ ShaderUniformBufferBlocks ShaderDecoder::DecodeUniformBuffer(std::vector<uint8>*
             {
                 ShaderUniformMember member;
                 member.Name = compiler.get_member_name(type.self, static_cast<uint32_t>(i));
-                ProcessShaderMemberName(member.Name);
                 member.Size = compiler.get_declared_struct_member_size(type, static_cast<uint32_t>(i));
                 member.Offset = compiler.type_struct_member_offset(type, static_cast<uint32_t>(i));
             
@@ -124,19 +111,16 @@ ShaderUniformBufferBlocks ShaderDecoder::DecodeUniformBuffer(std::vector<uint8>*
             
         }
 
-
+        
         uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
         uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 
-        block.Name = resource.name;
-        ProcessShaderMemberName(block.Name);
+        block.Name = compiler.get_name(resource.id);
         block.Size = compiler.get_declared_struct_size(type);
         block.Bind = binding;
         block.Set = set;
-        string resourceName = resource.name;
-        ProcessShaderMemberName(resourceName);
         
-        ans.UniformBlocks.insert({resourceName, block});
+        ans.UniformBlocks.insert({block.Name, block});
     }
 
     return ans;
@@ -163,14 +147,11 @@ ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShad
         uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
 
         ShaderTextureInput input;
-        input.name = resource.name;
-        ProcessShaderMemberName(input.name);
+        input.name = compiler.get_name(resource.id);
         input.bind = binding;
         input.set = set;
         input.type = type;
-        string resourceName = resource.name;
-        ProcessShaderMemberName(resourceName);
-        ret.Members.insert({resourceName, input});
+        ret.Members.insert({input.name, input});
     };
 
     // 获取反射数据
