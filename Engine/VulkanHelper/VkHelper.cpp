@@ -307,6 +307,32 @@ VkImageView VkHelper::createImageView(VkImage image, VkFormat format)
     return imageView;
 }
 
+uint32 VkHelper::GetUniformBufferAlignment()
+{
+    static const auto getFunc = [this]()
+    {
+        VkPhysicalDeviceProperties deviceProperties;
+        vkGetPhysicalDeviceProperties(physicalDevice, &deviceProperties);
+
+        uint32_t minAlignment = deviceProperties.limits.minUniformBufferOffsetAlignment;
+        return minAlignment;
+    };
+
+    static uint32 minAlignment = getFunc();
+
+    return minAlignment;
+}
+
+uint32 VkHelper::GetUniformBufferOffsetByElementSize(uint32 size)
+{
+    static uint32 minAlignment = GetUniformBufferAlignment();
+    uint32_t alignedOffset = (size / minAlignment) * minAlignment;
+    if (size % minAlignment != 0) {
+        alignedOffset += minAlignment;
+    }
+    return alignedOffset;
+}
+
 void VkHelper::createImageViews()
 {
     swapChainImageViews.resize(swapChainImages.size());
@@ -319,7 +345,7 @@ void VkHelper::createImageViews()
 void VkHelper::createLogicalDevice()
 {
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
-
+    
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 

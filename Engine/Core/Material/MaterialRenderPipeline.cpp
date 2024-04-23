@@ -214,14 +214,14 @@ std::vector<SPtr<UniformBuffer>> MaterialRenderPipelineInfo::MakeUniformBuffers(
         if(GlobalUniformBuffer == blocks.first)
         {
             auto buffer =
-                GlobalUniformBufferManager::Get()->GetBuffer(blocks.second.Size, &blocks.second);
+                GlobalUniformBufferManager::Get()->GetBuffer(blocks.second.ElementSize, &blocks.second);
             
             out.push_back(buffer);
             continue;
         }
         SPtr<UniformBuffer> buffer = NewSPtr<UniformBuffer>();
         buffer->BlockName = blocks.first;
-        buffer->Init(blocks.second.Size, blocks.first, blocks.second.Bind);
+        buffer->Init(blocks.second.CaclBufferSize(), blocks.first, blocks.second.Bind);
         buffer->UniformBlockCache = blocks.second;
         
         out.emplace_back(std::move(buffer));
@@ -233,14 +233,14 @@ std::vector<SPtr<UniformBuffer>> MaterialRenderPipelineInfo::MakeUniformBuffers(
         if(GlobalUniformBuffer == blocks.first)
         {
             auto buffer =
-                GlobalUniformBufferManager::Get()->GetBuffer(blocks.second.Size, &blocks.second);
+                GlobalUniformBufferManager::Get()->GetBuffer(blocks.second.ElementSize, &blocks.second);
             
             out.push_back(buffer);
             continue;
         }
         SPtr<UniformBuffer> buffer = NewSPtr<UniformBuffer>();
         buffer->BlockName = blocks.first;
-        buffer->Init(blocks.second.Size, blocks.first, blocks.second.Bind);
+        buffer->Init(blocks.second.CaclBufferSize(), blocks.first, blocks.second.Bind);
         buffer->UniformBlockCache = blocks.second;
         
         out.emplace_back(std::move(buffer));

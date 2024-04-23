@@ -8,6 +8,9 @@
 [[vk::binding(2, 0)]]
 ConstantBuffer<PointLight> pointLightBuffer[4];
 
+Texture2D texture0 : register(t3, space0);
+SamplerState sampler0 : register(s4, space0);
+
 DefaultVSOutput VS(DefaultVSInput input)
 {
     return CommonVS(input);
@@ -15,5 +18,10 @@ DefaultVSOutput VS(DefaultVSInput input)
 
 float4 PS(DefaultVSOutput input) : SV_TARGET
 {
-    return float4(pointLightBuffer[0].position, 1.0);
+    float4 pos = texture0.Sample(sampler0, input.TexCoords);;
+    pos += float4(pointLightBuffer[0].position, 1);
+    pos += float4(pointLightBuffer[1].position, 1);
+    pos += float4(pointLightBuffer[2].position, 1);
+    pos += float4(pointLightBuffer[3].position, 1);
+    return pos;
 }

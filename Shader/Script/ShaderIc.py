@@ -99,7 +99,7 @@ def compile_shaders(path, shader_files):
                 print(output_file_path)
                 command = [hlslc_path, '-spirv', '-T', hlsl_shader_config[shader_type], '-E', hlsl_entry_Point[shader_type], shader_file, '-Fo', output_file_path]
                 run_command(command)
-                # print(ret)
+                # print(command)
 
 
         else:

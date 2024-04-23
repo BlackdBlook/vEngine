@@ -113,4 +113,4 @@ void DrawTexCube::Init()
         obj->Attach(NewSPtr<TexCube>());
     }
 }
-LevelRegister(DrawTexCube);
+// LevelRegister(DrawTexCube);

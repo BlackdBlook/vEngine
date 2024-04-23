@@ -81,7 +81,7 @@ ShaderUniformBufferBlocks ShaderDecoder::DecodeUniformBuffer(std::vector<uint8>*
     for (auto& resource : resources.uniform_buffers)
     {
         ShaderUniformBufferBlock block;
-        const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+        const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
         
         // 遍历uniform变量的所有成员
         for (size_t i = 0; i < type.member_types.size(); i++)
@@ -116,9 +116,10 @@ ShaderUniformBufferBlocks ShaderDecoder::DecodeUniformBuffer(std::vector<uint8>*
         uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
 
         block.Name = compiler.get_name(resource.id);
-        block.Size = compiler.get_declared_struct_size(type);
+        block.ElementSize = compiler.get_declared_struct_size(type);
         block.Bind = binding;
         block.Set = set;
+        block.Array_length = std::vector<uint32>{type.array.begin(), type.array.end()};
         
         ans.UniformBlocks.insert({block.Name, block});
     }
@@ -160,7 +161,7 @@ ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShad
     // 遍历所有的Image变量
     for (auto& resource : resources.separate_samplers)
     {
-        const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+        const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
 
         if(type.basetype == spirv_cross::SPIRType::Sampler)
         {
@@ -170,7 +171,7 @@ ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShad
     
     for (auto& resource : resources.separate_images)
     {
-        const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+        const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
         if (type.basetype == spirv_cross::SPIRType::SampledImage ||
             type.basetype == spirv_cross::SPIRType::Image)
         {
@@ -180,7 +181,7 @@ ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShad
 
     for (auto& resource : resources.sampled_images)
     {
-        const spirv_cross::SPIRType& type = compiler.get_type(resource.base_type_id);
+        const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
         if (type.basetype == spirv_cross::SPIRType::SampledImage ||
             type.basetype == spirv_cross::SPIRType::Image)
         {
@@ -203,12 +204,12 @@ bool ShaderUniformMember::operator!=(const ShaderUniformMember& other)
 
 std::string ShaderUniformMember::Log()
 {
-    return "Name:" + Name + " ,Size:" + std::to_string(Size) + " ,Offset:" + std::to_string(Offset);
+    return "Name:" + Name + " ,ElementSize:" + std::to_string(Size) + " ,Offset:" + std::to_string(Offset);
 }
 
 bool ShaderUniformBufferBlock::operator==(const ShaderUniformBufferBlock& other)
 {
-    return Name == other.Name && Size == other.Size && Set == other.Set && Bind == other.Bind;
+    return Name == other.Name && ElementSize == other.ElementSize && Set == other.Set && Bind == other.Bind;
 }
 
 bool ShaderUniformBufferBlock::operator!=(const ShaderUniformBufferBlock& other)
@@ -216,9 +217,36 @@ bool ShaderUniformBufferBlock::operator!=(const ShaderUniformBufferBlock& other)
     return !(*this == other);
 }
 
+uint32 ShaderUniformBufferBlock::CaclBufferSize()
+{
+    // 一个对象的大小
+    return GetElementOffset() * CaclBufferElementNum();
+}
+
+uint32 ShaderUniformBufferBlock::CaclBufferElementNum()
+{
+    uint32 ret = 1;
+    if(Array_length.empty())
+    {
+        // 不是一个数组，直接返回
+        return ret;
+    }
+    for(uint32& i : Array_length)
+    {
+        // 乘以对象的数量
+        ret *= i;
+    }
+    return ret;
+}
+
+uint32 ShaderUniformBufferBlock::GetElementOffset()
+{
+    return VkHelperInstance->GetUniformBufferOffsetByElementSize(ElementSize);
+}
+
 std::string ShaderUniformBufferBlock::Log()
 {
-    string ans = "Uniform Block " + Name + ",Size:" + std::to_string(Size) +
+    string ans = "Uniform Block " + Name + ",ElementSize:" + std::to_string(ElementSize) +
         ",Set:" + std::to_string(Set) + ",Bind:" + std::to_string(Bind) + '\n';
     
     for(auto& m : Members)
@@ -330,7 +358,7 @@ void vShader::FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutBi
         // 类型
         uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
         // 数组数量
-        uboLayoutBinding.descriptorCount = 1;
+        uboLayoutBinding.descriptorCount = block.second.CaclBufferElementNum();
         // 作用阶段
         uboLayoutBinding.stageFlags = GetVkShaderStageFlagBits();
         // 纹理采样器
@@ -361,7 +389,7 @@ void vShader::FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutBi
         default:
             continue;
         }
-        // 数组数量
+        // 数组数量 TODO
         ImageBinding.descriptorCount = 1;
         // 作用阶段
         ImageBinding.stageFlags = GetVkShaderStageFlagBits();

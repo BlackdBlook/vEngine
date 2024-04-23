@@ -40,9 +40,16 @@ void DrawLightCube::Init()
     
     {
         auto obj = NewObject();
-        obj->CreateAttach<CubeComponent>("drawtexcube");
         obj->CreateAttach<AutoRot>();
+        auto cube = obj->CreateAttach<CubeComponent>("PointLightCube");
+        cube->material->SetTexture("texture0", "container2.png");
     }
-    
+
+    {
+        auto light = NewObject();
+        light->CreateAttach<Light>();
+        light->CreateAttach<CubeComponent>("PointLightCube");
+        light->SetScale(glm::vec3{0.1});
+    }
 }
 LevelRegister(DrawLightCube);

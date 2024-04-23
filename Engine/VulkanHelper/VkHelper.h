@@ -96,6 +96,8 @@ public:
     VkCommandBuffer BeginSingleTimeCommands();
     void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
     VkImageView createImageView(VkImage image, VkFormat format);
+    uint32 GetUniformBufferAlignment();
+    uint32 GetUniformBufferOffsetByElementSize(uint32 size);
 
     RenderInfo BeginRecordCommandBuffer();
     void EndRecordCommandBuffer(const RenderInfo& RenderInfo);

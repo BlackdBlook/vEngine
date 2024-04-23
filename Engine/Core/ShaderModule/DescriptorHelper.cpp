@@ -59,31 +59,45 @@ void DescriptorHelper::createDescriptorSets(
 
 void DescriptorHelper::BindInputBuffer()
 {
-    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
+    for (size_t freamIndex = 0; freamIndex < MAX_FRAMES_IN_FLIGHTS; freamIndex++)
     {
         int bufferCount = 0;
         std::vector<VkWriteDescriptorSet> descriptorWrites(buffers.size() + Texture2Ds.size());
-        
-        std::vector<VkDescriptorBufferInfo> bufferInfos(buffers.size());
+
+        uint32 bufferElementCount = 0;
         for(auto& buffer : this->buffers)
         {
-            //为每个descriptor set配置其中的descriptor，每个descriptor引用一个uniform buffer
-            VkDescriptorBufferInfo& bufferInfo = bufferInfos[bufferCount];
-            bufferInfo.buffer = *buffer->GetUniformBuffer(i);
-            bufferInfo.offset = 0;
-            bufferInfo.range = buffer->GetBufferSize();
-            
+            bufferElementCount += buffer->UniformBlockCache.CaclBufferElementNum();
+        }
+        std::vector<VkDescriptorBufferInfo> bufferInfos(bufferElementCount);
+        
+        for(auto& buffer : this->buffers)
+        {
+            for(uint64 i = 0;i < buffer->UniformBlockCache.CaclBufferElementNum();i++)
+            {
+                auto& bufferInfo = bufferInfos[bufferCount++];
+                bufferInfo.buffer = *buffer->GetUniformBuffer(freamIndex);
+                bufferInfo.offset = i * buffer->UniformBlockCache.GetElementOffset();
+                bufferInfo.range = buffer->UniformBlockCache.ElementSize;
+            }
+        }
+        bufferCount = 0;
+        bufferElementCount = 0;
+        for(auto& buffer : this->buffers)
+        {
             //更新descriptor set
             VkWriteDescriptorSet& descriptorWrite = descriptorWrites[bufferCount++];
             descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrite.dstSet = descriptorSets[i];
-            descriptorWrite.dstBinding = buffer->Bind;
-            descriptorWrite.dstArrayElement = 0;
-            descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-            descriptorWrite.descriptorCount = 1;
-            descriptorWrite.pBufferInfo = &bufferInfo;
+            descriptorWrite.dstSet = descriptorSets[freamIndex];// 目标Descriptor Set
+            descriptorWrite.dstBinding = buffer->Bind;// 绑定点
+            descriptorWrite.dstArrayElement = 0;// 数组元素的起始索引
+            descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;// 描述符类型
+            descriptorWrite.descriptorCount = buffer->UniformBlockCache.CaclBufferElementNum();// 描述符数量，对应二维数组展平后的大小
+            descriptorWrite.pBufferInfo = &bufferInfos[bufferElementCount];// 指向包含数据信息的结构体的指针
             descriptorWrite.pImageInfo = nullptr; // Optional
             descriptorWrite.pTexelBufferView = nullptr; // Optional
+
+            bufferElementCount += descriptorWrite.descriptorCount;
         }
 
         //在descriptor set中绑定实际的image和sampler资源到descriptors
@@ -99,7 +113,7 @@ void DescriptorHelper::BindInputBuffer()
             
             VkWriteDescriptorSet& descriptorWrite = descriptorWrites[bufferCount++];
             descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-            descriptorWrite.dstSet = descriptorSets[i];
+            descriptorWrite.dstSet = descriptorSets[freamIndex];
             descriptorWrite.dstBinding = image.second->InputInfo.bind;
             descriptorWrite.dstArrayElement = 0;
             descriptorWrite.descriptorType = image.second->InputInfo.GetDescriptorType();

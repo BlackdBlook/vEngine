@@ -125,4 +125,4 @@ void DrawCube::Init()
         obj->SetPos(glm::vec3{-2,0,0});
     }
 }
-LevelRegister(DrawCube);
+// LevelRegister(DrawCube);

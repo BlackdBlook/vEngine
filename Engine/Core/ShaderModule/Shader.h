@@ -32,13 +32,17 @@ struct ShaderUniformMember
 struct ShaderUniformBufferBlock
 {
     string Name;
-    size_t Size;
+    uint32 ElementSize;
     uint32 Set;
     uint32 Bind;
+    std::vector<uint32> Array_length;
     std::unordered_map<std::string, ShaderUniformMember> Members;
 
     bool operator==(const ShaderUniformBufferBlock& other);
     bool operator!=(const ShaderUniformBufferBlock& other);
+    uint32 CaclBufferSize();
+    uint32 CaclBufferElementNum();
+    uint32 GetElementOffset();
     std::string Log();
 };
 
