@@ -23,3 +23,17 @@ struct DefaultVSOutput
     float3 Normal : NORMAL;
     float2 TexCoords : TEXCOORD;
 };        
+
+struct PointLight {
+    float strength;
+    
+    float3 position;
+    float3 color;
+    float constant;
+    float linears;
+    float quadratic;
+
+    float3 ambient;
+    float3 diffuse;
+    float3 specular;
+};

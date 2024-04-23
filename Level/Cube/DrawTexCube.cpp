@@ -46,16 +46,16 @@ TexCube::TexCube() :
     material->SetTexture("texture0", "container2.png");
     
     
-    ubo.view = glm::lookAt(glm::vec3(0.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-
-    ubo.proj = glm::perspective(glm::radians(90.0f), (float)Engine::ins->WindowX / (float)Engine::ins->WindowY, 1.f, 10.0f);
+    // ubo.view = glm::lookAt(glm::vec3(0.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    //
+    // ubo.proj = glm::perspective(glm::radians(90.0f), (float)Engine::ins->WindowX / (float)Engine::ins->WindowY, 1.f, 10.0f);
 
     material->SetAllUniformData("ModelBuffer", "model", glm::mat4(1.f));
     // material->SetAllUniformData("GlobalUniformBuffer", "u_View", ubo.view);
     // material->SetAllUniformData("GlobalUniformBuffer", "u_Projection", ubo.proj);
 
-    GlobalUniformBufferManager::Get()->SetAllBuffer("u_View", ubo.view);
-    GlobalUniformBufferManager::Get()->SetAllBuffer("u_Projection", ubo.proj);
+    // GlobalUniformBufferManager::Get()->SetAllBuffer("u_View", ubo.view);
+    // GlobalUniformBufferManager::Get()->SetAllBuffer("u_Projection", ubo.proj);
 }
 
 TexCube::~TexCube()

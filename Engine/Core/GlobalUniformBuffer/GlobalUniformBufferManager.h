@@ -12,10 +12,15 @@ class GlobalUniformBuffer : public UniformBuffer
     virtual void Init(size_t size, string Name, uint32 bind) override;
 
     void Init_Internal(size_t size, string Name);
+
+    void UpdateCameraData();
 };
+
+
  
 class GlobalUniformBufferManager
 {
+    friend GlobalUniformBuffer;
 public:
     GlobalUniformBufferManager();
 
@@ -47,7 +52,7 @@ private:
     
     SPtr<GlobalUniformBuffer> buffer;
     
-    void Init(size_t size, string Name);
+    void Init(size_t size, string Name, ShaderUniformBufferBlock* block);
 };
 
 template <typename T>

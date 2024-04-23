@@ -4,6 +4,7 @@
 #include <glm/ext/matrix_transform.hpp>
 
 #include "Engine/vEngine.h"
+#include "Engine/Core/Camera/Camera.h"
 #include "Engine/Core/Component/Component.h"
 #include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/Core/Material/Material.h"
@@ -20,15 +21,27 @@ namespace
     public:
         
     };
+
+    class AutoRot : public Component
+    {
+    public:
+        void Update(float DeltaTime) override
+        {
+            Parent->AddRot(glm::vec3{0,1,1});
+        }
+    };
 }
 
 void DrawLightCube::Init()
 {
     Level::Init();
 
+    Camera::GetCamera()->SetPos(glm::vec3(0, 0, 2));
+    
     {
         auto obj = NewObject();
         obj->CreateAttach<CubeComponent>("drawtexcube");
+        obj->CreateAttach<AutoRot>();
     }
     
 }

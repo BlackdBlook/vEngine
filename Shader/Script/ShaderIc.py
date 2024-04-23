@@ -6,7 +6,7 @@ import sys
 # 文件修改时间记录文件
 record_file = 'file_modification_times.json'
 
-shader_file_type={'.frag','.vert','.hlsl','.glsl'}
+shader_file_type={'.frag','.vert','.hlsl','.hlsli','.glsl'}
 
 # 定义ANSI转义码
 RED = "\033[31m"
@@ -80,6 +80,10 @@ def compile_shaders(path, shader_files):
         name, ext = os.path.splitext(file_name)
         if str.find(ext, 'hlsl') != -1:
             #hlsl代码
+            if ext == '.hlsli':
+                #忽略hlsli头文件
+                continue
+
             base_name, shader_types = get_shader_name_and_types(name)
             if len(shader_types) == 0:
                 print(file_name, 'unknow hlsl shader type')
