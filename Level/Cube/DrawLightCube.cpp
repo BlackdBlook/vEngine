@@ -27,7 +27,19 @@ namespace
     public:
         void Update(float DeltaTime) override
         {
-            Parent->AddRot(glm::vec3{0,1,1});
+            Parent->AddRot(glm::vec3{
+                1
+                ,1
+                ,1});
+        }
+    };
+
+    class AutoMov : public Component
+    {
+    public:
+        void Update(float DeltaTime) override
+        {
+            Parent->SetPos(glm::vec3{glm::sin(glfwGetTime()) * 2,0,glm::cos(glfwGetTime()) * 2});
         }
     };
 }
@@ -36,8 +48,16 @@ void DrawLightCube::Init()
 {
     Level::Init();
 
-    Camera::GetCamera()->SetPos(glm::vec3(0, 0, 2));
-    
+    Camera::GetCamera()->SetPos(glm::vec3(0, 0, 3));
+    {
+        auto light = NewObject();
+        light->CreateAttach<Light>();
+        light->CreateAttach<AutoMov>();
+        light->CreateAttach<CubeComponent>("PointLightCube");
+        light->SetScale(glm::vec3{0.1});
+    }
+
+    // for(int i = 0;i < 100;i++)
     {
         auto obj = NewObject();
         obj->CreateAttach<AutoRot>();
@@ -45,11 +65,5 @@ void DrawLightCube::Init()
         cube->material->SetTexture("texture0", "container2.png");
     }
 
-    {
-        auto light = NewObject();
-        light->CreateAttach<Light>();
-        light->CreateAttach<CubeComponent>("PointLightCube");
-        light->SetScale(glm::vec3{0.1});
-    }
 }
 LevelRegister(DrawLightCube);

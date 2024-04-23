@@ -59,14 +59,20 @@ public:
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
     std::vector<VkFence> inFlightFences;
+    VkImage depthImage;
+    VkDeviceMemory depthImageMemory;
+    VkImageView depthImageView;
+    
 private:
-
+    VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling,
+                                 VkFormatFeatureFlags features);
+    VkFormat findDepthFormat();
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
     void createSwapChain();
     VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
     void createTextureSampler();
-    void createImageViews();
+    void createSwapChainImageViews();
     void createLogicalDevice();
     void createWindowSurface();
     void CreateVkInstance();
@@ -83,21 +89,26 @@ private:
     void createSyncObjects();
     void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
     void recreateSwapChain();
+    void createDepthResources();
     
 public:
     VkHelper(vEngine* engine);
     void InitVulkan();
     GLFWwindow* InitWindow(uint32 X, uint32 Y);
     void CleanVk();
+    void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
+                     VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
     void WaitDeviceIdle();
     void cleanupSwapChain();
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     VkCommandBuffer BeginSingleTimeCommands();
     void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
-    VkImageView createImageView(VkImage image, VkFormat format);
+    VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
     uint32 GetUniformBufferAlignment();
     uint32 GetUniformBufferOffsetByElementSize(uint32 size);
+    void transitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkFormat format, VkImageLayout oldLayout,
+                               VkImageLayout newLayout);
 
     RenderInfo BeginRecordCommandBuffer();
     void EndRecordCommandBuffer(const RenderInfo& RenderInfo);

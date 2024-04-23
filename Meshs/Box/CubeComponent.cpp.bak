@@ -1,0 +1,38 @@
+#include "CubeComponent.h"
+
+#include "BoxVertices.h"
+#include "Engine/Core/FrameInfo/RenderInfo.h"
+#include "Engine/Core/Object/Object.h"
+
+CubeComponent::CubeComponent(const string& shader):
+buffer(sizeof(BoxVertices), BoxVertices)
+{
+    material = NewSPtr<Material>(shader);
+}
+
+CubeComponent::~CubeComponent()
+{
+}
+
+void CubeComponent::Update(float DeltaTime)
+{
+    Component::Update(DeltaTime);
+    
+}
+
+void CubeComponent::Draw(const RenderInfo& RenderInfo)
+{
+    Component::Draw(RenderInfo);
+
+    auto model = Parent->GetModelMat();
+
+    material->SetCurrentUniformData("model", "model", model);
+    
+    material->Draw(RenderInfo);
+
+    buffer.CmdBind(RenderInfo.CommmandBuffer);
+    
+    vkCmdDraw(RenderInfo.CommmandBuffer,
+        sizeof(BoxVertices) / 8, 100, 0, 0);
+    
+}

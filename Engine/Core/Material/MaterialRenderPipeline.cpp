@@ -126,6 +126,23 @@ VkPipelineColorBlendStateCreateInfo* MaterialRenderPipelineInfo::PipelineColorBl
     return &colorBlending;
 }
 
+VkPipelineDepthStencilStateCreateInfo* MaterialRenderPipelineInfo::PipelineDepthStencilStat() const
+{
+    static VkPipelineDepthStencilStateCreateInfo depthStencil = {};
+    depthStencil.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    depthStencil.depthTestEnable = VK_TRUE;
+    depthStencil.depthWriteEnable = VK_TRUE;
+    depthStencil.depthCompareOp = VK_COMPARE_OP_LESS;
+    depthStencil.depthBoundsTestEnable = VK_FALSE;
+    depthStencil.minDepthBounds = 0.0f; // Optional
+    depthStencil.maxDepthBounds = 1.0f; // Optional
+    depthStencil.stencilTestEnable = VK_FALSE;
+    depthStencil.front = {}; // Optional
+    depthStencil.back = {}; // Optional
+
+    return &depthStencil;
+}
+
 VkPipelineDynamicStateCreateInfo* MaterialRenderPipelineInfo::PipelineDynamicStateCreateInfo()const
 {
     static std::vector<VkDynamicState> dynamicStates = {
@@ -307,6 +324,7 @@ void MaterialRenderPipeline::Init(MaterialRenderPipelineInfo* Info)
     pipelineInfo.pRasterizationState = Info->PipelineRasterizationStateCreateInfo();
     pipelineInfo.pMultisampleState = Info->PipelineMultisampleStateCreateInfo();
     pipelineInfo.pColorBlendState = Info->PipelineColorBlendStateCreateInfo();
+    pipelineInfo.pDepthStencilState = Info->PipelineDepthStencilStat();
     pipelineInfo.pDynamicState = Info->PipelineDynamicStateCreateInfo();
     pipelineInfo.layout = Info->PipelineLayout();
     pipelineInfo.renderPass = Info->PipelineRenderPass();

@@ -36,6 +36,7 @@ public:
     virtual VkPipelineMultisampleStateCreateInfo* PipelineMultisampleStateCreateInfo()const;
     virtual VkPipelineColorBlendAttachmentState* PipelineColorBlendAttachmentState()const;
     virtual VkPipelineColorBlendStateCreateInfo* PipelineColorBlendStateCreateInfo()const;
+    virtual VkPipelineDepthStencilStateCreateInfo* PipelineDepthStencilStat()const;
     virtual VkPipelineDynamicStateCreateInfo* PipelineDynamicStateCreateInfo()const;
     virtual VkPipelineLayout PipelineLayout()const;
     virtual VkRenderPass PipelineRenderPass()const;
