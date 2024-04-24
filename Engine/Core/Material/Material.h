@@ -65,6 +65,8 @@ public:
 
     SPtr<MaterialRenderPipelineInfo> info;
 
+    SPtr<ShaderUniformBufferBlocks> ShaderUniformBufferBlocks;
+
     Material(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
     
     Material(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
@@ -74,32 +76,29 @@ public:
     ~Material();
 
     void SetTexture(const string& TargetName, const string& NewTextureName);
-
-    void SetCurrentUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset = 0);
-    void SetAllUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset = 0);
     
-    void SetCurrentUniformData(const string& BlockName, uint8* Src, size_t Size, size_t Offset = 0);
-    void SetAllUniformData(const string& BlockName, uint8* Src, size_t Size, size_t Offset = 0);
+    void SetCurrentUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset);
+    void SetAllUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset);
     
-    void SetCurrentUniformData(const string& BlockName, const string& MemberName, uint8* Src, size_t Size);
-    void SetAllUniformData(const string& BlockName, const string& MemberName, uint8* Src, size_t Size);
+    void SetCurrentUniformData(const Container::Name& MemberName, uint8* Src, size_t Size);
+    void SetAllUniformData(const Container::Name& MemberName, uint8* Src, size_t Size);
 
     template<typename T>
-    void SetCurrentUniformData(const string& BlockName, const string& MemberName, const T& Src);
+    void SetCurrentUniformData(const Container::Name& MemberName, const T& Src);
     template<typename T>
-    void SetAllUniformData(const string& BlockName, const string& MemberName, const T& Src);
+    void SetAllUniformData(const Container::Name& MemberName, const T& Src);
 
     void Draw(const RenderInfo& RenderInfo);
 };
 
 template <typename T>
-void Material::SetCurrentUniformData(const string& BlockName, const string& MemberName, const T& Src)
+void Material::SetCurrentUniformData(const Container::Name& MemberName, const T& Src)
 {
-    SetCurrentUniformData(BlockName, MemberName, (uint8*)&Src, sizeof(T));
+    SetCurrentUniformData(MemberName, (uint8*)&Src, sizeof(T));
 }
 
 template <typename T>
-void Material::SetAllUniformData(const string& BlockName, const string& MemberName, const T& Src)
+void Material::SetAllUniformData(const Container::Name& MemberName, const T& Src)
 {
-    SetAllUniformData(BlockName, MemberName, (uint8*)&Src, sizeof(T));
+    SetAllUniformData(MemberName, (uint8*)&Src, sizeof(T));
 }

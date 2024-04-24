@@ -202,6 +202,7 @@ VkDescriptorSetLayout MaterialRenderPipelineInfo::MakeVkDescriptorSetLayout() co
     }
 
     std::vector<VkDescriptorSetLayoutBinding> out;
+
     VertShader->FillDescriptorSetLayoutBinding(out);
     FragShader->FillDescriptorSetLayoutBinding(out);
  
@@ -219,48 +220,39 @@ VkDescriptorSetLayout MaterialRenderPipelineInfo::MakeVkDescriptorSetLayout() co
     return descriptorSetLayout;
 }
 
-std::vector<SPtr<UniformBuffer>> MaterialRenderPipelineInfo::MakeUniformBuffers() const
+void createUniformBuffer(ShaderUniformBufferBlock& block, std::unordered_map<Container::Name, SPtr<UniformBuffer>>& out)
 {
-    std::vector<SPtr<UniformBuffer>> out;
+    if(block.IsGlobalUnifomrBuffer)
+    {
+        auto buffer =
+            GlobalUniformBufferManager::Get()->GetBuffer(block.ElementSize, &block);
 
-    static const Container::Name GlobalUniformBuffer {"GlobalUniformBuffer"};
+        out.insert({buffer->BlockName, buffer});
+        return;
+    }
+    SPtr<UniformBuffer> buffer = NewSPtr<UniformBuffer>();
+    buffer->BlockName = block.Name;
+    buffer->Init(block.CaclBufferSize(),
+        block.Name.ToString(), block.Bind);
+    buffer->UniformBlockCache = block;
+        
+    out.insert({buffer->BlockName, buffer});
+}
+
+std::unordered_map<Container::Name, SPtr<UniformBuffer>> MaterialRenderPipelineInfo::MakeUniformBuffers() const
+{
+    std::unordered_map<Container::Name, SPtr<UniformBuffer>> out;
 
     for(auto& blocks :
-        VertShader->ShaderUniformBufferBlocks.UniformBlocks)
+        VertShader->UniformBufferBlocks.UniformBlocks)
     {
-        if(GlobalUniformBuffer == blocks.first)
-        {
-            auto buffer =
-                GlobalUniformBufferManager::Get()->GetBuffer(blocks.second.ElementSize, &blocks.second);
-            
-            out.push_back(buffer);
-            continue;
-        }
-        SPtr<UniformBuffer> buffer = NewSPtr<UniformBuffer>();
-        buffer->BlockName = blocks.first;
-        buffer->Init(blocks.second.CaclBufferSize(), blocks.first, blocks.second.Bind);
-        buffer->UniformBlockCache = blocks.second;
-        
-        out.emplace_back(std::move(buffer));
+        createUniformBuffer(blocks.second, out);
     }
 
     for(auto& blocks :
-        FragShader->ShaderUniformBufferBlocks.UniformBlocks)
+        FragShader->UniformBufferBlocks.UniformBlocks)
     {
-        if(GlobalUniformBuffer == blocks.first)
-        {
-            auto buffer =
-                GlobalUniformBufferManager::Get()->GetBuffer(blocks.second.ElementSize, &blocks.second);
-            
-            out.push_back(buffer);
-            continue;
-        }
-        SPtr<UniformBuffer> buffer = NewSPtr<UniformBuffer>();
-        buffer->BlockName = blocks.first;
-        buffer->Init(blocks.second.CaclBufferSize(), blocks.first, blocks.second.Bind);
-        buffer->UniformBlockCache = blocks.second;
-        
-        out.emplace_back(std::move(buffer));
+        createUniformBuffer(blocks.second, out);
     }
     
     return out;

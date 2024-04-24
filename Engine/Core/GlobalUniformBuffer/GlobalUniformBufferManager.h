@@ -14,6 +14,9 @@ class GlobalUniformBuffer : public UniformBuffer
     void Init_Internal(size_t size, string Name);
 
     void UpdateCameraData();
+public:
+    
+    UniformMemberMap Members;
 };
 
 
@@ -23,10 +26,11 @@ class GlobalUniformBufferManager
     friend GlobalUniformBuffer;
 public:
     GlobalUniformBufferManager();
+    ~GlobalUniformBufferManager();
 
     SPtr<GlobalUniformBuffer> GetBuffer(size_t size, ShaderUniformBufferBlock* block);
 
-    std::unordered_map<string, size_t> MemberOffset;
+    GlobalUniformBufferInfo* globalInfo;
     
     static GlobalUniformBufferManager* Get();
 
@@ -58,9 +62,9 @@ private:
 template <typename T>
 void GlobalUniformBufferManager::SetCurrentBuffer(const string& name, const T& data)
 {
-    auto member = buffer->UniformBlockCache.Members.find(name);
+    auto member = buffer->Members.find(name);
 
-    if(member == buffer->UniformBlockCache.Members.end())
+    if(member == buffer->Members.end())
     {
         WARNING("Global Uniform member not found", name);
         return;
@@ -72,9 +76,9 @@ void GlobalUniformBufferManager::SetCurrentBuffer(const string& name, const T& d
 template <typename T>
 void GlobalUniformBufferManager::SetAllBuffer(const string& name, const T& data)
 {
-    auto member = buffer->UniformBlockCache.Members.find(name);
+    auto member = buffer->Members.find(name);
 
-    if(member == buffer->UniformBlockCache.Members.end())
+    if(member == buffer->Members.end())
     {
         WARNING("Global Uniform member not found", name);
         return;

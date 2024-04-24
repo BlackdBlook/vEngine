@@ -6,6 +6,7 @@
 namespace Container
 {
     struct CaseInsensitiveHash {
+        size_t operator()(const char* key) const;
         size_t operator()(const std::string& key) const;
         size_t operator()(const class Name& key) const;
     };
@@ -16,11 +17,13 @@ namespace Container
     };
     class Name
     {
-        SPtr<const std::string> str;
+        SPtr<const std::string> pStr;
         
         uint64 hash = INVALID_HASH;
     public:
         Name();
+        
+        Name(const char* str);
         
         Name(const std::string& str);
         
@@ -32,9 +35,11 @@ namespace Container
         
         const std::string& ToString() const
         {
-            return *str;
+            return *pStr;
         }
 
+        Name& operator=(const char* other);
+        
         Name& operator=(const Name& other);
         
         Name& operator=(const string& other);
@@ -72,7 +77,7 @@ namespace Container
 
         inline uint64 GetSize() const
         {
-            return str->size();
+            return pStr->size();
         }
         
         static constexpr uint64 INVALID_HASH = 0xffffffffffffffff;

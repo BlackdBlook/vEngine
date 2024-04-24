@@ -30,7 +30,7 @@ public:
     //每个运行帧的descriptor set
     std::vector<VkDescriptorSet> descriptorSets;
 
-    std::vector<SPtr<UniformBuffer>> buffers;
+    std::unordered_map<Container::Name, SPtr<UniformBuffer>> buffers;
     
     std::unordered_map<string, SPtr<Texture2D>> Texture2Ds;
 };

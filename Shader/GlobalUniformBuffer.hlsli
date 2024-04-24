@@ -8,4 +8,4 @@ struct GlobalUniformBufferStruct
 // <type> <name>
 
 [[vk::binding(0, 0)]]
-ConstantBuffer<GlobalUniformBufferStruct> GlobalUniformBuffer;
+ConstantBuffer<GlobalUniformBufferStruct> Global;

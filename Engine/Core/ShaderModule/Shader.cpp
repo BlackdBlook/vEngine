@@ -64,69 +64,6 @@ void ShaderTextureInputs::Log()
 #endif
 }
 
-ShaderUniformBufferBlocks ShaderDecoder::DecodeUniformBuffer(std::vector<uint8>* binaryShader)
-{
-    if(binaryShader->empty())
-    {
-        throw std::runtime_error("binaryShader is empty");
-    }
-    ShaderUniformBufferBlocks ans;
-    std::vector<uint32_t>& temp = reinterpret_cast<std::vector<uint32_t>&>(*binaryShader);
-    spirv_cross::Compiler compiler(temp);
-    
-    // 获取反射数据
-    spirv_cross::ShaderResources resources = compiler.get_shader_resources();
-
-    // 遍历所有的uniform变量
-    for (auto& resource : resources.uniform_buffers)
-    {
-        ShaderUniformBufferBlock block;
-        const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
-        
-        // 遍历uniform变量的所有成员
-        for (size_t i = 0; i < type.member_types.size(); i++)
-        {
-            const spirv_cross::SPIRType& memberType = compiler.get_type(type.member_types[i]);
-
-            if(memberType.basetype == spirv_cross::SPIRType::BaseType::Struct)
-            {
-                for (size_t j = 0; j < memberType.member_types.size(); j++)
-                {
-                    ShaderUniformMember member;
-                    member.Name = compiler.get_member_name(memberType.self, static_cast<uint32_t>(j));
-                    member.Size = compiler.get_declared_struct_member_size(memberType, static_cast<uint32_t>(j));
-                    member.Offset = compiler.type_struct_member_offset(memberType, static_cast<uint32_t>(j));
-                    block.Members.insert({member.Name, std::move(member)});
-                }
-            }
-            else
-            {
-                ShaderUniformMember member;
-                member.Name = compiler.get_member_name(type.self, static_cast<uint32_t>(i));
-                member.Size = compiler.get_declared_struct_member_size(type, static_cast<uint32_t>(i));
-                member.Offset = compiler.type_struct_member_offset(type, static_cast<uint32_t>(i));
-            
-                block.Members.insert({member.Name, std::move(member)});
-            }
-            
-        }
-
-        
-        uint32_t set = compiler.get_decoration(resource.id, spv::DecorationDescriptorSet);
-        uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
-
-        block.Name = compiler.get_name(resource.id);
-        block.ElementSize = compiler.get_declared_struct_size(type);
-        block.Bind = binding;
-        block.Set = set;
-        block.Array_length = std::vector<uint32>{type.array.begin(), type.array.end()};
-        
-        ans.UniformBlocks.insert({block.Name, block});
-    }
-
-    return ans;
-}
-
 ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShader)
 {
     ShaderTextureInputs ret;
@@ -192,86 +129,6 @@ ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShad
     return ret;
 }
 
-bool ShaderUniformMember::operator==(const ShaderUniformMember& other)
-{
-    return Name == other.Name && Size == other.Size && Offset == other.Offset;
-}
-
-bool ShaderUniformMember::operator!=(const ShaderUniformMember& other)
-{
-    return !(*this == other);
-}
-
-std::string ShaderUniformMember::Log()
-{
-    return "Name:" + Name + " ,ElementSize:" + std::to_string(Size) + " ,Offset:" + std::to_string(Offset);
-}
-
-bool ShaderUniformBufferBlock::operator==(const ShaderUniformBufferBlock& other)
-{
-    return Name == other.Name && ElementSize == other.ElementSize && Set == other.Set && Bind == other.Bind;
-}
-
-bool ShaderUniformBufferBlock::operator!=(const ShaderUniformBufferBlock& other)
-{
-    return !(*this == other);
-}
-
-uint32 ShaderUniformBufferBlock::CaclBufferSize()
-{
-    // 一个对象的大小
-    return GetElementOffset() * CaclBufferElementNum();
-}
-
-uint32 ShaderUniformBufferBlock::CaclBufferElementNum()
-{
-    uint32 ret = 1;
-    if(Array_length.empty())
-    {
-        // 不是一个数组，直接返回
-        return ret;
-    }
-    for(uint32& i : Array_length)
-    {
-        // 乘以对象的数量
-        ret *= i;
-    }
-    return ret;
-}
-
-uint32 ShaderUniformBufferBlock::GetElementOffset()
-{
-    return VkHelperInstance->GetUniformBufferOffsetByElementSize(ElementSize);
-}
-
-std::string ShaderUniformBufferBlock::Log()
-{
-    string ans = "Uniform Block " + Name + ",ElementSize:" + std::to_string(ElementSize) +
-        ",Set:" + std::to_string(Set) + ",Bind:" + std::to_string(Bind) + '\n';
-    
-    for(auto& m : Members)
-    {
-        ans += '\t' + m.second.Log() + '\n';
-    }
-
-    return ans;
-}
-
-void ShaderUniformBufferBlocks::Log()
-{
-#ifdef _DEBUG
-    string log;
-    for(auto& b : UniformBlocks)
-    {
-        log += b.second.Log() + '\n';
-    }
-    if(!log.empty())
-    {
-        LOG(log);
-    }
-#endif
-}
-
 VkShaderStageFlagBits vShader::GetVkShaderStageFlagBits()
 {
     switch (type)
@@ -284,7 +141,9 @@ VkShaderStageFlagBits vShader::GetVkShaderStageFlagBits()
     return VK_SHADER_STAGE_ALL;
 }
 
-vShader::vShader(const char* Name, ShaderType type, ShaderCodeType codeType): type(type)
+vShader::vShader(const char* Name, ShaderType type, ShaderCodeType codeType)
+: type(type)
+
 {
     string fileName = Name;
     
@@ -318,11 +177,11 @@ vShader::vShader(const char* Name, ShaderType type, ShaderCodeType codeType): ty
 
     auto data = FileToolKit::ReadFileAsBinary(Path);
 
-    ShaderUniformBufferBlocks = ShaderDecoder::DecodeUniformBuffer(&data);
+    ShaderReflector reflector(data);
+
+    reflector.MergeToUniformBufferBlocks(&UniformBufferBlocks);
 
     ShaderTextureInputs = ShaderDecoder::DecodeTextures(&data);
-
-    ShaderUniformBufferBlocks.Log();
     
     ShaderTextureInputs.Log();
 
@@ -346,13 +205,13 @@ VkPipelineShaderStageCreateInfo vShader::GetStageInfo()
     return vertShaderStageInfo;
 }
 
-void vShader::FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutBinding>& out)
+void vShader:: FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutBinding>& out)
 {
     for(auto& block :
-        ShaderUniformBufferBlocks.UniformBlocks)
+        UniformBufferBlocks.UniformBlocks)
     {
         VkDescriptorSetLayoutBinding uboLayoutBinding = {};
-
+    
         // 绑定点
         uboLayoutBinding.binding = block.second.Bind;
         // 类型
@@ -387,6 +246,7 @@ void vShader::FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutBi
             ImageBinding.descriptorType = VK_DESCRIPTOR_TYPE_SAMPLER;
             break;
         default:
+            ERR("Error Image Type");
             continue;
         }
         // 数组数量 TODO

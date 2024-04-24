@@ -32,8 +32,8 @@ DefaultVSOutput CommonVS(DefaultVSInput input)
     output.TexCoords = input.texCoord;
 	
     float4 pos = output.FragPos;
-    pos = mul(GlobalUniformBuffer.u_View, pos);
-    pos = mul(GlobalUniformBuffer.u_Projection, pos);
+    pos = mul(Global.u_View, pos);
+    pos = mul(Global.u_Projection, pos);
     output.Position = pos;
 
     return output;

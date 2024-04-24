@@ -64,52 +64,56 @@ void Material::SetTexture(const string& TargetName, const string& NewTextureName
     descriptor.BindInputBuffer();
 }
 
-void Material::SetCurrentUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset)
+void Material::SetCurrentUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset)
 {
-    descriptor.buffers[index]->UpdateCurrentBuffer(Src, Size, Offset);
-}
-
-void Material::SetAllUniformData(uint32 index, uint8* Src, size_t Size, size_t Offset)
-{
-    descriptor.buffers[index]->UpdateAllBuffer(Src, Size, Offset);
-}
-
-void Material::SetCurrentUniformData(const string& BlockName, uint8* Src, size_t Size, size_t Offset)
-{
-    for (auto& block : descriptor.buffers)
+    auto blockName = info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.find(MemberName);
+    if(blockName == info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.end())
     {
-        if(block->BlockName != BlockName)
-        {
-            continue;
-        }
+        ERR("Member in block Not find", MemberName);
+    }
 
-        block->UpdateCurrentBuffer(Src, Size, Offset);
+    auto buffer = descriptor.buffers.find(blockName->second);
+    if(buffer == descriptor.buffers.end())
+    {
+        ERR("Buffer Not Find", MemberName);
+    }
+
+    buffer->second->UpdateCurrentBuffer(Src, Size, Offset);
+}
+
+void Material::SetAllUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset)
+{
+    auto blockName = info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.find(MemberName);
+    if(blockName == info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.end())
+    {
+        ERR("Member in block Not find", MemberName);
+    }
+
+    auto buffer = descriptor.buffers.find(blockName->second);
+    if(buffer == descriptor.buffers.end())
+    {
+        ERR("Buffer Not Find", MemberName);
+    }
+
+    buffer->second->UpdateAllBuffer(Src, Size, Offset);
+}
+
+void Material::SetCurrentUniformData(const Container::Name& MemberName, uint8* Src, size_t Size)
+{
+    auto target = info->VertShader->UniformBufferBlocks.UniformMembers.find(MemberName);
+    if(target != info->VertShader->UniformBufferBlocks.UniformMembers.end())
+    {
+        SetCurrentUniformData(MemberName, Src, Size, target->second.Offset);
     }
 }
 
-void Material::SetAllUniformData(const string& BlockName, uint8* Src, size_t Size, size_t Offset)
+void Material::SetAllUniformData(const Container::Name& MemberName, uint8* Src, size_t Size)
 {
-    for (auto& block : descriptor.buffers)
+    auto target = info->VertShader->UniformBufferBlocks.UniformMembers.find(MemberName);
+    if(target != info->VertShader->UniformBufferBlocks.UniformMembers.end())
     {
-        if(block->BlockName != BlockName)
-        {
-            continue;
-        }
-
-        block->UpdateAllBuffer(Src, Size, Offset);
+        SetAllUniformData(MemberName, Src, Size, target->second.Offset);
     }
-}
-
-void Material::SetCurrentUniformData(const string& BlockName, const string& MemberName, uint8* Src, size_t Size)
-{
-    SetCurrentUniformData(BlockName, Src, Size,
-        info->VertShader->ShaderUniformBufferBlocks.UniformBlocks[BlockName].Members[MemberName].Offset);
-}
-
-void Material::SetAllUniformData(const string& BlockName, const string& MemberName, uint8* Src, size_t Size)
-{
-    SetAllUniformData(BlockName, Src, Size,
-        info->VertShader->ShaderUniformBufferBlocks.UniformBlocks[BlockName].Members[MemberName].Offset);
 }
 
 void Material::Draw(const RenderInfo& RenderInfo)

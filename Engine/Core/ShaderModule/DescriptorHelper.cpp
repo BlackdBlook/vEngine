@@ -67,18 +67,18 @@ void DescriptorHelper::BindInputBuffer()
         uint32 bufferElementCount = 0;
         for(auto& buffer : this->buffers)
         {
-            bufferElementCount += buffer->UniformBlockCache.CaclBufferElementNum();
+            bufferElementCount += buffer.second->UniformBlockCache.CaclBufferElementNum();
         }
         std::vector<VkDescriptorBufferInfo> bufferInfos(bufferElementCount);
         
         for(auto& buffer : this->buffers)
         {
-            for(uint64 i = 0;i < buffer->UniformBlockCache.CaclBufferElementNum();i++)
+            for(uint64 i = 0;i < buffer.second->UniformBlockCache.CaclBufferElementNum();i++)
             {
                 auto& bufferInfo = bufferInfos[bufferCount++];
-                bufferInfo.buffer = *buffer->GetUniformBuffer(freamIndex);
-                bufferInfo.offset = i * buffer->UniformBlockCache.GetElementOffset();
-                bufferInfo.range = buffer->UniformBlockCache.ElementSize;
+                bufferInfo.buffer = *buffer.second->GetUniformBuffer(freamIndex);
+                bufferInfo.offset = i * buffer.second->UniformBlockCache.GetElementOffset();
+                bufferInfo.range = buffer.second->UniformBlockCache.ElementSize;
             }
         }
         bufferCount = 0;
@@ -89,10 +89,10 @@ void DescriptorHelper::BindInputBuffer()
             VkWriteDescriptorSet& descriptorWrite = descriptorWrites[bufferCount++];
             descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
             descriptorWrite.dstSet = descriptorSets[freamIndex];// 目标Descriptor Set
-            descriptorWrite.dstBinding = buffer->Bind;// 绑定点
+            descriptorWrite.dstBinding = buffer.second->Bind;// 绑定点
             descriptorWrite.dstArrayElement = 0;// 数组元素的起始索引
             descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;// 描述符类型
-            descriptorWrite.descriptorCount = buffer->UniformBlockCache.CaclBufferElementNum();// 描述符数量，对应二维数组展平后的大小
+            descriptorWrite.descriptorCount = buffer.second->UniformBlockCache.CaclBufferElementNum();// 描述符数量，对应二维数组展平后的大小
             descriptorWrite.pBufferInfo = &bufferInfos[bufferElementCount];// 指向包含数据信息的结构体的指针
             descriptorWrite.pImageInfo = nullptr; // Optional
             descriptorWrite.pTexelBufferView = nullptr; // Optional

@@ -1,9 +1,9 @@
 #include "ShaderReflector.h"
 
+#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/VulkanHelper/VkHelper.h"
 #include "LogPrinter/Log.h"
 #include "ThirdParty/StringFormater/StringFormater.h"
-using namespace shader;
 
 /// Buffer命名规则：
 /// 1. 一个Buffer的名字与Shader中相同
@@ -100,6 +100,21 @@ void ShaderUniformBufferBlocks::Log()
     string log;
     for(auto& b : UniformBlocks)
     {
+        if(b.second.IsGlobalUnifomrBuffer)
+        {
+            log += b.second.Log() + '\n';
+            for(auto& m : GlobalUniformBufferManager::Get()->globalInfo->Members)
+            {
+                log += m.second.Log() + '\n';
+            }
+        }
+        else
+        {
+            log += b.second.Log() + '\n';
+        }
+    }
+    for(auto& b : UniformMembers)
+    {
         log += b.second.Log() + '\n';
     }
     if(!log.empty())
@@ -157,7 +172,7 @@ void ShaderReflector::prossesMemberName(
 
                 ShaderUniformMember member;
 
-                member.Name = compiler.get_name(memberTypeId);
+                member.Name = memberName;
 
                 member.Size = compiler.get_declared_struct_member_size(parentType, i);
 
@@ -178,7 +193,7 @@ void ShaderReflector::prossesMemberName(
 
                         ShaderUniformMember member;
 
-                        member.Name = compiler.get_name(memberTypeId);
+                        member.Name = memberName;
 
                         member.Size = compiler.get_declared_struct_member_size(parentType, i);
 
@@ -192,53 +207,89 @@ void ShaderReflector::prossesMemberName(
     }
 }
 
-SPtr<ShaderUniformBufferBlocks> ShaderReflector::GetUniformBufferBlocks()
+void ShaderReflector::processBlock(string& name, const spirv_cross::SPIRType& type, UniformMemberMap& out)
 {
-    BufferBlocksPtr ret = NewSPtr<ShaderUniformBufferBlocks>();
+    if(!type.array.empty())
+    {
+        // 这是个数组，i是这个数组的长度
+        for(uint32 i : type.array)
+        {
+            for(uint32 j = 0; j < i; j++)
+            {
+                string memberPrefix = Format(name, '[', j, "].");
+                prossesMemberName(memberPrefix, type, out);
+            }
+        }
+    }
+    else
+    {
+        // uniform_buffers拿到的类型必然是个结构体
+        // 遍历uniform变量的所有成员
+            
+        string memberPrefix = Format(name, '.');
+        prossesMemberName(memberPrefix, type, out);
+    }
 
+    
+}
+
+bool ShaderReflector::MergeToUniformBufferBlocks(ShaderUniformBufferBlocks* blocks)
+{
     // 获取反射数据
     spirv_cross::ShaderResources resources = compiler.get_shader_resources();
 
     // 遍历所有的uniform变量
     for (auto& resource : resources.uniform_buffers)
     {
-        ShaderUniformBufferBlock block;
-        // 块的名字
         string name = compiler.get_name(resource.id);
-        const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
-        if(!type.array.empty())
+        if(name != "Global")
         {
-            // 这是个数组，i是这个数组的长度
-            for(uint32 i : type.array)
+            const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
+            UniformMemberMap members;
+            processBlock(name, type, members);
+        
+            ShaderUniformBufferBlock block;
+            block.Array_length = {type.array.begin(), type.array.end()};
+            block.Name = name;
+            block.ElementSize = compiler.get_declared_struct_size(type);
+            block.Set = compiler.get_decoration(resource.id, spv::Decoration::DecorationDescriptorSet);
+            block.Bind = compiler.get_decoration(resource.id, spv::Decoration::DecorationBinding);
+
+            for(auto& m : members)
             {
-                for(uint32 j = 0; j < i; j++)
-                {
-                    string memberPrefix = Format(name, '[', j, "].");
-                    prossesMemberName(memberPrefix, type, ret->UniformMembers);
-                }
+                blocks->UniformMemberInBlocks.insert({m.first, Container::Name{name}});
             }
+            
+            blocks->UniformMembers.insert(members.begin(), members.end());
+    
+            blocks->UniformBlocks.insert({
+                name,
+                std::move(block)
+            });
         }
         else
         {
-            // uniform_buffers拿到的类型必然是个结构体
-            // 遍历uniform变量的所有成员
-            
-            string memberPrefix = Format(name, '.');
-            prossesMemberName(memberPrefix, type, ret->UniformMembers);
+            auto& info = GlobalUniformBufferManager::Get()->globalInfo;
+            if(info == nullptr)
+            {
+                const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
+                info = new GlobalUniformBufferInfo();
+                info->ElementSize = compiler.get_declared_struct_size(type);
+                processBlock(name, type, GlobalUniformBufferManager::Get()->globalInfo->Members);
+            }
+
+            ShaderUniformBufferBlock block;
+            block.Name = "Global";
+            block.IsGlobalUnifomrBuffer = true;
+            block.ElementSize = info->ElementSize;
+            block.Set = 0;
+            block.Bind = 0;
+
+            blocks->UniformBlocks.insert({
+                compiler.get_name(resource.id),
+                std::move(block)
+            });
         }
-
-        block.Array_length = {type.array.begin(), type.array.end()};
-        block.Name = name;
-        block.ElementSize = compiler.get_declared_struct_size(type);
-        block.Set = compiler.get_decoration(resource.id, spv::Decoration::DecorationDescriptorSet);
-        block.Bind = compiler.get_decoration(resource.id, spv::Decoration::DecorationBinding);
-        
-        ret->UniformBlocks.insert({
-            compiler.get_name(resource.id),
-            std::move(block)
-        });
     }
-
-
-    return ret;
+    return true;
 }

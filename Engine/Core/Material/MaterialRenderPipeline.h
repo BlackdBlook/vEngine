@@ -14,7 +14,7 @@ protected:
     mutable VkDescriptorSetLayout descriptorSetLayout = nullptr;
     mutable VkPipelineLayout pipelineLayout = nullptr;
 public:
-
+    
     SPtr<vShader> VertShader;
     SPtr<vShader> FragShader;
     MaterialRenderPipelineInfo();
@@ -44,7 +44,7 @@ public:
     virtual VkPipeline PipelineBasePipelineHandle()const;
 
     virtual VkDescriptorSetLayout MakeVkDescriptorSetLayout() const;
-    virtual std::vector<SPtr<UniformBuffer>> MakeUniformBuffers() const;
+    virtual std::unordered_map<Container::Name, SPtr<UniformBuffer>> MakeUniformBuffers() const;
     virtual void MakeInputTextures(std::unordered_map<string, SPtr<Texture2D>>& out) const;
 };
 

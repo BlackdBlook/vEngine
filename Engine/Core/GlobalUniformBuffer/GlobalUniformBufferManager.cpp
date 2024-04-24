@@ -21,11 +21,11 @@ void GlobalUniformBuffer::UpdateCameraData()
     
     {
         auto view = cam->GetCameraView();
-        auto member = UniformBlockCache.Members.find("u_View");
+        auto member = Members.find("Global.u_View");
 
-        if(member == UniformBlockCache.Members.end())
+        if(member == Members.end())
         {
-            WARNING("Global Uniform member not found", member->first);
+            WARNING("Global Uniform member not found", "Global.u_View");
             return;
         }
     
@@ -34,11 +34,11 @@ void GlobalUniformBuffer::UpdateCameraData()
 
     {
         auto Projection = cam->GetCameraProjection();
-        auto member = UniformBlockCache.Members.find("u_Projection");
+        auto member = Members.find("Global.u_Projection");
 
-        if(member == UniformBlockCache.Members.end())
+        if(member == Members.end())
         {
-            WARNING("Global Uniform member not found", member->first);
+            WARNING("Global Uniform member not found", "Global.u_Projection");
             return;
         }
     
@@ -49,6 +49,11 @@ void GlobalUniformBuffer::UpdateCameraData()
 GlobalUniformBufferManager::GlobalUniformBufferManager()
 {
     
+}
+
+GlobalUniformBufferManager::~GlobalUniformBufferManager()
+{
+    delete globalInfo;
 }
 
 SPtr<GlobalUniformBuffer> GlobalUniformBufferManager::GetBuffer(size_t size, ShaderUniformBufferBlock* block)
@@ -81,5 +86,6 @@ void GlobalUniformBufferManager::Init(size_t size, string Name, ShaderUniformBuf
     buffer = std::make_shared<GlobalUniformBuffer>();
     buffer->Init_Internal(size, Name);
     buffer->UniformBlockCache = *block;
+    buffer->Members = globalInfo->Members;
     buffer->UpdateCameraData();
 }

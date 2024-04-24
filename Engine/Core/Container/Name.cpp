@@ -36,6 +36,12 @@ uint32_t MurmurHash3(const char* key, size_t len) {
     return h;
 }
 
+size_t CaseInsensitiveHash::operator()(const char* key) const
+{
+    const size_t len = strlen(key);
+    return MurmurHash3(key, len);
+}
+
 size_t CaseInsensitiveHash::operator()(const std::string& key) const
 {
     return MurmurHash3(key.c_str(), key.size());
@@ -59,42 +65,56 @@ bool CaseInsensitiveEqual::operator()(const Name& key1, const string& key2) cons
 
 Name::Name()
 {
-    str = NewSPtr<const std::string>("");
+    pStr = NewSPtr<const std::string>("");
     
-    hash = CaseInsensitiveHash()(*str);
+    hash = INVALID_HASH;
+}
+
+Name::Name(const char* str)
+{
+    pStr = NewSPtr<const std::string>(str);
+
+    hash  = CaseInsensitiveHash()(str);
 }
 
 Name::Name(const std::string& str)
 {
-    this->str = NewSPtr<const std::string>(str);
+    this->pStr = NewSPtr<const std::string>(str);
     
-    hash = CaseInsensitiveHash()(*this->str);
+    hash = CaseInsensitiveHash()(*this->pStr);
 }
 
 Name::Name(std::string&& str)
 {
-    this->str = NewSPtr<const std::string>(std::move(str));
+    this->pStr = NewSPtr<const std::string>(std::move(str));
 
-    hash = CaseInsensitiveHash()(*this->str);
+    hash = CaseInsensitiveHash()(*this->pStr);
 }
 
 Name::Name(const Name& other)
 {
-    str = other.str;
+    pStr = other.pStr;
     hash = other.hash;
 }
 
 Name::Name(Name&& other) noexcept
 {
-    str = std::move(other.str);
+    pStr = std::move(other.pStr);
     hash = other.hash;
+}
+
+Name& Name::operator=(const char* other)
+{
+    pStr = NewSPtr<string>(other);
+    hash = CaseInsensitiveHash()(other);
+    return *this;
 }
 
 Name& Name::operator=(const Name& other)
 {
     if(other != *this)
     {
-        str = other.str;
+        pStr = other.pStr;
         hash = CaseInsensitiveHash()(other);
     }
     return *this;
@@ -102,7 +122,7 @@ Name& Name::operator=(const Name& other)
 
 Name& Name::operator=(const string& other)
 {
-    str = NewSPtr<const std::string>(other);
+    pStr = NewSPtr<const std::string>(other);
     hash = CaseInsensitiveHash()(other);
     return *this;
 }
