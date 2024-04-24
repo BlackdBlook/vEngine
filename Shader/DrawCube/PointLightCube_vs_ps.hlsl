@@ -2,7 +2,6 @@
 #include "../CommonFunction.hlsli"
 #include "../CommonStruct.hlsli"
 
-
 // 创建一个ConstantBuffer来存储PointLight数组
 // 使用vk::binding修饰符来指定Vulkan中的绑定和集合索引
 [[vk::binding(2, 0)]]
@@ -23,5 +22,6 @@ float4 PS(DefaultVSOutput input) : SV_TARGET
     pos += float4(pointLightBuffer[1].position, 1);
     pos += float4(pointLightBuffer[2].position, 1);
     pos += float4(pointLightBuffer[3].position, 1);
+
     return pos;
 }

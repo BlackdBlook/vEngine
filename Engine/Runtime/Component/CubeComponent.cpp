@@ -1,8 +1,7 @@
 #include "CubeComponent.h"
-
-#include "BoxVertices.h"
 #include "Engine/Core/FrameInfo/RenderInfo.h"
 #include "Engine/Core/Object/Object.h"
+#include "Meshs/Box/BoxVertices.h"
 
 CubeComponent::CubeComponent(const string& shader):
 buffer(sizeof(BoxVertices), BoxVertices)

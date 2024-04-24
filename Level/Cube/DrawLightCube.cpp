@@ -10,8 +10,9 @@
 #include "Engine/Core/Material/Material.h"
 #include "Engine/Core/Object/Object.h"
 #include "Engine/Core/Texture2D/Texture2D.h"
+#include "Engine/Runtime/Component/CubeComponent.h"
 #include "Meshs/Box/BoxVertices.h"
-#include "Meshs/Box/CubeComponent.h"
+
 
 
 namespace
