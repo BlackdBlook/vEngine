@@ -37,33 +37,21 @@ namespace
 
     class AutoMov : public Component
     {
+        Material* material;
     public:
+        AutoMov(Material* material)
+        {
+            Component();
+            this->material = material;
+        }
         void Update(float DeltaTime) override
         {
             Parent->SetPos(glm::vec3{glm::sin(glfwGetTime()) * 2,0,glm::cos(glfwGetTime()) * 2});
+            material->SetCurrentUniformData("pointLight.position", Parent->GetPos());
         }
     };
 
-    class DirectLightWithUbo
-    {
-#define LightNumber 0.8f
-        glm::vec3 direction = {-0.2f, -1.0f, -0.3f};
-        glm::vec3 color = {1.f, 1.f, 1.f};
-        glm::vec3 ambient = {0.2,0.2,0.2};
-        glm::vec3 diffuse = {LightNumber, LightNumber, LightNumber};
-        glm::vec3 specular = {LightNumber, LightNumber, LightNumber};
 
-    public:
-        void SetMat(Material& mat);
-    };
-    void DirectLightWithUbo::SetMat(Material& mat)
-    {
-        mat.SetAllUniformData("dirLight.ambient", ambient);
-        mat.SetAllUniformData("dirLight.color", color);
-        mat.SetAllUniformData("dirLight.direction", direction);
-        mat.SetAllUniformData("dirLight.diffuse", diffuse);
-        mat.SetAllUniformData("dirLight.specular", specular);
-    }
 }
 
 void DrawLightCube::Init()
@@ -71,22 +59,31 @@ void DrawLightCube::Init()
     Level::Init();
 
     Camera::GetCamera()->SetPos(glm::vec3(0, 0, 3));
+    Material* m;
+
+    {
+        auto obj = NewObject();
+        // obj->CreateAttach<AutoRot>();
+        auto cube = obj->CreateAttach<CubeComponent>("PointLightCube");
+        m = cube->material.get();
+        m->SetTexture("texture0", "container2.png");
+        m->SetAllUniformData("material.shininess", 1.f);
+        m->SetAllUniformData("pointLight.constant", 1.f);
+        m->SetAllUniformData("pointLight.linear", 0.09f);
+        m->SetAllUniformData("pointLight.quadratic", 0.032f);
+        m->SetAllUniformData("pointLight.strength", 1.f);
+        m->SetAllUniformData("pointLight.position", glm::vec3{1, 1, 1});
+        m->SetAllUniformData("pointLight.color", glm::vec3{1, 1, 1});
+    }
+    
     {
         auto light = NewObject();
         light->CreateAttach<Light>();
-        light->CreateAttach<AutoMov>();
+        light->CreateAttach<AutoMov>(m);
         light->CreateAttach<CubeComponent>("DrawTexCube");
         light->SetScale(glm::vec3{0.1});
     }
 
-    // for(int i = 0;i < 100;i++)
-    {
-        auto obj = NewObject();
-        obj->CreateAttach<AutoRot>();
-        auto cube = obj->CreateAttach<CubeComponent>("PointLightCube");
-        cube->material->SetTexture("texture0", "container2.png");
-        DirectLightWithUbo().SetMat(*cube->material);
-    }
 
 }
 LevelRegister(DrawLightCube);

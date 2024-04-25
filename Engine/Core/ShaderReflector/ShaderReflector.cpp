@@ -124,8 +124,9 @@ void ShaderUniformBufferBlocks::Log()
 #endif
 }
 
-ShaderReflector::ShaderReflector(const std::vector<uint8>& shaderByteCode)
-    :compiler(reinterpret_cast<const std::vector<uint32>&>(shaderByteCode))
+ShaderReflector::ShaderReflector(const std::vector<uint8>& shaderByteCode, VkShaderStageFlagBits shaderStageFlagBits):
+ShaderStageFlagBits(shaderStageFlagBits),
+compiler(reinterpret_cast<const std::vector<uint32>&>(shaderByteCode))
 {
     
 }
@@ -241,23 +242,36 @@ bool ShaderReflector::MergeToUniformBufferBlocks(ShaderUniformBufferBlocks* bloc
     // 遍历所有的uniform变量
     for (auto& resource : resources.uniform_buffers)
     {
-        string name = compiler.get_name(resource.id);
-        if(name != "Global")
+        static Container::Name GlobalName = "Global";
+        string nameStr = compiler.get_name(resource.id);
+        Container::Name name = nameStr;
+        if(name != GlobalName)
         {
+            {
+                auto it = blocks->UniformBlocks.find(name);
+                if(it != blocks->UniformBlocks.end())
+                {
+                    // 已经存在了
+                    it->second.shaderType = (VkShaderStageFlagBits)(ShaderStageFlagBits | it->second.shaderType);
+                    continue;
+                }
+            }
+            
             const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
             UniformMemberMap members;
-            processBlock(name, type, members);
+            processBlock(nameStr, type, members);
         
             ShaderUniformBufferBlock block;
             block.Array_length = {type.array.begin(), type.array.end()};
-            block.Name = name;
+            block.Name = nameStr;
             block.ElementSize = static_cast<uint32>(compiler.get_declared_struct_size(type));
             block.Set = compiler.get_decoration(resource.id, spv::Decoration::DecorationDescriptorSet);
             block.Bind = compiler.get_decoration(resource.id, spv::Decoration::DecorationBinding);
+            block.shaderType = ShaderStageFlagBits;
 
             for(auto& m : members)
             {
-                blocks->UniformMemberInBlocks.insert({m.first, Container::Name{name}});
+                blocks->UniformMemberInBlocks.insert({m.first, name});
             }
             
             blocks->UniformMembers.insert(members.begin(), members.end());
@@ -275,7 +289,7 @@ bool ShaderReflector::MergeToUniformBufferBlocks(ShaderUniformBufferBlocks* bloc
                 const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
                 info = new GlobalUniformBufferInfo();
                 info->ElementSize = static_cast<uint32>(compiler.get_declared_struct_size(type));
-                processBlock(name, type, GlobalUniformBufferManager::Get()->globalInfo->Members);
+                processBlock(nameStr, type, GlobalUniformBufferManager::Get()->globalInfo->Members);
             }
 
             ShaderUniformBufferBlock block;
@@ -284,6 +298,7 @@ bool ShaderReflector::MergeToUniformBufferBlocks(ShaderUniformBufferBlocks* bloc
             block.ElementSize = info->ElementSize;
             block.Set = 0;
             block.Bind = 0;
+            block.shaderType = VK_SHADER_STAGE_ALL;
 
             blocks->UniformBlocks.insert({
                 compiler.get_name(resource.id),

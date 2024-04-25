@@ -16,14 +16,14 @@ MaterialRenderPipelineInfo::MaterialRenderPipelineInfo()
 
 MaterialRenderPipelineInfo::MaterialRenderPipelineInfo(const string& shaderName, ShaderCodeType codeType)
 {
-    VertShader = NewSPtr<vShader>(shaderName.c_str(), ShaderType::Vertex, codeType);
-    FragShader = NewSPtr<vShader>(shaderName.c_str(), ShaderType::Fragment, codeType);
+    VertShader = NewSPtr<vShader>(shaderName.c_str(), ShaderType::Vertex, UniformBufferBlocks.get(), codeType);
+    FragShader = NewSPtr<vShader>(shaderName.c_str(), ShaderType::Fragment, UniformBufferBlocks.get(), codeType);
 }
 
 MaterialRenderPipelineInfo::MaterialRenderPipelineInfo(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType)
 {
-    VertShader = NewSPtr<vShader>(VertShaderName.c_str(), ShaderType::Vertex, codeType);
-    FragShader = NewSPtr<vShader>(FragShaderName.c_str(), ShaderType::Fragment, codeType);
+    VertShader = NewSPtr<vShader>(VertShaderName.c_str(), ShaderType::Vertex, UniformBufferBlocks.get(), codeType);
+    FragShader = NewSPtr<vShader>(FragShaderName.c_str(), ShaderType::Fragment, UniformBufferBlocks.get(), codeType);
 }
 
 MaterialRenderPipelineInfo::~MaterialRenderPipelineInfo()
@@ -203,6 +203,7 @@ VkDescriptorSetLayout MaterialRenderPipelineInfo::MakeVkDescriptorSetLayout() co
 
     std::vector<VkDescriptorSetLayoutBinding> out;
 
+    FillDescriptorSetLayoutBinding(out);
     VertShader->FillDescriptorSetLayoutBinding(out);
     FragShader->FillDescriptorSetLayoutBinding(out);
  
@@ -244,16 +245,16 @@ std::unordered_map<Container::Name, SPtr<UniformBuffer>> MaterialRenderPipelineI
     std::unordered_map<Container::Name, SPtr<UniformBuffer>> out;
 
     for(auto& blocks :
-        VertShader->UniformBufferBlocks.UniformBlocks)
+        UniformBufferBlocks->UniformBlocks)
     {
         createUniformBuffer(blocks.second, out);
     }
 
-    for(auto& blocks :
-        FragShader->UniformBufferBlocks.UniformBlocks)
-    {
-        createUniformBuffer(blocks.second, out);
-    }
+    // for(auto& blocks :
+    //     FragShader->UniformBufferBlocks.UniformBlocks)
+    // {
+    //     createUniformBuffer(blocks.second, out);
+    // }
     
     return out;
 }
@@ -278,6 +279,25 @@ void MaterialRenderPipelineInfo::MakeInputTextures(std::unordered_map<string, SP
         texture->InputInfo.set = tex.second.set;
         texture->InputInfo.type = tex.second.type;
         out.emplace(tex.first, texture);
+    }
+}
+
+void MaterialRenderPipelineInfo::FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutBinding>& out)const
+{
+    for(auto& block : UniformBufferBlocks->UniformBlocks)
+    {
+        VkDescriptorSetLayoutBinding& uboLayoutBinding = out.emplace_back();;
+    
+        // 绑定点
+        uboLayoutBinding.binding = block.second.Bind;
+        // 类型
+        uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        // 数组数量
+        uboLayoutBinding.descriptorCount = block.second.CaclBufferElementNum();
+        // 作用阶段
+        uboLayoutBinding.stageFlags = block.second.shaderType;
+        // 纹理采样器
+        uboLayoutBinding.pImmutableSamplers = nullptr;
     }
 }
 

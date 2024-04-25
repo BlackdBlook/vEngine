@@ -2,9 +2,12 @@
 #include <vector>
 #include "Header.h"
 #include "Engine/Core/Container/Name.h"
+#include "Engine/Core/ShaderModule/Shader.h"
 #include "LogPrinter/Log.h"
 #include "ThirdParty/SPIRV-Cross/spirv_cross.hpp"
 
+
+enum class ShaderType;
 
 struct ShaderUniformMember
 {
@@ -26,6 +29,8 @@ struct ShaderUniformBufferBlock
     uint32 Set;
     uint32 Bind;
     std::vector<uint32> Array_length;
+    
+    VkShaderStageFlagBits shaderType;
     // std::unordered_map<Container::Name, ShaderUniformMember> Members;
 
     bool operator==(const ShaderUniformBufferBlock& other);
@@ -59,7 +64,7 @@ struct ShaderUniformBufferBlocks
 class ShaderReflector
 {
     using BufferBlocksPtr = SPtr<ShaderUniformBufferBlocks>;
-    
+    VkShaderStageFlagBits ShaderStageFlagBits;
     spirv_cross::Compiler compiler;
     void prossesMemberName(string parentName, const spirv_cross::SPIRType& parentType
                            , UniformMemberMap& out);
@@ -67,7 +72,7 @@ class ShaderReflector
     void processBlock(string& name, const spirv_cross::SPIRType& type, UniformMemberMap& out);
     
 public:
-    ShaderReflector(const std::vector<uint8>& shaderByteCode);
+    ShaderReflector(const std::vector<uint8>& shaderByteCode, VkShaderStageFlagBits shaderStageFlagBits);
 
     bool MergeToUniformBufferBlocks(ShaderUniformBufferBlocks* blocks);
 };

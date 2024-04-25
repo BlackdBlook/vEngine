@@ -32,8 +32,4 @@ struct PointLight {
     float constant;
     float linears;
     float quadratic;
-
-    float3 ambient;
-    float3 diffuse;
-    float3 specular;
 };

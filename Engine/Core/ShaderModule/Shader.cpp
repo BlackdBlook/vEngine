@@ -141,7 +141,7 @@ VkShaderStageFlagBits vShader::GetVkShaderStageFlagBits()
     return VK_SHADER_STAGE_ALL;
 }
 
-vShader::vShader(const char* Name, ShaderType type, ShaderCodeType codeType)
+vShader::vShader(const char* Name, ShaderType type, ShaderUniformBufferBlocks* blocks, ShaderCodeType codeType)
 : type(type)
 
 {
@@ -177,13 +177,11 @@ vShader::vShader(const char* Name, ShaderType type, ShaderCodeType codeType)
 
     auto data = FileToolKit::ReadFileAsBinary(Path);
 
-    ShaderReflector reflector(data);
+    ShaderReflector reflector(data, GetVkShaderStageFlagBits());
 
-    reflector.MergeToUniformBufferBlocks(&UniformBufferBlocks);
+    reflector.MergeToUniformBufferBlocks(blocks);
 
     ShaderTextureInputs = ShaderDecoder::DecodeTextures(&data);
-
-    UniformBufferBlocks.Log();
     
     ShaderTextureInputs.Log();
 
@@ -209,24 +207,24 @@ VkPipelineShaderStageCreateInfo vShader::GetStageInfo()
 
 void vShader:: FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutBinding>& out)
 {
-    for(auto& block :
-        UniformBufferBlocks.UniformBlocks)
-    {
-        VkDescriptorSetLayoutBinding uboLayoutBinding = {};
-    
-        // 绑定点
-        uboLayoutBinding.binding = block.second.Bind;
-        // 类型
-        uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        // 数组数量
-        uboLayoutBinding.descriptorCount = block.second.CaclBufferElementNum();
-        // 作用阶段
-        uboLayoutBinding.stageFlags = GetVkShaderStageFlagBits();
-        // 纹理采样器
-        uboLayoutBinding.pImmutableSamplers = nullptr;
-        
-        out.emplace_back(uboLayoutBinding);
-    }
+    // for(auto& block :
+    //     UniformBufferBlocks.UniformBlocks)
+    // {
+    //     VkDescriptorSetLayoutBinding uboLayoutBinding = {};
+    //
+    //     // 绑定点
+    //     uboLayoutBinding.binding = block.second.Bind;
+    //     // 类型
+    //     uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    //     // 数组数量
+    //     uboLayoutBinding.descriptorCount = block.second.CaclBufferElementNum();
+    //     // 作用阶段
+    //     uboLayoutBinding.stageFlags = GetVkShaderStageFlagBits();
+    //     // 纹理采样器
+    //     uboLayoutBinding.pImmutableSamplers = nullptr;
+    //     
+    //     out.emplace_back(uboLayoutBinding);
+    // }
 
     for(auto& block :
         ShaderTextureInputs.Members)

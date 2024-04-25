@@ -53,7 +53,6 @@ class vShader
     ShaderType type;
     
 public:
-    ShaderUniformBufferBlocks UniformBufferBlocks;
 
     ShaderTextureInputs ShaderTextureInputs;
     
@@ -64,7 +63,8 @@ public:
 
     string EntryPointFunctionName;
     
-    vShader(const char* Name, ShaderType type, ShaderCodeType codeType = ShaderCodeType::HLSL);
+    vShader(const char* Name, ShaderType type, struct ShaderUniformBufferBlocks* blocks,
+            ShaderCodeType codeType = ShaderCodeType::HLSL);
     
     ~vShader();
 
