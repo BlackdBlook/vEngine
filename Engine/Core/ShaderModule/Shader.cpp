@@ -182,6 +182,8 @@ vShader::vShader(const char* Name, ShaderType type, ShaderCodeType codeType)
     reflector.MergeToUniformBufferBlocks(&UniformBufferBlocks);
 
     ShaderTextureInputs = ShaderDecoder::DecodeTextures(&data);
+
+    UniformBufferBlocks.Log();
     
     ShaderTextureInputs.Log();
 

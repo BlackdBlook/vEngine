@@ -41,7 +41,7 @@ bool ShaderUniformMember::operator!=(const ShaderUniformMember& other)
 
 std::string ShaderUniformMember::Log()
 {
-    return "Name:" + Name.ToString() + " ,ElementSize:" + std::to_string(Size) + " ,Offset:" + std::to_string(Offset);
+    return " ,Name:" + Name.ToString() + " ,ElementSize:" + std::to_string(Size) + " ,Offset:" + std::to_string(Offset);
 }
 
 bool ShaderUniformBufferBlock::operator==(const ShaderUniformBufferBlock& other)
@@ -115,7 +115,7 @@ void ShaderUniformBufferBlocks::Log()
     }
     for(auto& b : UniformMembers)
     {
-        log += b.second.Log() + '\n';
+        log += Format("Member: " , b.first.ToString() , b.second.Log() , '\n');
     }
     if(!log.empty())
     {
@@ -251,7 +251,7 @@ bool ShaderReflector::MergeToUniformBufferBlocks(ShaderUniformBufferBlocks* bloc
             ShaderUniformBufferBlock block;
             block.Array_length = {type.array.begin(), type.array.end()};
             block.Name = name;
-            block.ElementSize = compiler.get_declared_struct_size(type);
+            block.ElementSize = static_cast<uint32>(compiler.get_declared_struct_size(type));
             block.Set = compiler.get_decoration(resource.id, spv::Decoration::DecorationDescriptorSet);
             block.Bind = compiler.get_decoration(resource.id, spv::Decoration::DecorationBinding);
 
@@ -274,7 +274,7 @@ bool ShaderReflector::MergeToUniformBufferBlocks(ShaderUniformBufferBlocks* bloc
             {
                 const spirv_cross::SPIRType& type = compiler.get_type(resource.type_id);
                 info = new GlobalUniformBufferInfo();
-                info->ElementSize = compiler.get_declared_struct_size(type);
+                info->ElementSize = static_cast<uint32>(compiler.get_declared_struct_size(type));
                 processBlock(name, type, GlobalUniformBufferManager::Get()->globalInfo->Members);
             }
 

@@ -43,6 +43,27 @@ namespace
             Parent->SetPos(glm::vec3{glm::sin(glfwGetTime()) * 2,0,glm::cos(glfwGetTime()) * 2});
         }
     };
+
+    class DirectLightWithUbo
+    {
+#define LightNumber 0.8f
+        glm::vec3 direction = {-0.2f, -1.0f, -0.3f};
+        glm::vec3 color = {1.f, 1.f, 1.f};
+        glm::vec3 ambient = {0.2,0.2,0.2};
+        glm::vec3 diffuse = {LightNumber, LightNumber, LightNumber};
+        glm::vec3 specular = {LightNumber, LightNumber, LightNumber};
+
+    public:
+        void SetMat(Material& mat);
+    };
+    void DirectLightWithUbo::SetMat(Material& mat)
+    {
+        mat.SetAllUniformData("dirLight.ambient", ambient);
+        mat.SetAllUniformData("dirLight.color", color);
+        mat.SetAllUniformData("dirLight.direction", direction);
+        mat.SetAllUniformData("dirLight.diffuse", diffuse);
+        mat.SetAllUniformData("dirLight.specular", specular);
+    }
 }
 
 void DrawLightCube::Init()
@@ -54,7 +75,7 @@ void DrawLightCube::Init()
         auto light = NewObject();
         light->CreateAttach<Light>();
         light->CreateAttach<AutoMov>();
-        light->CreateAttach<CubeComponent>("PointLightCube");
+        light->CreateAttach<CubeComponent>("DrawTexCube");
         light->SetScale(glm::vec3{0.1});
     }
 
@@ -64,6 +85,7 @@ void DrawLightCube::Init()
         obj->CreateAttach<AutoRot>();
         auto cube = obj->CreateAttach<CubeComponent>("PointLightCube");
         cube->material->SetTexture("texture0", "container2.png");
+        DirectLightWithUbo().SetMat(*cube->material);
     }
 
 }

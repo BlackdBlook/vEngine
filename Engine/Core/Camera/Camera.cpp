@@ -2,13 +2,6 @@
 
 #include "Engine/vEngine.h"
 #include "Engine/Toolkit/math_utils.h"
-
-struct CameraUniformBuffer
-{
-    glm::mat4 projection;
-    glm::mat4 view;
-};
-
 Camera* Camera::malloc()
 {
     void* ans = ::malloc(sizeof(Camera));

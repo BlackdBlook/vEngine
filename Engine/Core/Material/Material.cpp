@@ -66,53 +66,128 @@ void Material::SetTexture(const string& TargetName, const string& NewTextureName
 
 void Material::SetCurrentUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset)
 {
-    auto blockName = info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.find(MemberName);
-    if(blockName == info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.end())
+    bool set = false;
+    do
     {
-        ERR("Member in block Not find", MemberName);
-    }
+        auto blockName = info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.find(MemberName);
+        if(blockName == info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.end())
+        {
+            break;
+        }
 
-    auto buffer = descriptor.buffers.find(blockName->second);
-    if(buffer == descriptor.buffers.end())
+        auto buffer = descriptor.buffers.find(blockName->second);
+        if(buffer == descriptor.buffers.end())
+        {
+            break;
+        }
+
+        buffer->second->UpdateCurrentBuffer(Src, Size, Offset);
+        set = true;
+    }while(false);
+    do
     {
-        ERR("Buffer Not Find", MemberName);
-    }
+        auto blockName = info->FragShader->UniformBufferBlocks.UniformMemberInBlocks.find(MemberName);
+        if(blockName == info->FragShader->UniformBufferBlocks.UniformMemberInBlocks.end())
+        {
+            break;
+        }
 
-    buffer->second->UpdateCurrentBuffer(Src, Size, Offset);
+        auto buffer = descriptor.buffers.find(blockName->second);
+        if(buffer == descriptor.buffers.end())
+        {
+            break;
+        }
+
+        buffer->second->UpdateCurrentBuffer(Src, Size, Offset);
+        set = true;
+    }while(false);
+
+    if(set == false)
+    {
+        ERR(MemberName, "Not Find");
+    }
 }
 
 void Material::SetAllUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset)
 {
-    auto blockName = info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.find(MemberName);
-    if(blockName == info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.end())
+    bool set = false;
+    do
     {
-        ERR("Member in block Not find", MemberName);
-    }
+        auto blockName = info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.find(MemberName);
+        if(blockName == info->VertShader->UniformBufferBlocks.UniformMemberInBlocks.end())
+        {
+            break;
+        }
 
-    auto buffer = descriptor.buffers.find(blockName->second);
-    if(buffer == descriptor.buffers.end())
+        auto buffer = descriptor.buffers.find(blockName->second);
+        if(buffer == descriptor.buffers.end())
+        {
+            break;
+        }
+
+        buffer->second->UpdateAllBuffer(Src, Size, Offset);
+        set = true;
+    }while(false);
+    do
     {
-        ERR("Buffer Not Find", MemberName);
-    }
+        auto blockName = info->FragShader->UniformBufferBlocks.UniformMemberInBlocks.find(MemberName);
+        if(blockName == info->FragShader->UniformBufferBlocks.UniformMemberInBlocks.end())
+        {
+            break;
+        }
 
-    buffer->second->UpdateAllBuffer(Src, Size, Offset);
+        auto buffer = descriptor.buffers.find(blockName->second);
+        if(buffer == descriptor.buffers.end())
+        {
+            break;
+        }
+
+        buffer->second->UpdateAllBuffer(Src, Size, Offset);
+        set = true;
+    }while(false);
+
+    if(set == false)
+    {
+        ERR(MemberName, "Not Find");
+    }
 }
 
 void Material::SetCurrentUniformData(const Container::Name& MemberName, uint8* Src, size_t Size)
 {
-    auto target = info->VertShader->UniformBufferBlocks.UniformMembers.find(MemberName);
-    if(target != info->VertShader->UniformBufferBlocks.UniformMembers.end())
     {
-        SetCurrentUniformData(MemberName, Src, Size, target->second.Offset);
+        auto target = info->VertShader->UniformBufferBlocks.UniformMembers.find(MemberName);
+        if(target != info->VertShader->UniformBufferBlocks.UniformMembers.end())
+        {
+            SetCurrentUniformData(MemberName, Src, Size, target->second.Offset);
+        }
     }
+
+    {
+        auto target = info->FragShader->UniformBufferBlocks.UniformMembers.find(MemberName);
+        if(target != info->FragShader->UniformBufferBlocks.UniformMembers.end())
+        {
+            SetCurrentUniformData(MemberName, Src, Size, target->second.Offset);
+        }
+    }
+    
 }
 
 void Material::SetAllUniformData(const Container::Name& MemberName, uint8* Src, size_t Size)
 {
-    auto target = info->VertShader->UniformBufferBlocks.UniformMembers.find(MemberName);
-    if(target != info->VertShader->UniformBufferBlocks.UniformMembers.end())
     {
-        SetAllUniformData(MemberName, Src, Size, target->second.Offset);
+        auto target = info->VertShader->UniformBufferBlocks.UniformMembers.find(MemberName);
+        if(target != info->VertShader->UniformBufferBlocks.UniformMembers.end())
+        {
+            SetAllUniformData(MemberName, Src, Size, target->second.Offset);
+        }
+    }
+
+    {
+        auto target = info->FragShader->UniformBufferBlocks.UniformMembers.find(MemberName);
+        if(target != info->FragShader->UniformBufferBlocks.UniformMembers.end())
+        {
+            SetAllUniformData(MemberName, Src, Size, target->second.Offset);
+        }
     }
 }
 

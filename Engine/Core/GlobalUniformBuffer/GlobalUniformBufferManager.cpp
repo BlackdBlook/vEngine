@@ -44,6 +44,19 @@ void GlobalUniformBuffer::UpdateCameraData()
     
         UpdateAllBuffer(&Projection, sizeof(Projection), member->second.Offset);
     }
+
+    {
+        auto pos = cam->GetPos();
+        auto member = Members.find("Global.u_CameraPos");
+
+        if(member == Members.end())
+        {
+            WARNING("Global Uniform member not found", "Global.u_CameraPos");
+            return;
+        }
+    
+        UpdateAllBuffer(&pos, sizeof(pos), member->second.Offset);
+    }
 }
 
 GlobalUniformBufferManager::GlobalUniformBufferManager()

@@ -397,6 +397,7 @@
     <ClInclude Include="Level\Cube\DrawTexCube.h" />
     <ClInclude Include="LogPrinter\Log.h" />
     <ClInclude Include="Meshs\Box\BoxVertices.h" />
+    <ClInclude Include="Shader\CommonDef.hlsli" />
     <ClInclude Include="ThirdParty\StringFormater\StringFormater.h" />
     <None Include="Shader\CommonFunction.hlsli" />
     <None Include="Shader\CommonStruct.hlsli" />
