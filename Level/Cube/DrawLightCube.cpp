@@ -50,13 +50,13 @@ void DrawLightCube::Init()
     Level::Init();
 
     Camera::GetCamera()->SetPos(glm::vec3(0, 0, 3));
-    // {
-    //     auto light = NewObject();
-    //     light->CreateAttach<Light>();
-    //     light->CreateAttach<AutoMov>();
-    //     light->CreateAttach<CubeComponent>("PointLightCube");
-    //     light->SetScale(glm::vec3{0.1});
-    // }
+    {
+        auto light = NewObject();
+        light->CreateAttach<Light>();
+        light->CreateAttach<AutoMov>();
+        light->CreateAttach<CubeComponent>("PointLightCube");
+        light->SetScale(glm::vec3{0.1});
+    }
 
     // for(int i = 0;i < 100;i++)
     {

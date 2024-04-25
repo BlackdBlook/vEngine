@@ -6,15 +6,18 @@
 namespace Container
 {
     struct CaseInsensitiveHash {
+        constexpr CaseInsensitiveHash(){}
         size_t operator()(const char* key) const;
         size_t operator()(const std::string& key) const;
         size_t operator()(const class Name& key) const;
     };
 
     struct CaseInsensitiveEqual {
+        constexpr CaseInsensitiveEqual(){}
         bool operator()(const Name& key1, const Name& key2) const;
         bool operator()(const Name& key1, const string& key2) const;
     };
+    
     class Name
     {
         SPtr<const std::string> pStr;
