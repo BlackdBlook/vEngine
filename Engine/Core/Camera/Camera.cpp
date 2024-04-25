@@ -72,7 +72,7 @@ glm::mat4 Camera::GetCameraView()
 glm::mat4 Camera::GetCameraProjection()
 {
     static const glm::mat4 projection =
-        glm::perspective(glm::radians(90.0f),
+        glm::perspective(glm::radians(45.0f),
         (float)Engine::ins->WindowX /
         (float)Engine::ins->WindowY, 0.1f, 100.0f);
     return projection;

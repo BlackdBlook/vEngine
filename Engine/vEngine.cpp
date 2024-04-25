@@ -7,6 +7,7 @@
 #include "Level/Cube/DrawCube.h"
 #include "Level/Cube/DrawTexCube.h"
 #include "LogPrinter/Log.h"
+#include "SubSystem/InputSystem/InputSysten.h"
 #include "Toolkit/Timer/Timer.h"
 #include "VulkanHelper/VkHelper.h"
 
@@ -33,7 +34,7 @@ vEngine::vEngine(): vkHelper(this)
     ins = this;
     window = vkHelper.InitWindow(2560, 1440);
     vkHelper.InitVulkan();
-    
+    InputSystem::GetInstance()->Init(window);
 
     InitLevelList();
 

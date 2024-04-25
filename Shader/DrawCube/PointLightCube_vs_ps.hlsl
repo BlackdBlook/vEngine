@@ -11,7 +11,7 @@ DefaultVSOutput VS(DefaultVSInput input)
 {
     return CommonVS(input);
 }
-
+  
 struct Material {
     float shininess;
 };
@@ -26,42 +26,57 @@ ConstantBuffer<Material> material;
 [[vk::binding(6, 0)]]
 ConstantBuffer<PointLight> pointLight;
 
-
+Texture2D texture1 : register(t7, space0);
+ 
+ 
 // calculates the color when using a point light.
-vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, float2 TexCoords)
+vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewPos, float2 TexCoords)
 {
     // ambient
-    vec3 ambient = texture0.Sample(sampler0, TexCoords).xyz;
-  	
+    vec3 ambient = 0.1 * texture0.Sample(sampler0, TexCoords).xyz;
+  	 
     // diffuse 
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * texture0.Sample(sampler0, TexCoords).xyz;  
-    
     // specular
-    vec3 view = normalize(viewDir - fragPos);
-    vec3 reflectDir = reflect(-lightDir, norm);  
-    float spec = pow(max(dot(view, reflectDir), 0.0), material.shininess);
-    vec3 specular = spec * texture0.Sample(sampler0, TexCoords).xyz;  
+
+    // vec3 view = normalize(viewPos - fragPos);
+    // vec3 reflectDir = reflect(-lightDir, normal);
+    // float spec = 0;
+    // if(dot(reflectDir, norm) > 0.0)
+    // {
+    //     spec = pow(max(dot(reflectDir, view), 0.0), material.shininess);
+    // }
+    
+    vec3 viewDir    = normalize(viewPos - fragPos);
+    vec3 halfwayDir = normalize(lightDir + viewDir); 
+    float spec = 0;
+    if(dot(lightDir, norm) > 0.0)
+    {
+        spec = pow(max(dot(norm, halfwayDir), 0.0), material.shininess);
+    }
+
+    vec3 specular = spec * texture1.Sample(sampler0, TexCoords).xyz;  
     
     // attenuation
     float distance    = length(light.position - fragPos);
     float attenuation = 1.0 / (light.constant + light.linears * distance + light.quadratic * (distance * distance));    
 
     ambient  *= attenuation;  
-    diffuse   *= attenuation;
+    diffuse  *= attenuation;
     specular *= attenuation;   
         
     return ambient + diffuse + specular;
+    // return diffuse+ specular;
+    // return spec;
     
-}
+} 
 
 float4 PS(DefaultVSOutput input) : SV_TARGET
 {
-    vec3 viewDir = normalize(Global.u_CameraPos - input.FragPos.xyz);
-    
-    float3 result = CalcPointLight(pointLight, input.Normal, input.FragPos.xyz, viewDir, input.TexCoords);
+    float3 result = CalcPointLight(pointLight, input.Normal, input.FragPos.xyz, Global.u_CameraPos, input.TexCoords);
       
     return float4(result, 1.0f);
 }

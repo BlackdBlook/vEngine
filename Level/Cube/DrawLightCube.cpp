@@ -3,6 +3,7 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
+#include "Component/BasicMove/BasicMove.h"
 #include "Engine/vEngine.h"
 #include "Engine/Core/Camera/Camera.h"
 #include "Engine/Core/Component/Component.h"
@@ -67,7 +68,8 @@ void DrawLightCube::Init()
         auto cube = obj->CreateAttach<CubeComponent>("PointLightCube");
         m = cube->material.get();
         m->SetTexture("texture0", "container2.png");
-        m->SetAllUniformData("material.shininess", 1.f);
+        m->SetTexture("texture1", "container2_specular.png");
+        m->SetAllUniformData("material.shininess", 64.f);
         m->SetAllUniformData("pointLight.constant", 1.f);
         m->SetAllUniformData("pointLight.linear", 0.09f);
         m->SetAllUniformData("pointLight.quadratic", 0.032f);
@@ -82,8 +84,13 @@ void DrawLightCube::Init()
         light->CreateAttach<AutoMov>(m);
         light->CreateAttach<CubeComponent>("DrawTexCube");
         light->SetScale(glm::vec3{0.1});
+        light->SetPos(glm::vec3{2,0,2});
     }
 
+    {
+        auto camRot = NewObject();
+        camRot->CreateAttach<BasicMove>();
+    }
 
 }
 LevelRegister(DrawLightCube);

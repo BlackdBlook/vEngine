@@ -154,6 +154,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Component\BasicMove\BasicMove.cpp" />
     <ClCompile Include="Engine\Core\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.cpp" />
     <ClCompile Include="Engine\Core\Component\Component.cpp" />
@@ -254,6 +255,7 @@
     </ClCompile>
     <ClCompile Include="Engine\Runtime\Component\Light\PointLight.cpp" />
     <ClCompile Include="Engine\SubSystem\AssetSystem\AssetSystem.cpp" />
+    <ClCompile Include="Engine\SubSystem\InputSystem\InputSysten.cpp" />
     <ClCompile Include="Engine\Toolkit\Container\Queue.cpp" />
     <ClCompile Include="Engine\Toolkit\FileToolKit\FileToolKit.cpp" />
     <ClCompile Include="Engine\Toolkit\math_utils.cpp" />
@@ -360,6 +362,7 @@
     <None Include="Shader\DrawCube\DrawTexCube_vs_ps.hlsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Component\BasicMove\BasicMove.h" />
     <ClInclude Include="Engine\Core\Camera\Camera.h" />
     <ClInclude Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.h" />
     <ClInclude Include="Engine\Core\Component\Component.h" />
@@ -384,6 +387,7 @@
     <ClInclude Include="Engine\Runtime\Component\CubeComponent.h" />
     <ClInclude Include="Engine\Runtime\Component\Light\PointLight.h" />
     <ClInclude Include="Engine\SubSystem\AssetSystem\AssetSystem.h" />
+    <ClInclude Include="Engine\SubSystem\InputSystem\InputSysten.h" />
     <ClInclude Include="Engine\Toolkit\Container\Queue.h" />
     <ClInclude Include="Engine\Toolkit\FileToolKit\FileToolKit.h" />
     <ClInclude Include="Engine\Toolkit\math_utils.h" />

@@ -52,6 +52,11 @@ public:
 
     void cleanUp();
 
+    void UpdateCameraData()
+    {
+        buffer->UpdateCameraData();
+    }
+
 private:
     
     SPtr<GlobalUniformBuffer> buffer;
