@@ -1,28 +1,18 @@
 ﻿#pragma once
-#include <optional>
-
-#define VK_USE_PLATFORM_WIN32_KHR
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-#define GLFW_EXPOSE_NATIVE_WIN32
+#include <SDL_video.h>
+#include <stdexcept>
 #include <vector>
-#include <GLFW/glfw3native.h>
+#include <vulkan/vulkan_core.h>
 
-
+#include "Header.h"
+#include "backends/imgui_impl_vulkan.h"
 #include "Engine/TypeDef.h"
-#include "Engine/Core/FrameInfo/RenderInfo.h"
+#include "ThirdParty/StringFormater/StringFormater.h"
 
-class RenderPipeline;
-class vEngine;
-
-struct QueueFamilyIndices {
-    std::optional<uint32_t> graphicsFamily;
-    std::optional<uint32_t> presentFamily;
-
-    bool isComplete() {
-        return graphicsFamily.has_value() && presentFamily.has_value();
-    }
-};
+extern class VkHelper* VkHelperInstance;
+#ifdef _DEBUG
+#define APP_USE_VULKAN_DEBUG_REPORT
+#endif
 
 struct SwapChainSupportDetails {
     VkSurfaceCapabilitiesKHR capabilities;
@@ -30,89 +20,80 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
+
+
+
+
+
+//#define APP_USE_UNLIMITED_FRAME_RATE
 class VkHelper
 {
-    vEngine* Engine;
-
 public:
-    uint8 currentFrame = 0;
-    VkDevice device;
-    //Texture image对应的sampler
-    VkSampler textureSampler;
-    VkInstance Instance;
-    GLFWwindow* window;
-    VkDebugUtilsMessengerEXT debugMessenger;
-    VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-    VkQueue graphicsQueue;
-    VkQueue presentQueue;
-    VkSwapchainKHR swapChain;
-    std::vector<VkImage> swapChainImages;
-    VkFormat swapChainImageFormat;
-    VkExtent2D swapChainExtent;
-    std::vector<VkImageView> swapChainImageViews;
-    VkPipelineLayout pipelineLayout;
+    VkHelper();
+    // Data
+    VkAllocationCallbacks*   Allocator = nullptr;
+    VkInstance               Instance = VK_NULL_HANDLE;
+    VkPhysicalDevice         PhysicalDevice = VK_NULL_HANDLE;
+    VkDevice                 Device = VK_NULL_HANDLE;
+    uint32_t                 QueueFamily = (uint32_t)-1;
+    VkQueue                  Queue = VK_NULL_HANDLE;
+    VkDebugReportCallbackEXT DebugReport = VK_NULL_HANDLE;
+    VkPipelineCache          PipelineCache = VK_NULL_HANDLE;
+    VkDescriptorPool         DescriptorPool = VK_NULL_HANDLE;
+    SDL_Window* window = nullptr;
+    ImGui_ImplVulkanH_Window MainWindowData;
+    uint32_t                 MinImageCount = MAX_FRAMES_IN_FLIGHTS;
+    // Create Window Surface
     VkSurfaceKHR surface;
-    VkRenderPass renderPass;
-    std::vector<VkFramebuffer> swapChainFramebuffers;
-    VkCommandPool commandPool;
-    std::vector<VkCommandBuffer> commandBuffer;
-    std::vector<VkSemaphore> imageAvailableSemaphores;
-    std::vector<VkSemaphore> renderFinishedSemaphores;
-    std::vector<VkFence> inFlightFences;
+    VkExtent2D swapChainExtent;
     VkImage depthImage;
     VkDeviceMemory depthImageMemory;
     VkImageView depthImageView;
-    
-private:
+    VkSampler textureSampler;
+    VkRenderPass renderPass;
+    VkSurfaceFormatKHR SwapSurfaceFormat;
+    std::vector<VkFramebuffer> swapChainFramebuffers;
+    // 首先，你需要定义一个函数指针来获取vkDebugMarkerSetObjectNameEXT函数的地址
+    PFN_vkDebugMarkerSetObjectNameEXT pfnDebugMarkerSetObjectNameEXT;
+
+    VkPhysicalDevice SetupVulkan_SelectPhysicalDevice();
+    void SetupVulkan(ImVector<const char*> instance_extensions);
+    void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
+    void Init();
+    void createRenderPass();
     VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling,
                                  VkFormatFeatureFlags features);
     VkFormat findDepthFormat();
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-    SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-    void createSwapChain();
-    VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
-    void createTextureSampler();
     void createSwapChainImageViews();
-    void createLogicalDevice();
-    void createWindowSurface();
-    void CreateVkInstance();
-    bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-    bool isDeviceSuitable(VkPhysicalDevice device);
-    void pickPhysicalDevice();
-    void CreateDebugUtilsMessenger();
-    void createGraphicsPipeline();
-    void createRenderPass();
-    QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
     void createFramebuffers();
-    void createCommandPool();
-    void createCommandBuffers();
-    void createSyncObjects();
-    void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
-    void recreateSwapChain();
-    void createDepthResources();
-    
-public:
-    VkHelper(vEngine* engine);
-    void InitVulkan();
-    GLFWwindow* InitWindow(uint32 X, uint32 Y);
-    void CleanVk();
     void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
                      VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-
-    void WaitDeviceIdle();
-    void cleanupSwapChain();
+    SwapChainSupportDetails querySwapChainSupport();
+    VkExtent2D chooseSwapExtent(SwapChainSupportDetails& swapChainSupport);
+    void createTextureSampler();
+    void transitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkFormat format, VkImageLayout oldLayout,
+                               VkImageLayout newLayout);
+    VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+    void createDepthResources();
+    void ReleaseDepthResources();
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     VkCommandBuffer BeginSingleTimeCommands();
     void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
-    VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+    void CleanupVulkanWindow();
+    void CleanupVulkan();
+    void cleanup();
+    void WaitDeviceIdle();
     uint32 GetUniformBufferAlignment();
     uint32 GetUniformBufferOffsetByElementSize(uint32 size);
-    void transitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkFormat format, VkImageLayout oldLayout,
-                               VkImageLayout newLayout);
+    void RebuildSwapChain(bool& outNeedRebuild);
 
-    RenderInfo BeginRecordCommandBuffer();
-    void EndRecordCommandBuffer(const RenderInfo& RenderInfo);
+    void SetObjectMarkName(uint64 object, const char* name);
+
+    static void check_vk_result(VkResult err)
+    {
+        if (err == 0)
+            return;
+        throw std::runtime_error(StrFormat("[vulkan] Error: VkResult = ", err));
+    }
 };
-
-
-extern VkHelper* VkHelperInstance;

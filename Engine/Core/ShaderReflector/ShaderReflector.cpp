@@ -115,7 +115,7 @@ void ShaderUniformBufferBlocks::Log()
     }
     for(auto& b : UniformMembers)
     {
-        log += Format("Member: " , b.first.ToString() , b.second.Log() , '\n');
+        log += StrFormat("Member: " , b.first.ToString() , b.second.Log() , '\n');
     }
     if(!log.empty())
     {
@@ -147,7 +147,7 @@ void ShaderReflector::prossesMemberName(
             if(memberType.array.empty())
             {
                 // 这是个结构体
-                string memberPrefix = Format(parentName, memberName, '.');
+                string memberPrefix = StrFormat(parentName, memberName, '.');
                 prossesMemberName(memberPrefix, memberType, out);
             }
             else
@@ -157,7 +157,7 @@ void ShaderReflector::prossesMemberName(
                 {
                     for(uint32 h = 0;h < j ; h++)
                     {
-                        string memberPrefix = Format(parentName, memberName, '[', h, ']', '.');
+                        string memberPrefix = StrFormat(parentName, memberName, '[', h, ']', '.');
                         prossesMemberName(memberPrefix, memberType, out);
                     }
                 }
@@ -169,7 +169,7 @@ void ShaderReflector::prossesMemberName(
             {
                 // 这是个基本类型
                 // 保存这个成员
-                Container::Name selfName = Format(parentName, memberName);
+                Container::Name selfName = StrFormat(parentName, memberName);
 
                 ShaderUniformMember member;
 
@@ -190,7 +190,7 @@ void ShaderReflector::prossesMemberName(
                     {
                         // 这是个基本类型
                         // 保存这个成员
-                        Container::Name selfName = Format(parentName, memberName, '[', h, ']');
+                        Container::Name selfName = StrFormat(parentName, memberName, '[', h, ']');
 
                         ShaderUniformMember member;
 
@@ -217,7 +217,7 @@ void ShaderReflector::processBlock(string& name, const spirv_cross::SPIRType& ty
         {
             for(uint32 j = 0; j < i; j++)
             {
-                string memberPrefix = Format(name, '[', j, "].");
+                string memberPrefix = StrFormat(name, '[', j, "].");
                 prossesMemberName(memberPrefix, type, out);
             }
         }
@@ -227,7 +227,7 @@ void ShaderReflector::processBlock(string& name, const spirv_cross::SPIRType& ty
         // uniform_buffers拿到的类型必然是个结构体
         // 遍历uniform变量的所有成员
             
-        string memberPrefix = Format(name, '.');
+        string memberPrefix = StrFormat(name, '.');
         prossesMemberName(memberPrefix, type, out);
     }
 

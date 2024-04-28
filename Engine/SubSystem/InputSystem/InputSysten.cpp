@@ -1,12 +1,15 @@
 #include "InputSysten.h"
+
+#include <SDL_keyboard.h>
+#include <SDL_mouse.h>
+
 #include "Header.h"
 
 
 
-void InputSystem::Init(GLFWwindow* window)
+void InputSystem::Init(SDL_Window* window)
 {
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetMouseButtonCallback(window, InputSystem::MouseCallback);
+
 }
 
 bool InputSystem::GetMouseButtonDown(bool Right)
@@ -19,24 +22,28 @@ bool InputSystem::GetMouseButtonDown(bool Right)
         return leftMouseButtonDown;
     }
 }
- 
+
+bool InputSystem::GetKeyDown(KeyBoardKey Key)
+{
+    const Uint8* state = SDL_GetKeyboardState(NULL);
+    SDL_Scancode scancode = SDL_GetScancodeFromKey(static_cast<SDL_Keycode>(Key));
+    return state[scancode];
+}
+
+void InputSystem::Update()
+{
+    int x, y;
+    Uint32 state = SDL_GetMouseState(&x, &y);
+    
+    leftMouseButtonDown = (state & SDL_BUTTON(SDL_BUTTON_LEFT));
+    
+    rightMouseButtonDown = (state & SDL_BUTTON(SDL_BUTTON_RIGHT));
+}
+
 InputSystem* InputSystem::GetInstance()
 { 
     static InputSystem* ans = new InputSystem();
     return ans; 
-}
-
-void InputSystem::MouseCallback(GLFWwindow* window, int button, int state, int mod)
-{
-    if(button == GLFW_MOUSE_BUTTON_LEFT)
-    {
-        GetInstance()->leftMouseButtonDown = (state==GLFW_PRESS);
-        // LOG("MouseButtonLeft", GetInstance()->leftMouseButtonDown);
-    }else if(button == GLFW_MOUSE_BUTTON_RIGHT)
-    {
-        GetInstance()->rightMouseButtonDown = (state==GLFW_PRESS);
-        // LOG("MouseButtonRight", GetInstance()->rightMouseButtonDown);
-    }
 }
 
 InputSystem::InputSystem()

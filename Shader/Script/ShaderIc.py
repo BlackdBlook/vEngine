@@ -97,7 +97,12 @@ def compile_shaders(path, shader_files):
                 output_file_name = f'{base_name}.{hlsl_entry_Point[shader_type]}.spv'.lower()
                 output_file_path = os.path.join(path, 'ShaderCache', output_file_name)
                 print(output_file_path)
-                command = [hlslc_path, '-spirv', '-T', hlsl_shader_config[shader_type], '-E', hlsl_entry_Point[shader_type], shader_file, '-Fo', output_file_path]
+                command = [hlslc_path, '-spirv', 
+                           '-T', hlsl_shader_config[shader_type], 
+                           '-E', hlsl_entry_Point[shader_type], shader_file, 
+                           '-Fo', output_file_path,
+                           '-Zi'
+                           ]
                 run_command(command)
                 # print(command)
 

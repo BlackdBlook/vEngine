@@ -11,6 +11,7 @@ BasicMove::BasicMove()
 {
     cam = Camera::GetCamera();
     window = Engine::ins->GetWindow();
+    input = InputSystem::GetInstance();
 }
 
 void BasicMove::Update(float DeltaTime)
@@ -29,33 +30,34 @@ void BasicMove::Update(float DeltaTime)
     auto f = glm::cross(r,u);
     f = glm::normalize(f);
         
-    if (glfwGetKey(Engine::ins->GetWindow(), GLFW_KEY_W) == GLFW_PRESS)
+    if (input->GetKeyDown(KeyBoardKey::KEY_W))
     {
         pos+= MoveSpeed * f;
         flag = true;
     }
-    if (glfwGetKey(Engine::ins->GetWindow(), GLFW_KEY_S) == GLFW_PRESS)
-    {
+
+    if (input->GetKeyDown(KeyBoardKey::KEY_S))    {
         pos+= -MoveSpeed * f;
         flag = true;
     }
-    if (glfwGetKey(Engine::ins->GetWindow(), GLFW_KEY_A) == GLFW_PRESS)
-    {
+
+    if (input->GetKeyDown(KeyBoardKey::KEY_A))    {
         pos += MoveSpeed * r;
         flag = true;
     }
-    if (glfwGetKey(Engine::ins->GetWindow(), GLFW_KEY_D) == GLFW_PRESS)
-    {
+
+    if (input->GetKeyDown(KeyBoardKey::KEY_D))    {
         pos += -MoveSpeed * r;
         flag = true;
     }
-    if (glfwGetKey(Engine::ins->GetWindow(), GLFW_KEY_E) == GLFW_PRESS)
-    {
+    
+
+    if (input->GetKeyDown(KeyBoardKey::KEY_E))    {
         pos+= MoveSpeed * u;
         flag = true;
     }
-    if (glfwGetKey(Engine::ins->GetWindow(), GLFW_KEY_Q) == GLFW_PRESS)
-    {
+
+    if (input->GetKeyDown(KeyBoardKey::KEY_Q))    {
         pos+= -MoveSpeed * u;
         flag = true;
     }
@@ -71,13 +73,13 @@ void BasicMove::Update(float DeltaTime)
         if(window == nullptr)
         {
             window = Engine::ins->GetWindow();
-            glfwGetCursorPos(window,&tempX ,&tempY);
+            tempX = input->MousePositionX;
+            tempY = input->MousePositionY;
             return;
         }
-        double x,y;
-        glfwGetCursorPos(window,&x ,&y);
+        
             
-        glm::vec3 inputR ={ (y - tempY) * -0.2,  (x - tempX) * -0.2, 0};
+        glm::vec3 inputR ={ (input->MousePositionY - tempY) * -0.2,  (input->MousePositionX - tempX) * -0.2, 0};
 
         if(inputR.x != 0)
         {
@@ -97,8 +99,8 @@ void BasicMove::Update(float DeltaTime)
 
         GlobalUniformBufferManager::Get()->UpdateCameraData();
 
-        tempX = x;
-        tempY = y;
+        tempX = input->MousePositionX;
+        tempY = input->MousePositionY;
     }else
     {
         if(window)

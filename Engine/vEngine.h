@@ -1,7 +1,9 @@
 ﻿#pragma once
 #include <functional>
-#include <GLFW/glfw3.h>
 #include <vulkan/vulkan_core.h>
+
+#include "TypeDef.h"
+#include "Toolkit/Container/Queue.h"
 #include "VulkanHelper/VkHelper.h"
 
 
@@ -11,69 +13,68 @@ class VkHelper;
 class vEngine 
 {
     friend VkHelper;
-    GLFWwindow* window;
+    
     VkHelper vkHelper;
-
+    
     SPtr<Level> CurrentLevel;
     std::vector<std::function<void(std::shared_ptr<Level>& CurrentLevel)>>* levelList;
     float DeltaTime = 0;
-
+    bool SwapChainRebuild = false;
     uint64 FrameCount = 0;
+    uint64 currentFrame = 0;
 
     void processInput();
 
     void InitLevelList();
     
     void UpdateLevel();
-    void DrawLevel();
+    void DrawLevel(VkCommandBuffer cmd);
+    void FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
+    void FramePresent(ImGui_ImplVulkanH_Window* wd);
+    void RebuildSwapChain();
     void Run();
 
-    void DrawFrame();
+    
     
 public:
-    FORCEINLINE GLFWwindow* GetWindow()
+    SDL_Window* GetWindow()
     {
-        return window;
+        return vkHelper.window;
     }
     
-    FORCEINLINE VkDevice GetVulkanDevice()
+    VkDevice GetVulkanDevice()
     {
-        return vkHelper.device;
+        return vkHelper.Device;
     }
     
-    FORCEINLINE VkSwapchainKHR GetVkSwapchain()
+    VkSwapchainKHR GetVkSwapchain()
     {
-        return vkHelper.swapChain; 
+        return vkHelper.MainWindowData.Swapchain; 
     }
     
-    FORCEINLINE VkRenderPass GetVkRenderPass()
+    VkRenderPass GetVkRenderPass()
     {
         return vkHelper.renderPass;
     }
-
-    FORCEINLINE VkPipelineLayout GetVkPipeLineLayout()
+    
+    size_t GetCurrentFrame()
     {
-        return vkHelper.pipelineLayout;
+        return currentFrame;
     }
 
-    FORCEINLINE size_t GetCurrentFrame()
-    {
-        return vkHelper.currentFrame;
-    }
-
-    FORCEINLINE uint64 GetFrameCount()
+    uint64 GetFrameCount()
     {
         return FrameCount;
     }
 
-    FORCEINLINE VkCommandPool GetCommandPool()
+    VkCommandPool GetCommandPool()
     {
-        return vkHelper.commandPool;
+        return vkHelper.MainWindowData.Frames->CommandPool;
     }
 
-    FORCEINLINE VkQueue GetGraphicsQueue()
+    VkQueue GetGraphicsQueue()
     {
-        return vkHelper.graphicsQueue;
+        return vkHelper.Queue;
     }
     
     static uint32 WindowX;
@@ -89,7 +90,6 @@ using Engine = vEngine;
 #define GDevice vEngine::ins->GetVulkanDevice()
 #define GlobalVkSwapchain vEngine::ins->GetVkSwapchain()
 #define GlobalVkRenderPass vEngine::ins->GetVkRenderPass()
-#define GlobalVkPipeLineLayout vEngine::ins->GetVkPipeLineLayout()
 #define GFrameCount vEngine::ins->GetFrameCount()
 #define GCommandPool vEngine::ins->GetCommandPool()
 #define GGraphicsQueue vEngine::ins->GetGraphicsQueue()

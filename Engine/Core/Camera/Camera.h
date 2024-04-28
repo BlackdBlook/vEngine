@@ -6,7 +6,7 @@
 class Camera :public Object
 {
     glm::mat4 viewmat;
-
+    glm::mat4 projection;
     std::function<void(float)> updateFun;
     bool needUpdateView = true;
     static Camera* malloc();
@@ -39,6 +39,7 @@ public:
     Camera(std::function<void(float)> update);
     void Reset(std::function<void(float)> update = [](float) {});
     glm::mat4 GetCameraView();
+    void UpdateProjection();
     glm::mat4 GetCameraProjection();
     
     void SetPos(const glm::vec3& pos)override;

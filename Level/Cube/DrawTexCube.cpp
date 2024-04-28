@@ -1,9 +1,11 @@
 #include "DrawTexCube.h"
 
+#include <SDL_timer.h>
 #include <stdexcept>
 
 #include "Engine/vEngine.h"
 #include "Engine/Core/Component/Component.h"
+#include "Engine/Core/FrameInfo/RenderInfo.h"
 #include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/Core/Material/Material.h"
 #include "Engine/Core/Object/Object.h"
@@ -75,7 +77,7 @@ void TexCube::Update(float DeltaTime)
     // 旋转
     glm::quat quat = VEC3_ZERO;
     
-    quat *= glm::angleAxis((float)glfwGetTime(), glm::vec3{1, 0, 0});
+    quat *= glm::angleAxis((float)ImGui::GetTime(), glm::vec3{1, 0, 0});
 
     glm::mat4 rotationMatrix = glm::mat4_cast(quat);
     m *= rotationMatrix;

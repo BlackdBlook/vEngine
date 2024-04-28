@@ -68,7 +68,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewPos, f
     diffuse  *= attenuation;
     specular *= attenuation;   
         
-    return ambient + diffuse + specular;
+    return (ambient + diffuse + specular) * light.color * light.strength;
     // return diffuse+ specular;
     // return spec;
     

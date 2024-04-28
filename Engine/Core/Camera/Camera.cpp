@@ -17,6 +17,7 @@ Camera* Camera::GetCamera()
 Camera::Camera()
 {
     Reset();
+    UpdateProjection();
 }
 
 Camera::Camera(std::function<void(float)> update)
@@ -69,12 +70,16 @@ glm::mat4 Camera::GetCameraView()
     return viewmat;
 }
 
-glm::mat4 Camera::GetCameraProjection()
+void Camera::UpdateProjection()
 {
-    static const glm::mat4 projection =
+    projection =
         glm::perspective(glm::radians(45.0f),
         (float)Engine::ins->WindowX /
         (float)Engine::ins->WindowY, 0.1f, 100.0f);
+}
+
+glm::mat4 Camera::GetCameraProjection()
+{
     return projection;
 }
 

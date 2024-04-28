@@ -33,4 +33,4 @@ public:
     }
 };
 
-#define Format(...) StringFormater::Formater(__VA_ARGS__)
+#define StrFormat(...) StringFormater::Formater(__VA_ARGS__)

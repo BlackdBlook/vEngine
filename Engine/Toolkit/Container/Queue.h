@@ -1,8 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
-#define FORCEINLINE
-
 // Alignment.
 #if defined(__clang__)
 	#define GCC_PACK(n) __attribute__((packed,aligned(n)))

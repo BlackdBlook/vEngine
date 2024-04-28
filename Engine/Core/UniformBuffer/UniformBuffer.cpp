@@ -71,6 +71,9 @@ void UniformBuffer::Init(size_t size, string Name, uint32 bind)
             throw std::runtime_error("failed to allocate vertex buffer memory!");
         }
 
+        
+        VkHelperInstance->SetObjectMarkName((uint64)&uniformBuffersMemory[i], (BlockName.ToString() + " Memory").c_str());
+
         vkBindBufferMemory(GDevice, uniformBuffers[i], uniformBuffersMemory[i], 0);
 
         // 调用Map会消耗额外资源，所以可以直接Map而不UnMap

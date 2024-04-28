@@ -1,5 +1,6 @@
 #include "DrawLightCube.h"
 
+#include <SDL_timer.h>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
@@ -47,7 +48,7 @@ namespace
         }
         void Update(float DeltaTime) override
         {
-            Parent->SetPos(glm::vec3{glm::sin(glfwGetTime()) * 2,0,glm::cos(glfwGetTime()) * 2});
+            Parent->SetPos(glm::vec3{glm::sin(ImGui::GetTime()) * 2,0,glm::cos(ImGui::GetTime()) * 2});
             material->SetCurrentUniformData("pointLight.position", Parent->GetPos());
         }
     };

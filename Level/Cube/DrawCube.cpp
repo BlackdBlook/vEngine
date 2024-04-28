@@ -2,6 +2,7 @@
 
 #include <array>
 #include <chrono>
+#include <SDL_timer.h>
 #include <stdexcept>
 
 #include "Engine/vEngine.h"
@@ -76,7 +77,7 @@ void Cube::Update(float DeltaTime)
     // // 旋转
     glm::quat quat = VEC3_ZERO;
     // // quat *= glm::angleAxis(0, glm::vec3{0,0,1});
-    quat *= glm::angleAxis((float)glfwGetTime(), glm::vec3{1, 0, 0});
+    quat *= glm::angleAxis((float)ImGui::GetTime(), glm::vec3{1, 0, 0});
     // quat *= glm::angleAxis(time, glm::vec3{1, 0, 0});
     glm::mat4 rotationMatrix = glm::mat4_cast(quat);
     m *= rotationMatrix;
