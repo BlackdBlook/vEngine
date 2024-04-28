@@ -4,7 +4,8 @@
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
 
-#include "Component/BasicMove/BasicMove.h"
+#include "Component/Common/BasicMove/BasicCameraMove.h"
+#include "Component/Common/EscExit/PressEscExit.h"
 #include "Engine/vEngine.h"
 #include "Engine/Core/Camera/Camera.h"
 #include "Engine/Core/Component/Component.h"
@@ -53,7 +54,34 @@ namespace
         }
     };
 
+    class UIDemo :public Component
+    {
+        Material* material;
+        float LightStrength = 1.f;
+    public:
+        UIDemo(Material* m):material(m)
+        {
+            Component();
+        }
+        virtual void Update(float DeltaTime) override;
+    };
 
+    void UIDemo::Update(float DeltaTime)
+    {
+        ImGui::Begin("UIDemo");
+        ImGui::SetWindowPos(ImVec2(0, 0));
+        ImGui::Text("Hello, world!");
+        // ImGui::SliderFloat("float", &Parent->GetPos().x, 0.0f, 1.0f);
+        auto pos = Parent->GetPos();
+        float p[3] = {pos.x, pos.y, pos.z};
+        ImGui::DragFloat3("LightPos", p, 0.001f);
+        ImGui::DragFloat("LightStrength", &LightStrength, 0.001f);
+        ImGui::End();
+
+        Parent->SetPos(glm::vec3{p[0], p[1], p[2]});
+        material->SetCurrentUniformData("pointLight.position", Parent->GetPos());
+        material->SetCurrentUniformData("pointLight.strength", LightStrength);
+    }
 }
 
 void DrawLightCube::Init()
@@ -61,7 +89,7 @@ void DrawLightCube::Init()
     Level::Init();
 
     Camera::GetCamera()->SetPos(glm::vec3(0, 0, 3));
-    Material* m;
+    
 
     {
         auto obj = NewObject();
@@ -82,16 +110,13 @@ void DrawLightCube::Init()
     {
         auto light = NewObject();
         light->CreateAttach<Light>();
-        light->CreateAttach<AutoMov>(m);
+        // light->CreateAttach<AutoMov>(m);
         light->CreateAttach<CubeComponent>("DrawTexCube");
         light->SetScale(glm::vec3{0.1});
-        light->SetPos(glm::vec3{2,0,2});
+        light->SetPos(glm::vec3{0,0,2});
+        light->CreateAttach<UIDemo>(m);
+        light->CreateAttach<BasicCameraMove>();
+        light->CreateAttach<PressEscExit>();
     }
-
-    {
-        auto camRot = NewObject();
-        camRot->CreateAttach<BasicMove>();
-    }
-
 }
 LevelRegister(DrawLightCube);

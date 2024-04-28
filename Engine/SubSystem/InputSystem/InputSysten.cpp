@@ -4,7 +4,7 @@
 #include <SDL_mouse.h>
 
 #include "Header.h"
-
+#include "LogPrinter/Log.h"
 
 
 void InputSystem::Init(SDL_Window* window)
@@ -30,10 +30,9 @@ bool InputSystem::GetKeyDown(KeyBoardKey Key)
     return state[scancode];
 }
 
-void InputSystem::Update()
+void InputSystem::Update(float DeltaTime)
 {
-    int x, y;
-    Uint32 state = SDL_GetMouseState(&x, &y);
+    Uint32 state = SDL_GetMouseState(&MousePositionX, &MousePositionY);
     
     leftMouseButtonDown = (state & SDL_BUTTON(SDL_BUTTON_LEFT));
     

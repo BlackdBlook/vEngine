@@ -6,7 +6,7 @@
 
 class Camera;
 
-class BasicMove : public Component
+class BasicCameraMove : public Component
 {
     Camera* cam;
     SDL_Window* window;
@@ -15,6 +15,6 @@ class BasicMove : public Component
     InputSystem* input;
 
 public:
-    BasicMove();
+    BasicCameraMove();
     void Update(float DeltaTime) override;
 };

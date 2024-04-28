@@ -158,7 +158,8 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Component\BasicMove\BasicMove.cpp" />
+    <ClCompile Include="Component\Common\BasicMove\BasicCameraMove.cpp" />
+    <ClCompile Include="Component\Common\EscExit\PressEscExit.cpp" />
     <ClCompile Include="Engine\Core\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.cpp" />
     <ClCompile Include="Engine\Core\Component\Component.cpp" />
@@ -380,7 +381,8 @@
     <None Include="Shader\DrawCube\DrawTexCube_vs_ps.hlsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Component\BasicMove\BasicMove.h" />
+    <ClInclude Include="Component\Common\BasicMove\BasicCameraMove.h" />
+    <ClInclude Include="Component\Common\EscExit\PressEscExit.h" />
     <ClInclude Include="Engine\Core\Camera\Camera.h" />
     <ClInclude Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.h" />
     <ClInclude Include="Engine\Core\Component\Component.h" />

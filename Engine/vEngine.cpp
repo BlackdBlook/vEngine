@@ -73,8 +73,10 @@ void vEngine::InitLevelList()
     levelList = Level::GlobalLevelRegisterList;
 }
 
-void vEngine::UpdateLevel()
+void vEngine::UpdateLevel(float DeltaTime)
 {
+    this->DeltaTime = DeltaTime;
+    
     CurrentLevel->Update(DeltaTime);
 
     CurrentLevel->LateUpdate(DeltaTime);
@@ -125,7 +127,7 @@ void vEngine::FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data)
 
     {
         std::array<VkClearValue, 2> clearValues = {};
-        clearValues[0].color = {0.0f, 0.0f, 0.2f, 1.0f};
+        clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
         clearValues[1].depthStencil = {1.0f, 0};
 
         
@@ -222,8 +224,10 @@ void vEngine::Run()
         std::chrono::microseconds(1000000 / TargetFreamRate);
     Timer t{"MainLoop"};
     // Main loop
-    bool done = false;
-    while(!done)
+
+    InputSystem * input_system = InputSystem::GetInstance();
+    Camera* cam = Camera::GetCamera();
+    while(!ExitEngine)
     {
 // Poll and handle events (inputs, window resize, etc.)
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -235,10 +239,10 @@ void vEngine::Run()
         {
             ImGui_ImplSDL2_ProcessEvent(&event);
             if (event.type == SDL_QUIT)
-                done = true;
+                ExitEngine = true;
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE
                 && event.window.windowID == SDL_GetWindowID(vkHelper.window))
-                done = true;
+                ExitEngine = true;
         }
 
         // Resize swap chain?
@@ -252,10 +256,10 @@ void vEngine::Run()
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        bool Show;
-        ImGui::ShowDemoWindow(&Show);
-        UpdateLevel();
-
+        input_system->Update(DeltaTime);
+        
+        UpdateLevel(DeltaTime);
+        cam->Update(DeltaTime);
         // Rendering
         ImGui::Render();
         ImDrawData* draw_data = ImGui::GetDrawData();
@@ -264,6 +268,18 @@ void vEngine::Run()
         {
             FrameRender(&vkHelper.MainWindowData, draw_data);
             FramePresent(&vkHelper.MainWindowData);
+        }
+
+        {
+            // MaxFpsControl
+            std::chrono::microseconds timeSpan = t.GetTimeSpan();
+            while(timeSpan < MinFreamTime)
+            {
+                timeSpan = t.GetTimeSpan();
+            }
+            DeltaTime = convertToSeconds(timeSpan);
+            FrameCount += 1;
+            t.Reset();
         }
     }
 

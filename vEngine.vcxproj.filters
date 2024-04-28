@@ -147,9 +147,6 @@
     <ClCompile Include="ThirdParty\stb\stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Component\BasicMove\BasicMove.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\ShaderReflector\ShaderReflector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -208,6 +205,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ThirdParty\imgui\misc\cpp\imgui_stdlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\Common\EscExit\PressEscExit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Component\Common\BasicMove\BasicCameraMove.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -365,9 +368,6 @@
     <ClInclude Include="ThirdParty\stb\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Component\BasicMove\BasicMove.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Core\ShaderReflector\ShaderReflector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -434,6 +434,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ThirdParty\imgui\misc\single_file\imgui_single_file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\Common\EscExit\PressEscExit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

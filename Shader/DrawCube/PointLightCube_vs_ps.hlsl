@@ -33,13 +33,13 @@ Texture2D texture1 : register(t7, space0);
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewPos, float2 TexCoords)
 {
     // ambient
-    vec3 ambient = 0.1 * texture0.Sample(sampler0, TexCoords).xyz;
+    vec3 ambient = 0.01 * texture0.Sample(sampler0, TexCoords).xyz;
   	 
     // diffuse 
     vec3 norm = normalize(normal);
     vec3 lightDir = normalize(light.position - fragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * texture0.Sample(sampler0, TexCoords).xyz;  
+    vec3 diffuse = diff * texture0.Sample(sampler0, TexCoords).xyz;    
     // specular
 
     // vec3 view = normalize(viewPos - fragPos);

@@ -1,7 +1,10 @@
 #include "Camera.h"
 
 #include "Engine/vEngine.h"
+#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/Toolkit/math_utils.h"
+#include "LogPrinter/Log.h"
+
 Camera* Camera::malloc()
 {
     void* ans = ::malloc(sizeof(Camera));
@@ -42,8 +45,10 @@ void Camera::Update(float DeltaTime)
 {
     Object::Update(DeltaTime);
     updateFun(DeltaTime);
-
-    // SetGlobalUniformBuffer("Matrices", "view", GetCameraView());
+    if(needUpdateView)
+    {
+        GlobalUniformBufferManager::Get()->UpdateCameraData();
+    }
 }
 
 void Camera::Attach(std::shared_ptr<Component> Target)
@@ -86,7 +91,7 @@ glm::mat4 Camera::GetCameraProjection()
 void Camera::SetPos(const glm::vec3& pos)
 {
     needUpdateView = true;
-    
+
     Object::SetPos(pos);
 }
 

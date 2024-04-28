@@ -72,10 +72,10 @@ public:
     bool GetMouseButtonDown(bool Right);
     bool GetKeyDown(KeyBoardKey Key);
 
-    uint32 MousePositionX = 0;
-    uint32 MousePositionY = 0;
+    int MousePositionX = 0;
+    int MousePositionY = 0;
 
-    void Update();
+    void Update(float DeltaTime);
 
     static InputSystem* GetInstance();
 private:

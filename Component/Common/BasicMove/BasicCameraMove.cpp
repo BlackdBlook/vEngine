@@ -1,24 +1,22 @@
-#include "BasicMove.h"
-
-#include <GLFW/glfw3.h>
+#include "BasicCameraMove.h"
 
 #include "Engine/vEngine.h"
 #include "Engine/Core/Camera/Camera.h"
 #include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/SubSystem/InputSystem/InputSysten.h"
 
-BasicMove::BasicMove()
+BasicCameraMove::BasicCameraMove()
 {
     cam = Camera::GetCamera();
     window = Engine::ins->GetWindow();
     input = InputSystem::GetInstance();
 }
 
-void BasicMove::Update(float DeltaTime)
+void BasicCameraMove::Update(float DeltaTime)
 {
     Component::Update(DeltaTime);
 
-    constexpr float MOVE_SPEED = 5;
+    constexpr float MOVE_SPEED = 5.f;
     glm::vec3 pos = cam->GetPos();
     const float MoveSpeed = MOVE_SPEED * DeltaTime;
     bool flag = false;

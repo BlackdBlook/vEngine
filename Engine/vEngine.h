@@ -13,7 +13,7 @@ class VkHelper;
 class vEngine 
 {
     friend VkHelper;
-    
+    bool ExitEngine = false;
     VkHelper vkHelper;
     
     SPtr<Level> CurrentLevel;
@@ -27,7 +27,7 @@ class vEngine
 
     void InitLevelList();
     
-    void UpdateLevel();
+    void UpdateLevel(float DeltaTime);
     void DrawLevel(VkCommandBuffer cmd);
     void FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
     void FramePresent(ImGui_ImplVulkanH_Window* wd);
