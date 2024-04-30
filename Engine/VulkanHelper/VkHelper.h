@@ -9,6 +9,8 @@
 #include "Engine/TypeDef.h"
 #include "ThirdParty/StringFormater/StringFormater.h"
 
+class TextureFileArray;
+class TexutreFile;
 extern class VkHelper* VkHelperInstance;
 #ifdef _DEBUG
 #define APP_USE_VULKAN_DEBUG_REPORT
@@ -65,16 +67,22 @@ public:
                                  VkFormatFeatureFlags features);
     VkFormat findDepthFormat();
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-    void createSwapChainImageViews();
     void createFramebuffers();
+
     void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
                      VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+    void copyBufferToImage(VkCommandBuffer commandBuffer, VkBuffer buffer, VkImage image, uint32_t width,
+                           uint32_t height) const;
+
+    void createImage(TextureFileArray& file,
+                     VkImage image, VkDeviceMemory imageMemory);
+
     SwapChainSupportDetails querySwapChainSupport();
     VkExtent2D chooseSwapExtent(SwapChainSupportDetails& swapChainSupport);
     void createTextureSampler();
     void transitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkFormat format, VkImageLayout oldLayout,
                                VkImageLayout newLayout);
-    VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+    VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, VkImageViewType viewType);
     void createDepthResources();
     void ReleaseDepthResources();
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);

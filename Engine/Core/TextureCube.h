@@ -1,23 +1,21 @@
 #pragma once
-#include <unordered_map>
 #include <vulkan/vulkan_core.h>
 
-#include "Header.h"
-#include "Engine/Core/ShaderModule/Shader.h"
-#include "ThirdParty/stb/stb_image.h"
+#include "Engine/TypeDef.h"
+#include "ShaderModule/Shader.h"
 
 class TexutreFile;
-class TexutreFileSourceManager;
 
-
-class Texture2D
+class TextureCube
 {
+public:
     friend class DescriptorHelper;
-    SPtr<TexutreFile> SourceFile;
+    
+    std::vector<SPtr<TexutreFile>> SourceFiles;
 
     //存储纹理image及其对应device memory
-    VkImage textureImage = nullptr;
-    VkDeviceMemory textureImageMemory = nullptr;
+    VkImage textureImage;
+    VkDeviceMemory textureImageMemory;
 
     //Texture iamge对应的image view
     VkImageView textureImageView = nullptr;
@@ -26,8 +24,8 @@ class Texture2D
     void cleanUp(VkImageView tempTextureImageView,
     VkImage tempTextureImage, VkDeviceMemory tempTextureImageMemory);
 public:
-    Texture2D(const string& TextureName);
-    ~Texture2D();
+    TextureCube(const string& TextureName);
+    ~TextureCube();
 
     // TODO
     ShaderTextureInput InputInfo;

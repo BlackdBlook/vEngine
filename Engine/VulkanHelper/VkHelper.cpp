@@ -12,6 +12,7 @@
 #include "backends/imgui_impl_vulkan.h"
 #include "Engine/vEngine.h"
 #include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
+#include "Engine/TextureFile/TextureFile.h"
 #include "LogPrinter/Log.h"
 #include "ThirdParty/StringFormater/StringFormater.h"
 
@@ -588,6 +589,88 @@ void VkHelper::createImage(uint32_t width, uint32_t height, VkFormat format,
     vkBindImageMemory(GDevice, image, imageMemory, 0);
 }
 
+void VkHelper::copyBufferToImage(VkCommandBuffer commandBuffer,
+    VkBuffer buffer, VkImage image, uint32_t width, uint32_t height)const
+{
+    // VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+    VkBufferImageCopy region{};
+    region.bufferOffset = 0;
+    region.bufferRowLength = 0;
+    region.bufferImageHeight = 0;
+
+    region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    region.imageSubresource.mipLevel = 0;
+    region.imageSubresource.baseArrayLayer = 0;
+    region.imageSubresource.layerCount = 1;
+
+    region.imageOffset = { 0, 0, 0 };
+    region.imageExtent = {
+        width,
+        height,
+        1
+    };
+
+    //拷贝buffer到image
+    vkCmdCopyBufferToImage(
+        commandBuffer,
+        buffer,
+        image,
+        VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+        1,
+        &region
+    );
+    
+    // endSingleTimeCommands(commandBuffer);
+}
+
+void VkHelper::createImage(TextureFileArray& file,
+    VkImage image, VkDeviceMemory imageMemory)
+{
+    VkFormat format = file.format;
+    VkImageTiling tiling = file.tiling;
+    VkImageUsageFlags usage = file.usage;
+    VkMemoryPropertyFlags properties = file.properties;
+    
+    //创建image
+    VkImageCreateInfo imageInfo{};
+    imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.imageType = VK_IMAGE_TYPE_2D;
+    imageInfo.extent.width = file.GetTexWidth();
+    imageInfo.extent.height = file.GetTexHeight();
+    imageInfo.extent.depth = 1;
+    imageInfo.mipLevels = 1;
+    imageInfo.arrayLayers = (uint32)file.SourceFiles.size();
+    imageInfo.format = format;
+    imageInfo.tiling = tiling;
+    imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;//GPU无法使用，但是第一个transition将保留texels
+    imageInfo.usage = usage;
+    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    if (vkCreateImage(GDevice, &imageInfo, nullptr, &image) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create image!");
+    }
+
+    //获取image对应的内存要求（找到对应的内存类型）
+    VkMemoryRequirements memRequirements;
+    vkGetImageMemoryRequirements(GDevice, image, &memRequirements);
+    //分配内存
+    VkMemoryAllocateInfo allocInfo{};
+    allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    allocInfo.allocationSize = memRequirements.size;
+    allocInfo.memoryTypeIndex = VkHelperInstance->FindMemoryType(memRequirements.memoryTypeBits,
+        properties);
+
+    if (vkAllocateMemory(GDevice, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to allocate image memory!");
+    }
+        
+    //绑定image和为其分配的实际内存
+    vkBindImageMemory(GDevice, image, imageMemory, 0);
+}
+
 SwapChainSupportDetails VkHelper::querySwapChainSupport() {
     SwapChainSupportDetails details;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(PhysicalDevice, MainWindowData.Surface, &details.capabilities);
@@ -756,7 +839,7 @@ void VkHelper::transitionImageLayout(VkCommandBuffer commandBuffer,
 }
 
 //创建image view的抽象
-VkImageView VkHelper::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags)
+VkImageView VkHelper::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, VkImageViewType viewType)
 {
     VkImageViewCreateInfo viewInfo{};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -787,7 +870,7 @@ void VkHelper::createDepthResources()
                 VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage,
                 depthImageMemory);
-    depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+    depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D);
     
     auto cmd = BeginSingleTimeCommands();
 

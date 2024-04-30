@@ -180,6 +180,7 @@
     <ClCompile Include="Engine\Core\ShaderModule\Shader.cpp" />
     <ClCompile Include="Engine\Core\ShaderReflector\ShaderReflector.cpp" />
     <ClCompile Include="Engine\Core\Texture2D\Texture2D.cpp" />
+    <ClCompile Include="Engine\Core\TextureCube.cpp" />
     <ClCompile Include="Engine\Core\UniformBuffer\UniformBuffer.cpp" />
     <ClCompile Include="Engine\Runtime\Component\CubeComponent.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -261,6 +262,7 @@
     <ClCompile Include="Engine\Runtime\Component\Light\PointLight.cpp" />
     <ClCompile Include="Engine\SubSystem\AssetSystem\AssetSystem.cpp" />
     <ClCompile Include="Engine\SubSystem\InputSystem\InputSysten.cpp" />
+    <ClCompile Include="Engine\TextureFile\TextureFile.cpp" />
     <ClCompile Include="Engine\Toolkit\Container\Queue.cpp" />
     <ClCompile Include="Engine\Toolkit\FileToolKit\FileToolKit.cpp" />
     <ClCompile Include="Engine\Toolkit\math_utils.cpp" />
@@ -349,6 +351,7 @@
     <ClCompile Include="LogPrinter\Log.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Meshs\Box\BoxVertices.cpp" />
+    <None Include="Shader\SkyBox\CommonSkyBox_vs_ps.hlsl" />
     <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx10.cpp" />
     <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx11.cpp" />
     <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx12.cpp" />
@@ -403,11 +406,13 @@
     <ClInclude Include="Engine\Core\ShaderModule\Shader.h" />
     <ClInclude Include="Engine\Core\ShaderReflector\ShaderReflector.h" />
     <ClInclude Include="Engine\Core\Texture2D\Texture2D.h" />
+    <ClInclude Include="Engine\Core\TextureCube.h" />
     <ClInclude Include="Engine\Core\UniformBuffer\UniformBuffer.h" />
     <ClInclude Include="Engine\Runtime\Component\CubeComponent.h" />
     <ClInclude Include="Engine\Runtime\Component\Light\PointLight.h" />
     <ClInclude Include="Engine\SubSystem\AssetSystem\AssetSystem.h" />
     <ClInclude Include="Engine\SubSystem\InputSystem\InputSysten.h" />
+    <ClInclude Include="Engine\TextureFile\TextureFile.h" />
     <ClInclude Include="Engine\Toolkit\Container\Queue.h" />
     <ClInclude Include="Engine\Toolkit\FileToolKit\FileToolKit.h" />
     <ClInclude Include="Engine\Toolkit\math_utils.h" />

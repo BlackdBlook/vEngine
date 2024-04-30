@@ -1,45 +1,55 @@
-#include "Texture2D.h"
+#include "TextureCube.h"
 
-#include <vulkan/vulkan_core.h>
+#include <array>
 
 #include "Engine/vEngine.h"
-#include "Engine/SubSystem/AssetSystem/AssetSystem.h"
 #include "Engine/TextureFile/TextureFile.h"
-#include "Engine/Toolkit/FileToolKit/FileToolKit.h"
-#include "ThirdParty/stb/stb_image.h"
+#include "Engine/VulkanHelper/VkHelper.h"
 
-void Texture2D::SetTexture_Internel(const string& TextureName)
+void TextureCube::SetTexture_Internel(const string& TextureName)
 {
-    SourceFile = TexutreFileSourceManager::GetTextureFile(TextureName);
+    std::array<SPtr<TextureBuffer>, 6> buffers;
 
-    auto buffer = SourceFile->CreateMemoryBuffer();
-
-    SourceFile->CreateImage(textureImage, textureImageMemory);
-
+    TextureFileArray file_array
+    (
+        std::vector<Container::Name>{
+            Container::Name{"back.jpg"},
+            Container::Name{"bottom.jpg"},
+            Container::Name{"front.jpg"},
+            Container::Name{"left.jpg"},
+            Container::Name{"right.jpg"},
+            Container::Name{"top.jpg"}
+        }
+    );
     
+    VkHelperInstance->createImage(file_array, textureImage, textureImageMemory);
+
     auto cmd = VkHelperInstance->BeginSingleTimeCommands();
 
     //将texture image转换到VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
     VkHelperInstance->transitionImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
-    //执行buffer到image的copy函数
-    VkHelperInstance->copyBufferToImage(cmd, buffer->stagingBuffer, textureImage,
-        SourceFile->texWidth, SourceFile->texHeight);
+    for(int i = 0; i < 6; i++)
+    {
+        //执行buffer到image的copy函数
+        VkHelperInstance->copyBufferToImage(cmd, buffers[i]->stagingBuffer, textureImage,
+            SourceFiles[i]->texWidth, SourceFiles[i]->texHeight);
+    }
 
     //在copy之后进行一次transition来准备让shader访问
     VkHelperInstance->transitionImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-        
+    
 
     VkHelperInstance->EndSingleTimeCommands(cmd);
 
     textureImageView = VkHelperInstance->createImageView(
-        textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D);
+        textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_CUBE);
 }
 
-void Texture2D::cleanUp(VkImageView tempTextureImageView, VkImage tempTextureImage,
+void TextureCube::cleanUp(VkImageView tempTextureImageView, VkImage tempTextureImage,
     VkDeviceMemory tempTextureImageMemory)
 {
     //销毁texture image view
@@ -58,17 +68,17 @@ void Texture2D::cleanUp(VkImageView tempTextureImageView, VkImage tempTextureIma
     }
 }
 
-Texture2D::Texture2D(const string& TextureName)
+TextureCube::TextureCube(const string& TextureName)
 {
     SetTexture_Internel(TextureName);
 }
 
-Texture2D::~Texture2D()
+TextureCube::~TextureCube()
 {
     cleanUp(textureImageView, textureImage, textureImageMemory);
 }
 
-void Texture2D::SetTexture(const string& TextureName)
+void TextureCube::SetTexture(const string& TextureName)
 {
     auto tempTextureImageView = textureImageView;
     auto tempTextureImage = textureImage;
