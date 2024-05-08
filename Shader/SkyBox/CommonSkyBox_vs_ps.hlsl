@@ -16,7 +16,7 @@ struct SkyboxView
 ConstantBuffer<SkyboxView> SkyboxViewBuffer;
 
 
-TextureCube texture0 : register(t2, space0);
+TextureCube texture0 : register(t2, space0); 
 SamplerState sampler0 : register(s3, space0);
 
 struct VSOutput    

@@ -32,6 +32,12 @@ public:
     virtual void Update(float DeltaTime);
     virtual void Draw(const RenderInfo& RenderInfo);
 
+    template<typename T>
+    SPtr<T> FindComponent(uint32 Index = 0);
+
+    template<typename T>
+    std::vector<SPtr<T>> FindComponents();
+
     template<typename T, typename ...Args>
     SPtr<T> CreateAttach(Args&&... args)
     {
@@ -57,4 +63,46 @@ public:
     const glm::mat4& GetModelMat();
     void LateUpdate(float delta_time);
 };
+
+template <typename T>
+SPtr<T> Object::FindComponent(uint32 Index)
+{
+    uint32 i = 0;
+    for(auto& c : Components)
+    {
+        SPtr<T> ret = std::dynamic_pointer_cast<T>(c);
+        if(ret == nullptr)
+        {
+            continue;
+        }
+
+        if(i == Index)
+        {
+            return ret;
+        }
+        i++;
+    }
+    return nullptr;
+}
+
+template <typename T>
+.
+
+
+
+std::vector<SPtr<T>> Object::FindComponents()
+{
+    std::vector<SPtr<T>> ret;
+    for(auto& c : Components)
+    {
+        SPtr<T> p = std::dynamic_pointer_cast<T>(c);
+        if(p == nullptr)
+        {
+            continue;
+        }
+        
+        ret.emplace_back(std::move(p));
+    }
+    return nullptr;
+}
 

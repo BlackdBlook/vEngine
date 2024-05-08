@@ -24,6 +24,7 @@ struct ShaderTextureInput
     uint32 bind;
     uint32 set;
     spirv_cross::SPIRType::BaseType type;
+    spv::Dim dim;
 
     VkDescriptorType GetDescriptorType();
 

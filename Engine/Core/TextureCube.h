@@ -3,10 +3,11 @@
 
 #include "Engine/TypeDef.h"
 #include "ShaderModule/Shader.h"
+#include "TextureInterface/ITexture.h"
 
 class TexutreFile;
 
-class TextureCube
+class TextureCube : public ITexture
 {
 public:
     friend class DescriptorHelper;
@@ -25,10 +26,9 @@ public:
     VkImage tempTextureImage, VkDeviceMemory tempTextureImageMemory);
 public:
     TextureCube(const string& TextureName);
-    ~TextureCube();
+    ~TextureCube() override;
+    
 
-    // TODO
-    ShaderTextureInput InputInfo;
-
-    void SetTexture(const string& TextureName);
+    void SetTexture(const string& TextureName) override;
+    VkImageView GetImageView() override;
 };

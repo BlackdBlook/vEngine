@@ -259,7 +259,7 @@ std::unordered_map<Container::Name, SPtr<UniformBuffer>> MaterialRenderPipelineI
     return out;
 }
 
-void MaterialRenderPipelineInfo::MakeInputTextures(std::unordered_map<string, SPtr<Texture2D>>& out) const
+void MaterialRenderPipelineInfo::MakeInputTextures(std::unordered_map<string, SPtr<ITexture>>& out) const
 {
     for(auto& tex :
         VertShader->ShaderTextureInputs.Members)

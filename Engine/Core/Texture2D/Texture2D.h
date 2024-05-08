@@ -4,13 +4,14 @@
 
 #include "Header.h"
 #include "Engine/Core/ShaderModule/Shader.h"
+#include "Engine/Core/TextureInterface/ITexture.h"
 #include "ThirdParty/stb/stb_image.h"
 
 class TexutreFile;
 class TexutreFileSourceManager;
 
 
-class Texture2D
+class Texture2D : public ITexture
 {
     friend class DescriptorHelper;
     SPtr<TexutreFile> SourceFile;
@@ -27,10 +28,10 @@ class Texture2D
     VkImage tempTextureImage, VkDeviceMemory tempTextureImageMemory);
 public:
     Texture2D(const string& TextureName);
-    ~Texture2D();
+    ~Texture2D() override;
 
-    // TODO
-    ShaderTextureInput InputInfo;
 
-    void SetTexture(const string& TextureName);
+
+    void SetTexture(const string& TextureName) override;
+    VkImageView GetImageView() override;
 };

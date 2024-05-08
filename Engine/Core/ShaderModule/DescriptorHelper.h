@@ -4,6 +4,7 @@
 
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
+class ITexture;
 class Texture2D;
 class UniformBuffer;
 
@@ -32,5 +33,5 @@ public:
 
     std::unordered_map<Container::Name, SPtr<UniformBuffer>> buffers;
     
-    std::unordered_map<string, SPtr<Texture2D>> Texture2Ds;
+    std::unordered_map<string, SPtr<ITexture>> Texture2Ds;
 };

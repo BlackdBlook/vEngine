@@ -5,6 +5,7 @@
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
 
+class ITexture;
 class Texture2D;
 class vShader;
 
@@ -45,7 +46,7 @@ public:
 
     virtual VkDescriptorSetLayout MakeVkDescriptorSetLayout() const;
     virtual std::unordered_map<Container::Name, SPtr<UniformBuffer>> MakeUniformBuffers() const;
-    virtual void MakeInputTextures(std::unordered_map<string, SPtr<Texture2D>>& out) const;
+    virtual void MakeInputTextures(std::unordered_map<string, SPtr<ITexture>>& out) const;
     virtual void FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutBinding>& out)const;
 };
 

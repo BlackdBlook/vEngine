@@ -78,7 +78,7 @@ ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShad
 
     auto getResource = [&ret, &compiler](
         const spirv_cross::Resource& resource,
-        spirv_cross::SPIRType::BaseType type)
+        const spirv_cross::SPIRType& type)
     {
         // 打印资源名称
         uint32_t binding = compiler.get_decoration(resource.id, spv::DecorationBinding);
@@ -88,7 +88,8 @@ ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShad
         input.name = compiler.get_name(resource.id);
         input.bind = binding;
         input.set = set;
-        input.type = type;
+        input.type = type.basetype;
+        input.dim = type.image.dim;
         ret.Members.insert({input.name, input});
     };
 
@@ -102,7 +103,7 @@ ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShad
 
         if(type.basetype == spirv_cross::SPIRType::Sampler)
         {
-            getResource(resource, type.basetype);
+            getResource(resource, type);
         }
     }
     
@@ -112,7 +113,7 @@ ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShad
         if (type.basetype == spirv_cross::SPIRType::SampledImage ||
             type.basetype == spirv_cross::SPIRType::Image)
         {
-            getResource(resource, type.basetype);
+            getResource(resource, type);
         }
     }
 
@@ -122,7 +123,7 @@ ShaderTextureInputs ShaderDecoder::DecodeTextures(std::vector<uint8>* binaryShad
         if (type.basetype == spirv_cross::SPIRType::SampledImage ||
             type.basetype == spirv_cross::SPIRType::Image)
         {
-            getResource(resource, type.basetype);
+            getResource(resource, type);
         }
     }
     

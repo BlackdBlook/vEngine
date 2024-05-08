@@ -79,3 +79,8 @@ void Texture2D::SetTexture(const string& TextureName)
 
     cleanUp(tempTextureImageView, tempTextureImage, tempTextureImageMemory);
 }
+
+VkImageView Texture2D::GetImageView()
+{
+    return textureImageView;
+}

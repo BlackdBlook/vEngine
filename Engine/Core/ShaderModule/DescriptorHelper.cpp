@@ -107,7 +107,7 @@ void DescriptorHelper::BindInputBuffer()
         {
             auto& imageInfo = imageInfos[imageCount++];
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            imageInfo.imageView = image.second->textureImageView;
+            imageInfo.imageView = image.second->GetImageView();
             imageInfo.sampler = VkHelperInstance->textureSampler;
         
             

@@ -7,6 +7,7 @@
 #include "Component/Common/BasicMove/BasicCameraMove.h"
 #include "Component/Common/EscExit/PressEscExit.h"
 #include "Engine/vEngine.h"
+#include "Engine/Core/TextureCube.h"
 #include "Engine/Core/Camera/Camera.h"
 #include "Engine/Core/Component/Component.h"
 #include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
@@ -37,34 +38,46 @@ namespace
                 ,1});
         }
     };
-
-    class AutoMov : public Component
-    {
-        Material* material;
-    public:
-        AutoMov(Material* material)
-        {
-            Component();
-            this->material = material;
-        }
-        void Update(float DeltaTime) override
-        {
-            Parent->SetPos(glm::vec3{glm::sin(ImGui::GetTime()) * 2,0,glm::cos(ImGui::GetTime()) * 2});
-            material->SetCurrentUniformData("pointLight.position", Parent->GetPos());
-        }
-    };
-
+    
     class UIDemo :public Component
     {
         Material* material;
         float LightStrength = 1.f;
     public:
+        bool Turn = false;
         UIDemo(Material* m):material(m)
         {
             Component();
         }
         virtual void Update(float DeltaTime) override;
     };
+
+    class AutoMov : public Component
+    {
+        Material* material;
+        SPtr<UIDemo> ui;
+    public:
+        AutoMov(Material* material)
+        {
+            Component();
+            this->material = material;
+        }
+
+        void OnAttached() override
+        {
+            ui = Parent->FindComponent<UIDemo>();
+        }
+        
+        void Update(float DeltaTime) override
+        {
+            if(ui && ui->Turn)
+            {
+                Parent->SetPos(glm::vec3{glm::sin(ImGui::GetTime()) * 2,0,glm::cos(ImGui::GetTime()) * 2});
+                material->SetCurrentUniformData("pointLight.position", Parent->GetPos());
+            }
+        }
+    };
+
 
     void UIDemo::Update(float DeltaTime)
     {
@@ -76,11 +89,32 @@ namespace
         float p[3] = {pos.x, pos.y, pos.z};
         ImGui::DragFloat3("LightPos", p, 0.001f);
         ImGui::DragFloat("LightStrength", &LightStrength, 0.001f);
+        ImGui::Checkbox("Turn", &Turn);
         ImGui::End();
 
         Parent->SetPos(glm::vec3{p[0], p[1], p[2]});
         material->SetCurrentUniformData("pointLight.position", Parent->GetPos());
         material->SetCurrentUniformData("pointLight.strength", LightStrength);
+    }
+
+    class SkyBoxComponent : public Component
+    {
+        SPtr<TextureCube> cube;
+    public:
+        SkyBoxComponent()
+        {
+            Component();
+            cube = std::make_shared<TextureCube>("skybox");
+        }
+
+        virtual void Draw(const RenderInfo& RenderInfo) override;
+    };
+
+    void SkyBoxComponent::Draw(const RenderInfo& RenderInfo)
+    {
+        Component::Draw(RenderInfo);
+
+        
     }
 }
 
@@ -109,14 +143,19 @@ void DrawLightCube::Init()
     
     {
         auto light = NewObject();
+        light->CreateAttach<UIDemo>(m);
         light->CreateAttach<Light>();
-        // light->CreateAttach<AutoMov>(m);
+        light->CreateAttach<AutoMov>(m);
         light->CreateAttach<CubeComponent>("DrawTexCube");
         light->SetScale(glm::vec3{0.1});
         light->SetPos(glm::vec3{0,0,2});
-        light->CreateAttach<UIDemo>(m);
         light->CreateAttach<BasicCameraMove>();
         light->CreateAttach<PressEscExit>();
+    }
+
+    {
+        auto skyBox = NewObject();
+        // skyBox->CreateAttach<SkyBoxComponent>();
     }
 }
 LevelRegister(DrawLightCube);

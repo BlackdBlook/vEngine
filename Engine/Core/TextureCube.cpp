@@ -89,3 +89,8 @@ void TextureCube::SetTexture(const string& TextureName)
 
     cleanUp(tempTextureImageView, tempTextureImage, tempTextureImageMemory);
 }
+
+VkImageView TextureCube::GetImageView()
+{
+    return textureImageView;
+}
