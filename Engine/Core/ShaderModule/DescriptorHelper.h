@@ -15,7 +15,7 @@ public:
 
     ~DescriptorHelper();
     
-    void createDescriptorPool();
+    void createDescriptorPool(uint32 poolSize);
     
     void createDescriptorSets(const VkDescriptorSetLayout& descriptorSetLayout);
 

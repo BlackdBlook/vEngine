@@ -86,10 +86,6 @@ SPtr<T> Object::FindComponent(uint32 Index)
 }
 
 template <typename T>
-.
-
-
-
 std::vector<SPtr<T>> Object::FindComponents()
 {
     std::vector<SPtr<T>> ret;
