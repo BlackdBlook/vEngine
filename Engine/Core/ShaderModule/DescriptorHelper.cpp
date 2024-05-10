@@ -5,12 +5,27 @@
 
 #include "Header.h"
 #include "Engine/vEngine.h"
+#include "Engine/Core/Material/MaterialRenderPipeline.h"
 #include "Engine/Core/Texture2D/Texture2D.h"
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
-DescriptorHelper::DescriptorHelper()
+DescriptorHelper::DescriptorHelper(MaterialRenderPipelineInfo* info)
 {
-    createDescriptorPool(10);
+    info->MakeInputTextures(Texture2Ds);
+
+    std::vector<VkDescriptorPoolSize> poolSize;
+
+    info->FillVkDescriptorPoolSize(poolSize);
+
+    createDescriptorPool(poolSize);
+    
+    auto setLayout = info->MakeVkDescriptorSetLayout();
+    
+    createDescriptorSets(setLayout);
+
+    buffers = info->MakeUniformBuffers();
+
+    BindInputBuffer();
 }
 
 DescriptorHelper::~DescriptorHelper()
@@ -18,25 +33,13 @@ DescriptorHelper::~DescriptorHelper()
     cleanUp();
 }
 
-void DescriptorHelper::createDescriptorPool(uint32 poolSize)
+void DescriptorHelper::createDescriptorPool(const std::vector<VkDescriptorPoolSize>& poolSize)
 {
-    std::array<VkDescriptorPoolSize, 4> poolSizes{};
-    poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHTS) * poolSize;
-    poolSizes[1].type = VK_DESCRIPTOR_TYPE_SAMPLER;
-    poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHTS) * poolSize;
-    poolSizes[2].type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-    poolSizes[2].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHTS) * poolSize;
-    poolSizes[3].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-    poolSizes[3].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHTS) * poolSize;
-
     VkDescriptorPoolCreateInfo poolInfo{};
     poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    poolInfo.poolSizeCount = poolSizes.size();
-    poolInfo.pPoolSizes = poolSizes.data();
-    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHTS) * poolSizes.size();
-
-
+    poolInfo.poolSizeCount = (uint32)poolSize.size();
+    poolInfo.pPoolSizes = poolSize.data();
+    poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHTS);
 
     if (vkCreateDescriptorPool(GDevice, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
     {
@@ -56,7 +59,9 @@ void DescriptorHelper::createDescriptorSets(
     
     //为运行中的每一帧创建一个descriptor set
     descriptorSets.resize(MAX_FRAMES_IN_FLIGHTS);
-    if (vkAllocateDescriptorSets(GDevice, &allocInfo, descriptorSets.data()) !=VK_SUCCESS)
+    VkResult result = vkAllocateDescriptorSets(GDevice, &allocInfo, descriptorSets.data());
+
+    if (result !=VK_SUCCESS)
     {
         throw std::runtime_error("failed to allocate descriptor sets!");
     }

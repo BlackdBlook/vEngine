@@ -194,6 +194,46 @@ VkPipeline MaterialRenderPipelineInfo::PipelineBasePipelineHandle()const
     return VK_NULL_HANDLE;
 }
 
+void MaterialRenderPipelineInfo::FillVkDescriptorPoolSize(std::vector<VkDescriptorPoolSize>& sizes) const
+{
+    if(UniformBufferBlocks->UniformBlocks.empty() == false)
+    {
+        VkDescriptorPoolSize& size = sizes.emplace_back();
+
+        size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+        size.descriptorCount = (uint32)UniformBufferBlocks->UniformBlocks.size();
+    }
+
+    uint32 textureNum = 0;
+    uint32 samplerNum = 0;
+    uint32 CombindImageNum = 0;
+
+    VertShader->CountTextureInputNum(textureNum, samplerNum, CombindImageNum);
+    FragShader->CountTextureInputNum(textureNum, samplerNum, CombindImageNum);
+
+    if(textureNum != 0)
+    {
+        VkDescriptorPoolSize& size = sizes.emplace_back();
+
+        size.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+        size.descriptorCount = textureNum;
+    }
+    if(samplerNum != 0)
+    {
+        VkDescriptorPoolSize& size = sizes.emplace_back();
+
+        size.type = VK_DESCRIPTOR_TYPE_SAMPLER;
+        size.descriptorCount = samplerNum;
+    }
+    if(CombindImageNum != 0)
+    {
+        VkDescriptorPoolSize& size = sizes.emplace_back();
+
+        size.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+        size.descriptorCount = CombindImageNum;
+    }
+}
+
 VkDescriptorSetLayout MaterialRenderPipelineInfo::MakeVkDescriptorSetLayout() const
 {
     if(descriptorSetLayout)

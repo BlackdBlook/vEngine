@@ -142,6 +142,27 @@ VkShaderStageFlagBits vShader::GetVkShaderStageFlagBits()
     return VK_SHADER_STAGE_ALL;
 }
 
+void vShader::CountTextureInputNum(uint32& textureNum, uint32& samplerNum, uint32& CombindImageNum)
+{
+    for(auto& block:ShaderTextureInputs.Members)
+    {
+        switch (block.second.type)
+        {
+        case spirv_cross::SPIRType::Image:
+            ++textureNum;
+            break;
+        case spirv_cross::SPIRType::SampledImage:
+            ++CombindImageNum;
+            break;
+        case spirv_cross::SPIRType::Sampler:
+            ++samplerNum;
+            break;
+        default:
+            throw std::runtime_error("Unknow Texture Type");
+        }
+    }
+}
+
 vShader::vShader(const char* Name, ShaderType type, ShaderUniformBufferBlocks* blocks, ShaderCodeType codeType)
 : type(type)
 

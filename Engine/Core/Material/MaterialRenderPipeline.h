@@ -44,6 +44,7 @@ public:
     virtual uint32 PipelineSubpass();
     virtual VkPipeline PipelineBasePipelineHandle()const;
 
+    virtual void FillVkDescriptorPoolSize(std::vector<VkDescriptorPoolSize>& sizes) const;
     virtual VkDescriptorSetLayout MakeVkDescriptorSetLayout() const;
     virtual std::unordered_map<Container::Name, SPtr<UniformBuffer>> MakeUniformBuffers() const;
     virtual void MakeInputTextures(std::unordered_map<string, SPtr<ITexture>>& out) const;

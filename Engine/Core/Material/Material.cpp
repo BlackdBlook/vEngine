@@ -16,16 +16,8 @@ Material::Material()
 
 void Material::Init()
 {
-    auto setLayout = info->MakeVkDescriptorSetLayout();
-    
-    info->MakeInputTextures(descriptor.Texture2Ds);
-    
-    descriptor.createDescriptorSets(setLayout);
+    descriptor = NewSPtr<DescriptorHelper>(info.get());
 
-    descriptor.buffers = info->MakeUniformBuffers();
-
-    descriptor.BindInputBuffer();
-    
     pipeline.Init(info.get());
 }
 
@@ -54,14 +46,14 @@ Material::~Material()
 
 void Material::SetTexture(const string& TargetName, const string& NewTextureName)
 {
-    auto target = descriptor.Texture2Ds.find(TargetName);
-    if(target == descriptor.Texture2Ds.end())
+    auto target = descriptor->Texture2Ds.find(TargetName);
+    if(target == descriptor->Texture2Ds.end())
     {
         ERR("Texture not found");
         return;
     }
     target->second->SetTexture(NewTextureName);
-    descriptor.BindInputBuffer();
+    descriptor->BindInputBuffer();
 }
 
 void Material::SetCurrentUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset)
@@ -72,8 +64,8 @@ void Material::SetCurrentUniformData(const Container::Name& MemberName, uint8* S
         return;
     }
 
-    auto buffer = descriptor.buffers.find(blockName->second);
-    if(buffer == descriptor.buffers.end())
+    auto buffer = descriptor->buffers.find(blockName->second);
+    if(buffer == descriptor->buffers.end())
     {
         return;
     }
@@ -90,8 +82,8 @@ void Material::SetAllUniformData(const Container::Name& MemberName, uint8* Src, 
         return;
     }
 
-    auto buffer = descriptor.buffers.find(blockName->second);
-    if(buffer == descriptor.buffers.end())
+    auto buffer = descriptor->buffers.find(blockName->second);
+    if(buffer == descriptor->buffers.end())
     {
         return;
     }
@@ -124,6 +116,6 @@ void Material::Draw(const RenderInfo& RenderInfo)
     vkCmdBindDescriptorSets(
         RenderInfo.CommmandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS,
         info->PipelineLayout(), 0, 1,
-        descriptor.GetDescriptorSetsByCurrentFrameIndex(),
+        descriptor->GetDescriptorSetsByCurrentFrameIndex(),
         0, nullptr);
 }

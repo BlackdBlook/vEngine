@@ -4,6 +4,7 @@
 
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
+class MaterialRenderPipelineInfo;
 class ITexture;
 class Texture2D;
 class UniformBuffer;
@@ -11,11 +12,11 @@ class UniformBuffer;
 class DescriptorHelper
 {
 public:
-    DescriptorHelper();
+    DescriptorHelper(MaterialRenderPipelineInfo* info);
 
     ~DescriptorHelper();
     
-    void createDescriptorPool(uint32 poolSize);
+    void createDescriptorPool(const std::vector<VkDescriptorPoolSize>& poolSize);
     
     void createDescriptorSets(const VkDescriptorSetLayout& descriptorSetLayout);
 
@@ -26,7 +27,9 @@ public:
     void cleanUp();
 
     //存储descriptor pool，用于分配descriptor sets
-    VkDescriptorPool descriptorPool;
+    VkDescriptorPool descriptorPool = VK_NULL_HANDLE;
+
+    uint32 descriptorPoolSize = 10;
     
     //每个运行帧的descriptor set
     std::vector<VkDescriptorSet> descriptorSets;

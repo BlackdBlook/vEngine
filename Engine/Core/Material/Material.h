@@ -61,7 +61,7 @@ class Material
 public:
     MaterialRenderPipeline pipeline;
 
-    DescriptorHelper descriptor;
+    SPtr<DescriptorHelper> descriptor;
 
     SPtr<MaterialRenderPipelineInfo> info;
 
