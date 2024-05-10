@@ -36,5 +36,5 @@ public:
 
     std::unordered_map<Container::Name, SPtr<UniformBuffer>> buffers;
     
-    std::unordered_map<string, SPtr<ITexture>> Texture2Ds;
+    std::unordered_map<string, SPtr<ITexture>> Textures;
 };

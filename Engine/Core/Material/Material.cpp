@@ -46,8 +46,8 @@ Material::~Material()
 
 void Material::SetTexture(const string& TargetName, const string& NewTextureName)
 {
-    auto target = descriptor->Texture2Ds.find(TargetName);
-    if(target == descriptor->Texture2Ds.end())
+    auto target = descriptor->Textures.find(TargetName);
+    if(target == descriptor->Textures.end())
     {
         ERR("Texture not found");
         return;

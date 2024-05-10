@@ -2,6 +2,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "Engine/TypeDef.h"
+#include "Engine/TextureFile/TextureFile.h"
 #include "ShaderModule/Shader.h"
 #include "TextureInterface/ITexture.h"
 
@@ -12,7 +13,7 @@ class TextureCube : public ITexture
 public:
     friend class DescriptorHelper;
     
-    std::vector<SPtr<TexutreFile>> SourceFiles;
+    // TextureFileArray SourceFiles;
 
     //存储纹理image及其对应device memory
     VkImage textureImage;

@@ -11,7 +11,7 @@
 
 DescriptorHelper::DescriptorHelper(MaterialRenderPipelineInfo* info)
 {
-    info->MakeInputTextures(Texture2Ds);
+    info->MakeInputTextures(Textures);
 
     std::vector<VkDescriptorPoolSize> poolSize;
 
@@ -73,7 +73,7 @@ void DescriptorHelper::BindInputBuffer()
     for (size_t freamIndex = 0; freamIndex < MAX_FRAMES_IN_FLIGHTS; freamIndex++)
     {
         int bufferCount = 0;
-        std::vector<VkWriteDescriptorSet> descriptorWrites(buffers.size() + Texture2Ds.size());
+        std::vector<VkWriteDescriptorSet> descriptorWrites(buffers.size() + Textures.size());
 
         uint32 bufferElementCount = 0;
         for(auto& buffer : this->buffers)
@@ -112,9 +112,9 @@ void DescriptorHelper::BindInputBuffer()
         }
 
         //在descriptor set中绑定实际的image和sampler资源到descriptors
-        std::vector<VkDescriptorImageInfo> imageInfos(Texture2Ds.size());
+        std::vector<VkDescriptorImageInfo> imageInfos(Textures.size());
         int imageCount = 0;
-        for(auto& image : this->Texture2Ds)
+        for(auto& image : this->Textures)
         {
             auto& imageInfo = imageInfos[imageCount++];
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

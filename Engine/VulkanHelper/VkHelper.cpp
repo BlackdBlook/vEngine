@@ -545,13 +545,14 @@ void VkHelper::createFramebuffers()
     }
 }
 
-void VkHelper::createImage(uint32_t width, uint32_t height, VkFormat format,
+void VkHelper::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageCreateFlags flags,
     VkImageTiling tiling,VkImageUsageFlags usage, VkMemoryPropertyFlags properties,
     VkImage& image, VkDeviceMemory& imageMemory)
 {
     //创建image
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.flags = flags;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
     imageInfo.extent.width = width;
     imageInfo.extent.height = height;
@@ -564,7 +565,7 @@ void VkHelper::createImage(uint32_t width, uint32_t height, VkFormat format,
     imageInfo.usage = usage;
     imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-
+    
     if (vkCreateImage(GDevice, &imageInfo, nullptr, &image) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create image!");
@@ -623,8 +624,8 @@ void VkHelper::copyBufferToImage(VkCommandBuffer commandBuffer,
     // endSingleTimeCommands(commandBuffer);
 }
 
-void VkHelper::createImage(TextureFileArray& file,
-    VkImage image, VkDeviceMemory imageMemory)
+void VkHelper::createImage(TextureFileArray& file, VkImageCreateFlags flags,
+                           VkImage& image, VkDeviceMemory& imageMemory)
 {
     VkFormat format = file.format;
     VkImageTiling tiling = file.tiling;
@@ -634,6 +635,7 @@ void VkHelper::createImage(TextureFileArray& file,
     //创建image
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageInfo.flags = flags;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
     imageInfo.extent.width = file.GetTexWidth();
     imageInfo.extent.height = file.GetTexHeight();
@@ -838,19 +840,106 @@ void VkHelper::transitionImageLayout(VkCommandBuffer commandBuffer,
     // endSingleTimeCommands(commandBuffer);
 }
 
+void VkHelper::transitionCubeImageLayout(VkCommandBuffer commandBuffer,
+    VkImage image, VkFormat format,
+    VkImageLayout oldLayout, VkImageLayout newLayout)
+{
+    // VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+
+    VkPipelineStageFlags sourceStage;
+    VkPipelineStageFlags destinationStage;
+
+    VkImageMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = oldLayout;
+    barrier.newLayout = newLayout;
+
+    barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+    barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+
+    barrier.image = image;
+    if (newLayout == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL) {
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+
+        if (hasStencilComponent(format)) {
+            barrier.subresourceRange.aspectMask |= VK_IMAGE_ASPECT_STENCIL_BIT;
+        }
+    } else {
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    }
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 6;
+    
+    if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout ==
+				    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+    {
+	    barrier.srcAccessMask = 0;
+	    barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+	    sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+	    destinationStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+    }
+    else if (oldLayout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL &&
+		    newLayout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+    {
+	    barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+	    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+	    sourceStage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+	    destinationStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    }
+    else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout
+		    == VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL)
+    {
+	    barrier.srcAccessMask = 0;
+	    barrier.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+				    VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+	    sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+	    destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    }
+    else
+    {
+	    throw std::invalid_argument("unsupported layout transition!");
+    }
+
+    vkCmdPipelineBarrier(commandBuffer, 
+        sourceStage, destinationStage, 
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &barrier);
+
+    // endSingleTimeCommands(commandBuffer);
+}
+
 //创建image view的抽象
 VkImageView VkHelper::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, VkImageViewType viewType)
 {
     VkImageViewCreateInfo viewInfo{};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     viewInfo.image = image;
-    viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    viewInfo.viewType = viewType;
     viewInfo.format = format;
     viewInfo.subresourceRange.aspectMask = aspectFlags;
     viewInfo.subresourceRange.baseMipLevel = 0;
     viewInfo.subresourceRange.levelCount = 1;
     viewInfo.subresourceRange.baseArrayLayer = 0;
-    viewInfo.subresourceRange.layerCount = 1;
+    switch (viewType)
+    {
+    case VK_IMAGE_VIEW_TYPE_2D:
+        viewInfo.subresourceRange.layerCount = 1;
+        break;
+    
+    case VK_IMAGE_VIEW_TYPE_CUBE:
+        viewInfo.subresourceRange.layerCount = 6;
+        break;
+    default:
+        throw std::runtime_error("unsupported viewType!");
+    }
+    
 
     VkImageView imageView;
     if (vkCreateImageView(GDevice, &viewInfo, nullptr, &imageView) != VK_SUCCESS)
@@ -866,7 +955,7 @@ void VkHelper::createDepthResources()
     VkFormat depthFormat = findDepthFormat();
 
     createImage(swapChainExtent.width, swapChainExtent.height,
-                depthFormat, VK_IMAGE_TILING_OPTIMAL,
+                depthFormat, 0, VK_IMAGE_TILING_OPTIMAL,
                 VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage,
                 depthImageMemory);

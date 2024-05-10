@@ -69,19 +69,23 @@ public:
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
     void createFramebuffers();
 
-    void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage,
-                     VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+    void createImage(uint32_t width, uint32_t height, VkFormat format,VkImageCreateFlags flags,
+        VkImageTiling tiling, VkImageUsageFlags usage,
+        VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
     void copyBufferToImage(VkCommandBuffer commandBuffer, VkBuffer buffer, VkImage image, uint32_t width,
                            uint32_t height) const;
 
-    void createImage(TextureFileArray& file,
-                     VkImage image, VkDeviceMemory imageMemory);
+    void createImage(TextureFileArray& file, VkImageCreateFlags flags,
+                     VkImage& image, VkDeviceMemory& imageMemory);
 
     SwapChainSupportDetails querySwapChainSupport();
     VkExtent2D chooseSwapExtent(SwapChainSupportDetails& swapChainSupport);
     void createTextureSampler();
     void transitionImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkFormat format, VkImageLayout oldLayout,
                                VkImageLayout newLayout);
+    void transitionCubeImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkFormat format,
+                                   VkImageLayout oldLayout,
+                                   VkImageLayout newLayout);
     VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, VkImageViewType viewType);
     void createDepthResources();
     void ReleaseDepthResources();

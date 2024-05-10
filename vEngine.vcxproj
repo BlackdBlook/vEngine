@@ -137,7 +137,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;GLM_FORCE_RADIANS;GLM_FORCE_DEPTH_ZERO_TO_ONE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)\ThirdParty\SDL\include;$(ProjectDir)\ThirdParty\imgui;$(ProjectDir)\ThirdParty\VulkanSdk\Include;$(ProjectDir)\ThirdParty\lib-glfw\include\GLFW;$(ProjectDir)\ThirdParty\Vulkan-Hpp\glm;$(ProjectDir)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\ThirdParty\SDL\include;$(ProjectDir)\ThirdParty\imgui;$(ProjectDir)\ThirdParty\VulkanSdk\Include;$(ProjectDir)\ThirdParty\lib-glfw\include\;$(ProjectDir)\ThirdParty\Vulkan-Hpp\glm;$(ProjectDir)</AdditionalIncludeDirectories>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>MaxSpeed</Optimization>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -182,6 +182,7 @@
     <ClCompile Include="Engine\Core\Texture2D\Texture2D.cpp" />
     <ClCompile Include="Engine\Core\TextureCube.cpp" />
     <ClCompile Include="Engine\Core\TextureInterface\ITexture.cpp" />
+    <ClCompile Include="Engine\Core\TextureSampler\TextureSampler.cpp" />
     <ClCompile Include="Engine\Core\UniformBuffer\UniformBuffer.cpp" />
     <ClCompile Include="Engine\Runtime\Component\CubeComponent.cpp">
       <RuntimeLibrary>MultiThreadedDebugDll</RuntimeLibrary>
@@ -426,6 +427,7 @@
     </ClCompile>
     <ClCompile Include="Level\Cube\DrawLightCube.cpp" />
     <ClCompile Include="Level\Cube\DrawTexCube.cpp" />
+    <ClCompile Include="Level\Skybox\DrawSkybox.cpp" />
     <ClCompile Include="LogPrinter\Log.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Meshs\Box\BoxVertices.cpp" />
@@ -485,6 +487,7 @@
     <ClInclude Include="Engine\Core\Texture2D\Texture2D.h" />
     <ClInclude Include="Engine\Core\TextureCube.h" />
     <ClInclude Include="Engine\Core\TextureInterface\ITexture.h" />
+    <ClInclude Include="Engine\Core\TextureSampler\TextureSampler.h" />
     <ClInclude Include="Engine\Core\UniformBuffer\UniformBuffer.h" />
     <ClInclude Include="Engine\Runtime\Component\CubeComponent.h" />
     <ClInclude Include="Engine\Runtime\Component\Light\PointLight.h" />
@@ -502,6 +505,7 @@
     <ClInclude Include="Level\Cube\DrawCube.h" />
     <ClInclude Include="Level\Cube\DrawLightCube.h" />
     <ClInclude Include="Level\Cube\DrawTexCube.h" />
+    <ClInclude Include="Level\Skybox\DrawSkybox.h" />
     <ClInclude Include="LogPrinter\Log.h" />
     <ClInclude Include="Meshs\Box\BoxVertices.h" />
     <ClInclude Include="Shader\CommonDef.hlsli" />

@@ -6,6 +6,8 @@
 #include "Engine/Core/ShaderReflector/ShaderReflector.h"
 #include "ThirdParty/SPIRV-Cross/spirv_common.hpp"
 
+class ITexture;
+
 enum class ShaderType
 {
     Vertex,
@@ -27,6 +29,8 @@ struct ShaderTextureInput
     spv::Dim dim;
 
     VkDescriptorType GetDescriptorType();
+
+    SPtr<ITexture> CreateTextureObject();
 
     std::string Log();
 };

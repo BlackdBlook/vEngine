@@ -1,4 +1,5 @@
 #pragma once
+#include <stdexcept>
 #include <unordered_map>
 #include <vulkan/vulkan_core.h>
 
@@ -25,7 +26,7 @@ class TexutreFile
     friend TexutreFileSourceManager;
 public:
     SPtr<TextureBuffer> CreateMemoryBuffer();
-    void CreateImage(VkImage& image, VkDeviceMemory& imageMemory);
+    void CreateImage(VkImage& image, VkDeviceMemory& imageMemory, VkImageCreateFlags flags = 0);
 
     VkDeviceSize  imageSize = 0;
     int texWidth = 0;
@@ -48,6 +49,23 @@ public:
     TextureFileArray(const std::vector<Container::Name>& FileNames);
     
     std::vector<TexutreFilePtr> SourceFiles;
+
+    template<size_t T>
+    void FillBuffer(std::array<SPtr<TextureBuffer>, T>& buffer)
+    {
+        if(SourceFiles.size() == T)
+        {
+            for(int i = 0; i < T; i++)
+            {
+                buffer[i] = NewSPtr<TextureBuffer>(SourceFiles[i]->imageSize);
+                buffer[i]->WriteTextureSourceData(SourceFiles[i].get());
+            }
+        }
+        else
+        {
+            throw std::runtime_error("TextureFileArray::FillBuffer: SourceFiles.size() != T");
+        }
+    }
 
     int GetTexWidth();
     int GetTexHeight();

@@ -158,4 +158,4 @@ void DrawLightCube::Init()
         // skyBox->CreateAttach<SkyBoxComponent>();
     }
 }
-LevelRegister(DrawLightCube);
+// LevelRegister(DrawLightCube);

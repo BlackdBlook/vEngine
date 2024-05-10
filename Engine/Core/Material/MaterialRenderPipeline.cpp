@@ -304,20 +304,14 @@ void MaterialRenderPipelineInfo::MakeInputTextures(std::unordered_map<string, SP
     for(auto& tex :
         VertShader->ShaderTextureInputs.Members)
     {
-        auto texture = NewSPtr<Texture2D>("default.jpg");
-        texture->InputInfo.bind = tex.second.bind;
-        texture->InputInfo.set = tex.second.set;
-        texture->InputInfo.type = tex.second.type;
-        out.emplace(tex.first, texture);
+        auto texture = tex.second.CreateTextureObject();
+        out.emplace(tex.first, tex.second.CreateTextureObject());
     }
 
     for(auto& tex :
-    FragShader->ShaderTextureInputs.Members)
+        FragShader->ShaderTextureInputs.Members)
     {
-        auto texture = NewSPtr<Texture2D>("default.jpg");
-        texture->InputInfo.bind = tex.second.bind;
-        texture->InputInfo.set = tex.second.set;
-        texture->InputInfo.type = tex.second.type;
+        auto texture = tex.second.CreateTextureObject();
         out.emplace(tex.first, texture);
     }
 }
@@ -326,7 +320,7 @@ void MaterialRenderPipelineInfo::FillDescriptorSetLayoutBinding(std::vector<VkDe
 {
     for(auto& block : UniformBufferBlocks->UniformBlocks)
     {
-        VkDescriptorSetLayoutBinding& uboLayoutBinding = out.emplace_back();;
+        VkDescriptorSetLayoutBinding& uboLayoutBinding = out.emplace_back();
     
         // 绑定点
         uboLayoutBinding.binding = block.second.Bind;

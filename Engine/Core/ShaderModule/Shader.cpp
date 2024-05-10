@@ -3,6 +3,9 @@
 #include <filesystem>
 
 #include "Engine/vEngine.h"
+#include "Engine/Core/TextureCube.h"
+#include "Engine/Core/Texture2D/Texture2D.h"
+#include "Engine/Core/TextureSampler/TextureSampler.h"
 #include "Engine/SubSystem/AssetSystem/AssetSystem.h"
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"
 #include "LogPrinter/Log.h"
@@ -36,6 +39,36 @@ VkDescriptorType ShaderTextureInput::GetDescriptorType()
     default:
         throw std::runtime_error("type error");
     }
+}
+
+SPtr<ITexture> ShaderTextureInput::CreateTextureObject()
+{
+    SPtr<ITexture> ret;
+
+    switch (dim)
+    {
+    case spv::Dim1D:
+        if(type == spirv_cross::SPIRType::Sampler)
+        {
+            ret = NewSPtr<TextureSampler>();
+            ret->InputInfo = *this;
+        }else
+        {
+            throw std::runtime_error("Unsupport Texture Type");
+        }
+    case spv::Dim2D:
+        ret = NewSPtr<Texture2D>("default.jpg");
+        ret->InputInfo = *this;
+        break;
+    case spv::DimCube:
+        ret = NewSPtr<TextureCube>("default.jpg");
+        ret->InputInfo = *this;
+        break;
+    default:
+        throw std::runtime_error("Unsupport Texture Type");
+    }
+
+    return ret;
 }
 
 std::string ShaderTextureInput::Log()

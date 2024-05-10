@@ -69,10 +69,11 @@ SPtr<TextureBuffer> TexutreFile::CreateMemoryBuffer()
     return buffer;
 }
 
-void TexutreFile::CreateImage(VkImage& image, VkDeviceMemory& imageMemory)
+void TexutreFile::CreateImage(VkImage& image, VkDeviceMemory& imageMemory, VkImageCreateFlags flags)
 {
     VkHelperInstance->createImage(texWidth, texHeight,
         VK_FORMAT_R8G8B8A8_SRGB,
+        flags,
         VK_IMAGE_TILING_OPTIMAL,
         VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
         VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
@@ -98,7 +99,9 @@ TextureFileArray::TextureFileArray(const std::vector<Container::Name>& FileNames
     {
         auto file = TexutreFileSourceManager::GetTextureFile(name.ToString());
 
-        SourceFiles.emplace_back(std::move(file));
+        SourceFiles.emplace_back(file);
+
+        
     }
 }
 

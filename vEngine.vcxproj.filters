@@ -144,9 +144,6 @@
     <ClCompile Include="Level\Cube\DrawTexCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ThirdParty\stb\stb_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\ShaderReflector\ShaderReflector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -211,6 +208,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Component\Common\BasicMove\BasicCameraMove.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\TextureCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\TextureInterface\ITexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\TextureSampler\TextureSampler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\TextureFile\TextureFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Toolkit\FileToolKit\stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Skybox\DrawSkybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -439,6 +454,24 @@
     <ClInclude Include="Component\Common\EscExit\PressEscExit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Component\Common\BasicMove\BasicCameraMove.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\TextureCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\TextureInterface\ITexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\TextureSampler\TextureSampler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\TextureFile\TextureFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\Skybox\DrawSkybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\DrawCube\DrawCube_vs_ps.hlsl" />
@@ -446,5 +479,6 @@
     <None Include="Shader\DrawCube\PointLightCube_vs_ps.hlsl" />
     <None Include="Shader\CommonFunction.hlsli" />
     <None Include="Shader\CommonStruct.hlsli" />
+    <None Include="Shader\SkyBox\CommonSkyBox_vs_ps.hlsl" />
   </ItemGroup>
 </Project>

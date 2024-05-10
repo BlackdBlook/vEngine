@@ -21,24 +21,50 @@ void TextureCube::SetTexture_Internel(const string& TextureName)
             Container::Name{"top.jpg"}
         }
     );
+
+    file_array.FillBuffer(buffers);
     
-    VkHelperInstance->createImage(file_array, textureImage, textureImageMemory);
+    VkHelperInstance->createImage(file_array, VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT, textureImage, textureImageMemory);
 
     auto cmd = VkHelperInstance->BeginSingleTimeCommands();
 
     //将texture image转换到VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-    VkHelperInstance->transitionImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB,
+    VkHelperInstance->transitionCubeImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     for(int i = 0; i < 6; i++)
     {
         //执行buffer到image的copy函数
-        VkHelperInstance->copyBufferToImage(cmd, buffers[i]->stagingBuffer, textureImage,
-            SourceFiles[i]->texWidth, SourceFiles[i]->texHeight);
+        VkBufferImageCopy region{};
+        region.bufferOffset = 0;
+        region.bufferRowLength = 0;
+        region.bufferImageHeight = 0;
+
+        region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        region.imageSubresource.mipLevel = 0;
+        region.imageSubresource.baseArrayLayer = i;
+        region.imageSubresource.layerCount = 1;
+
+        region.imageOffset = { 0, 0, 0 };
+        region.imageExtent = {
+            (uint32)file_array.SourceFiles[i]->texWidth,
+            (uint32)file_array.SourceFiles[i]->texHeight,
+            1
+        };
+
+        //拷贝buffer到image
+        vkCmdCopyBufferToImage(
+            cmd,
+            buffers[i]->stagingBuffer,
+            textureImage,
+            VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+            1,
+            &region
+        );
     }
 
     //在copy之后进行一次transition来准备让shader访问
-    VkHelperInstance->transitionImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB,
+    VkHelperInstance->transitionCubeImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     
