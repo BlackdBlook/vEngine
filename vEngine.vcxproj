@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="Component\Common\BasicMove\BasicCameraMove.cpp" />
     <ClCompile Include="Component\Common\EscExit\PressEscExit.cpp" />
+    <ClCompile Include="Component\Envriment\Skybox\Skybox.cpp" />
     <ClCompile Include="Engine\Core\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.cpp" />
     <ClCompile Include="Engine\Core\Component\Component.cpp" />
@@ -465,6 +466,7 @@
   <ItemGroup>
     <ClInclude Include="Component\Common\BasicMove\BasicCameraMove.h" />
     <ClInclude Include="Component\Common\EscExit\PressEscExit.h" />
+    <ClInclude Include="Component\Envriment\Skybox\Skybox.h" />
     <ClInclude Include="Engine\Core\Camera\Camera.h" />
     <ClInclude Include="Engine\Core\CommonRenderCmd\CommonRenderCmd.h" />
     <ClInclude Include="Engine\Core\Component\Component.h" />
