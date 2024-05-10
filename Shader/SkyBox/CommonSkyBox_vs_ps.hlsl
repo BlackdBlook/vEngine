@@ -20,8 +20,17 @@ VSOutput VS(VSInput input)
     VSOutput output;
     
     output.TexCoords = input.pos;
+    float3x3 viewTemp = (float3x3)Global.u_View;
+    float4x4 view2 = float4x4(
+        viewTemp._m00_m01_m02, 0,
+        viewTemp._m10_m11_m12, 0,
+        viewTemp._m20_m21_m22, 0,
+        0, 0, 0, 1
+    );
+
+    
     output.Position = mul(Global.u_Projection,
-        mul(Global.u_View, float4(input.pos, 1.0)));
+        mul(view2, float4(input.pos, 1.0)));
 
     return output;
 }

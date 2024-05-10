@@ -13,12 +13,12 @@ void TextureCube::SetTexture_Internel(const string& TextureName)
     TextureFileArray file_array
     (
         std::vector<Container::Name>{
-            Container::Name{"back.jpg"},
-            Container::Name{"bottom.jpg"},
-            Container::Name{"front.jpg"},
-            Container::Name{"left.jpg"},
-            Container::Name{"right.jpg"},
-            Container::Name{"top.jpg"}
+            Container::Name{"right.jpg"},   // x+
+            Container::Name{"left.jpg"},    // x-
+            Container::Name{"top.jpg"},     // y+
+            Container::Name{"bottom.jpg"},  // y-
+            Container::Name{"front.jpg"},   // z+
+            Container::Name{"back.jpg"},    // z-
         }
     );
 
