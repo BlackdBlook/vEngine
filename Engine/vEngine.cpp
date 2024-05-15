@@ -9,8 +9,8 @@
 #include "Core/Camera/Camera.h"
 #include "Core/CommonRenderCmd/CommonRenderCmd.h"
 #include "Core/FrameInfo/RenderInfo.h"
-#include "Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Core/Level/Level.h"
+#include "Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Level/Cube/DrawCube.h"
 #include "Level/Cube/DrawTexCube.h"
 #include "LogPrinter/Log.h"
@@ -293,7 +293,7 @@ void vEngine::Run()
         {
             // MaxFpsControl
             std::chrono::microseconds timeSpan = t.GetTimeSpan();
-            // while(timeSpan < MinFreamTime)
+            while(timeSpan < MinFreamTime)
             {
                 timeSpan = t.GetTimeSpan();
             }

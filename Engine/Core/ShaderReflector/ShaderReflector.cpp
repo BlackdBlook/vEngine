@@ -1,6 +1,6 @@
 #include "ShaderReflector.h"
 
-#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
+#include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/VulkanHelper/VkHelper.h"
 #include "LogPrinter/Log.h"
 #include "ThirdParty/StringFormater/StringFormater.h"

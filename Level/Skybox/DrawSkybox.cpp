@@ -4,7 +4,6 @@
 #include "Component/Common/EscExit/PressEscExit.h"
 #include "Component/Envriment/Skybox/Skybox.h"
 #include "Engine/vEngine.h"
-#include "Engine/Core/TextureCube.h"
 #include "Engine/Core/Component/Component.h"
 #include "Engine/Core/FrameInfo/RenderInfo.h"
 #include "Engine/Core/Object/Object.h"

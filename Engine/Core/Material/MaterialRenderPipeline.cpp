@@ -5,9 +5,8 @@
 #include "Engine/vEngine.h"
 #include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
 #include "Engine/Core/ShaderModule/Shader.h"
+#include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "LogPrinter/Log.h"
-#include "../Texture2D/Texture2D.h"
-#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 
 MaterialRenderPipelineInfo::MaterialRenderPipelineInfo()
 {

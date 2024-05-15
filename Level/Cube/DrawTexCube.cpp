@@ -6,10 +6,10 @@
 #include "Engine/vEngine.h"
 #include "Engine/Core/Component/Component.h"
 #include "Engine/Core/FrameInfo/RenderInfo.h"
-#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
+#include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/Core/Material/Material.h"
 #include "Engine/Core/Object/Object.h"
-#include "Engine/Core/Texture2D/Texture2D.h"
+#include "Engine/Core/Texture/Texture2D/Texture2D.h"
 #include "Meshs/Box/BoxVertices.h"
 #include "ThirdParty/stb/stb_image.h"
 

@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 #include "Engine/vEngine.h"
-#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
+#include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/Toolkit/math_utils.h"
 #include "LogPrinter/Log.h"
 

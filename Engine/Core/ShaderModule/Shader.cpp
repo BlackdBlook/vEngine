@@ -3,9 +3,9 @@
 #include <filesystem>
 
 #include "Engine/vEngine.h"
-#include "Engine/Core/TextureCube.h"
-#include "Engine/Core/Texture2D/Texture2D.h"
-#include "Engine/Core/TextureSampler/TextureSampler.h"
+#include "Engine/Core/Texture/TextureCube/TextureCube.h"
+#include "Engine/Core/Texture/Texture2D/Texture2D.h"
+#include "Engine/Core/Texture/TextureSampler/TextureSampler.h"
 #include "Engine/SubSystem/AssetSystem/AssetSystem.h"
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"
 #include "LogPrinter/Log.h"

@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core/Component/Component.h"
 #include "Engine/Core/Material/Material.h"
-#include "Engine/Core/Texture2D/Texture2D.h"
+
 
 class CubeComponent : public Component
 {

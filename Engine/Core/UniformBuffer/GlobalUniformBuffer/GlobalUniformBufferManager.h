@@ -57,6 +57,7 @@ public:
         buffer->UpdateCameraData();
     }
 
+
 private:
     
     SPtr<GlobalUniformBuffer> buffer;

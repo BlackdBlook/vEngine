@@ -11,7 +11,7 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_vulkan.h"
 #include "Engine/vEngine.h"
-#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
+#include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/TextureFile/TextureFile.h"
 #include "LogPrinter/Log.h"
 #include "ThirdParty/StringFormater/StringFormater.h"

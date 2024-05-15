@@ -4,7 +4,7 @@
 
 #include "Header.h"
 #include "Engine/Core/ShaderModule/Shader.h"
-#include "Engine/Core/TextureInterface/ITexture.h"
+#include "Engine/Core/Texture/TextureInterface/ITexture.h"
 #include "ThirdParty/stb/stb_image.h"
 
 class TexutreFile;

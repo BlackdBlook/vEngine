@@ -51,9 +51,6 @@
     <ClCompile Include="Engine\Core\FrameInfo\RenderInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\GlobalUniformBuffer\GlobalUniformBufferManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Core\Level\Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -61,12 +58,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\Object\ObjectHandle\ObjectHandle.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\RenderCommandQueue\RenderCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\RenderCommandQueue\RenderCommandQueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Core\Semaphore\Semaphore.cpp">
@@ -138,9 +129,6 @@
     <ClCompile Include="Engine\Core\Container\Name.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\Texture2D\Texture2D.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Level\Cube\DrawTexCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -210,15 +198,6 @@
     <ClCompile Include="Component\Common\BasicMove\BasicCameraMove.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Core\TextureCube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\TextureInterface\ITexture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Core\TextureSampler\TextureSampler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\TextureFile\TextureFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -229,6 +208,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Component\Envriment\Skybox\Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Texture\TextureCube\TextureCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\UniformBuffer\GlobalUniformBuffer\GlobalUniformBufferManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Texture\Texture2D\Texture2D.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Texture\TextureInterface\ITexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Core\Texture\TextureSampler\TextureSampler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -269,9 +263,6 @@
     <ClInclude Include="Engine\Core\FrameInfo\RenderInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\GlobalUniformBuffer\GlobalUniformBufferManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Core\Level\Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -279,12 +270,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Object\ObjectHandle\ObjectHandle.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\RenderCommandQueue\RenderCommand.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\RenderCommandQueue\RenderCommandQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Core\Semaphore\Semaphore.h">
@@ -377,9 +362,6 @@
     <ClInclude Include="Engine\Core\Container\Name.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\Texture2D\Texture2D.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Level\Cube\DrawTexCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -460,15 +442,6 @@
     <ClInclude Include="Component\Common\BasicMove\BasicCameraMove.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Core\TextureCube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\TextureInterface\ITexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Core\TextureSampler\TextureSampler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\TextureFile\TextureFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -476,6 +449,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Component\Envriment\Skybox\Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Texture\TextureCube\TextureCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\UniformBuffer\GlobalUniformBuffer\GlobalUniformBufferManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Core\Texture\TextureSampler\TextureSampler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

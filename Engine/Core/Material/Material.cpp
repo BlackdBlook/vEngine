@@ -4,7 +4,7 @@
 #include "Engine/vEngine.h"
 #include "Engine/Core/FrameInfo/RenderInfo.h"
 #include "Engine/Core/ShaderModule/Shader.h"
-#include "Engine/Core/Texture2D/Texture2D.h"
+#include "Engine/Core/Texture/Texture2D/Texture2D.h"
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"
 #include "LogPrinter/Log.h"
 

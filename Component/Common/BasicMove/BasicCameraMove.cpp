@@ -2,7 +2,7 @@
 
 #include "Engine/vEngine.h"
 #include "Engine/Core/Camera/Camera.h"
-#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
+#include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/SubSystem/InputSystem/InputSysten.h"
 
 BasicCameraMove::BasicCameraMove()

@@ -6,7 +6,7 @@
 #include "Header.h"
 #include "Engine/vEngine.h"
 #include "Engine/Core/Material/MaterialRenderPipeline.h"
-#include "Engine/Core/Texture2D/Texture2D.h"
+#include "Engine/Core/Texture/TextureInterface/ITexture.h"
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
 DescriptorHelper::DescriptorHelper(MaterialRenderPipelineInfo* info)

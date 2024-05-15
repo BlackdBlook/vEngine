@@ -2,9 +2,7 @@
 #include <vulkan/vulkan_core.h>
 
 #include "Engine/TypeDef.h"
-#include "Engine/TextureFile/TextureFile.h"
-#include "ShaderModule/Shader.h"
-#include "TextureInterface/ITexture.h"
+#include "Engine/Core/Texture/TextureInterface/ITexture.h"
 
 class TexutreFile;
 

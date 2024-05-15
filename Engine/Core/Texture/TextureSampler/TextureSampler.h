@@ -1,5 +1,6 @@
 #pragma once
-#include "Engine/Core/TextureInterface/ITexture.h"
+#include "Engine/Core/Texture/TextureInterface/ITexture.h"
+
 
 class TextureSampler : public ITexture
 {

@@ -7,17 +7,16 @@
 #include "Component/Common/BasicMove/BasicCameraMove.h"
 #include "Component/Common/EscExit/PressEscExit.h"
 #include "Engine/vEngine.h"
-#include "Engine/Core/TextureCube.h"
 #include "Engine/Core/Camera/Camera.h"
 #include "Engine/Core/Component/Component.h"
-#include "Engine/Core/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/Core/Material/Material.h"
 #include "Engine/Core/Object/Object.h"
-#include "Engine/Core/Texture2D/Texture2D.h"
+#include "Engine/Core/Texture/TextureCube/TextureCube.h"
 #include "Engine/Runtime/Component/CubeComponent.h"
 #include "Meshs/Box/BoxVertices.h"
 
 
+class TextureCube;
 
 namespace
 {
