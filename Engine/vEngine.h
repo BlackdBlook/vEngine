@@ -32,6 +32,7 @@ class vEngine
     void FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
     void FramePresent(ImGui_ImplVulkanH_Window* wd);
     void RebuildSwapChain();
+    void DrawFrameRateInfoWindow(float DeltaTime);
     void Run();
 
     

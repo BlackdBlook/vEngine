@@ -332,7 +332,10 @@ void VkHelper::Init()
 #ifdef SDL_HINT_IME_SHOW_UI
     SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
     SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "1");
+#ifdef WIN32
     SetProcessDPIAware();
+#endif
+    
 #endif
 
     // Create window with Vulkan graphics context

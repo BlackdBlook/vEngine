@@ -217,6 +217,22 @@ void vEngine::RebuildSwapChain()
     GlobalUniformBufferManager::Get()->UpdateCameraData();
 }
 
+void vEngine::DrawFrameRateInfoWindow(float DeltaTime)
+{
+    ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_AlwaysAutoResize;
+    ImGui::Begin("FrameRateInfo", nullptr, window_flags);
+
+    ImGui::Text("DeltaTime: %f", DeltaTime);
+
+    float Fps = 1.0f / DeltaTime;
+
+    ImGui::Text("FPS: %f", Fps);
+
+    ImGui::SetWindowPos(ImVec2{0.0f, 0.0f});
+    
+    ImGui::End();
+}
+
 void vEngine::Run()
 {
     constexpr int64 TargetFreamRate = 60;
@@ -256,10 +272,14 @@ void vEngine::Run()
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
+        DrawFrameRateInfoWindow(DeltaTime);
+
         input_system->Update(DeltaTime);
         
         UpdateLevel(DeltaTime);
+        
         cam->Update(DeltaTime);
+        
         // Rendering
         ImGui::Render();
         ImDrawData* draw_data = ImGui::GetDrawData();
@@ -273,7 +293,7 @@ void vEngine::Run()
         {
             // MaxFpsControl
             std::chrono::microseconds timeSpan = t.GetTimeSpan();
-            while(timeSpan < MinFreamTime)
+            // while(timeSpan < MinFreamTime)
             {
                 timeSpan = t.GetTimeSpan();
             }

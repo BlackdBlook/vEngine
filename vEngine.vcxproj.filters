@@ -228,6 +228,9 @@
     <ClCompile Include="Level\Skybox\DrawSkybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Component\Envriment\Skybox\Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\vEngine.h">
@@ -470,6 +473,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Level\Skybox\DrawSkybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Component\Envriment\Skybox\Skybox.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
