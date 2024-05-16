@@ -28,4 +28,4 @@ void DrawSkybox::Init()
     }
 }
 
-LevelRegister(DrawSkybox);
+// LevelRegister(DrawSkybox);

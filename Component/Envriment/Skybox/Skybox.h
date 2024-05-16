@@ -1,5 +1,6 @@
 #pragma once
 #include "Engine/Core/Component/Component.h"
+#include "Engine/Core/Component/SceneComponent/SceneComponent.h"
 #include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
 
 class Material;
@@ -27,7 +28,7 @@ struct SkyBoxMeshVertex
     static std::array<VkVertexInputAttributeDescription, 1> getAttributeDescriptions();
 };
 
-class Skybox : public Component
+class Skybox : public SceneComponent
 {
     SPtr<Material> material;
 

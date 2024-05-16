@@ -23,7 +23,7 @@ void CubeComponent::Draw(const RenderInfo& RenderInfo)
 {
     Component::Draw(RenderInfo);
 
-    auto model = Parent->GetModelMat();
+    auto model = ParentObject->GetModelMat();
 
     material->SetCurrentUniformData("model.model", model);
     

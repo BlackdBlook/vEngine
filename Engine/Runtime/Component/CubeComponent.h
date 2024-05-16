@@ -1,9 +1,10 @@
 #pragma once
 #include "Engine/Core/Component/Component.h"
+#include "Engine/Core/Component/SceneComponent/SceneComponent.h"
 #include "Engine/Core/Material/Material.h"
 
 
-class CubeComponent : public Component
+class CubeComponent : public SceneComponent
 {
 public:
     SPtr<Material> material;

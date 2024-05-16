@@ -71,7 +71,7 @@ void Cube::Update(float DeltaTime)
     MAT4(m);
 
     // 平移
-    m = glm::translate(m, Parent->GetPos());
+    m = glm::translate(m, ParentObject->GetPos());
     
     //
     // // 旋转

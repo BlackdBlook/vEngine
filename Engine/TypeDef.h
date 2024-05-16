@@ -18,6 +18,8 @@ typedef unsigned char uint8;
 
 // stl
 using string  = std::string;
+using vec3 = glm::vec3;
+using quat = glm::quat;
 
 // shared_ptr
 template<typename T>
@@ -33,7 +35,7 @@ inline SPtr<T> NewSPtr(Args&&... args)
     return std::make_shared<T>(args...);
 }
 
-#define MAT4(name) glm::mat4 name(1.0f)
+#define MAT4(name) glm::mat4 name{1.0f}
 #define VEC3_ZERO glm::vec3(0,0,0)
 
 

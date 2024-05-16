@@ -54,7 +54,10 @@ public:
 
     void UpdateCameraData()
     {
-        buffer->UpdateCameraData();
+        if(buffer)
+        {
+            buffer->UpdateCameraData();
+        }
     }
 
 

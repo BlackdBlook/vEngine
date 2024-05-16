@@ -1,6 +1,7 @@
 #include "Object.h"
 #include "memory"
 #include "Engine/Core/Component/Component.h"
+#include "Engine/Core/Component/SceneComponent/SceneComponent.h"
 #include "Engine/Core/Level/Level.h"
 #include "Engine/Toolkit/math_utils.h"
 #include "LogPrinter/Log.h"
@@ -34,18 +35,43 @@ void Object::Draw(const RenderInfo& RenderInfo)
     {
         c->Draw(RenderInfo);
     }
+
+    if(rootComponent)
+    {
+        rootComponent->Draw(RenderInfo);
+    }
 }
 
 void Object::Attach(std::shared_ptr<Component> Target)
 {
-    if(Target->Parent != nullptr)
+    if(Target->ParentObject != nullptr)
     {
-        auto oldParent = Target->Parent;
+        auto oldParent = Target->ParentObject;
         oldParent->Dettach(Target);
     }
-    Target->Parent = this; 
+    Target->ParentObject = this; 
     Components.emplace_back(Target);
     Target->OnAttached();
+}
+
+void Object::SetRootComponent(SPtr<SceneComponent> newRoot)
+{
+    if(newRoot->ParentComponent)
+    {
+        ERR("重复附加");
+        return;
+    }
+
+    if(rootComponent)
+    {
+        newRoot->OnDettached();
+        newRoot.reset();
+    }
+    
+    rootComponent = newRoot;
+    rootComponent->ParentComponent = nullptr;
+    rootComponent->ParentObject = this;
+    rootComponent->OnAttached();
 }
 
 void Object::Dettach(std::shared_ptr<Component> Target)
@@ -59,7 +85,7 @@ void Object::Dettach(std::shared_ptr<Component> Target)
             LOG(L"移除组件");
             Target->OnDettached();
             Components.erase(it);
-            Target->Parent = nullptr;
+            Target->ParentObject = nullptr;
             return;
         }
     }
@@ -73,7 +99,7 @@ Object::~Object()
     for(auto it : Components)
     {
         it->OnDettached();
-        it->Parent = nullptr;
+        it->ParentObject = nullptr;
     }
     Components = {};
 }
@@ -136,6 +162,11 @@ glm::vec3 Object::GetScale()
     return scale;
 }
 
+SceneComponent* Object::GetRootComponent()
+{
+    return rootComponent.get();
+}
+
 const glm::mat4& Object::GetModelMat()
 {
     if(needUpdateModelMat)
@@ -153,6 +184,11 @@ const glm::mat4& Object::GetModelMat()
         m = glm::scale(m, scale);
 
         this->model = m;
+
+        if(rootComponent)
+        {
+            rootComponent->MarkRenderInfoDirty();
+        }
     }
 
     return this->model;

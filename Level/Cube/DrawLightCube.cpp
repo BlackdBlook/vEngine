@@ -6,6 +6,7 @@
 
 #include "Component/Common/BasicMove/BasicCameraMove.h"
 #include "Component/Common/EscExit/PressEscExit.h"
+#include "Component/Envriment/Skybox/Skybox.h"
 #include "Engine/vEngine.h"
 #include "Engine/Core/Camera/Camera.h"
 #include "Engine/Core/Component/Component.h"
@@ -31,7 +32,7 @@ namespace
     public:
         void Update(float DeltaTime) override
         {
-            Parent->AddRot(glm::vec3{
+            ParentObject->AddRot(glm::vec3{
                 1
                 ,1
                 ,1});
@@ -64,15 +65,15 @@ namespace
 
         void OnAttached() override
         {
-            ui = Parent->FindComponent<UIDemo>();
+            ui = ParentObject->FindComponent<UIDemo>();
         }
         
         void Update(float DeltaTime) override
         {
             if(ui && ui->Turn)
             {
-                Parent->SetPos(glm::vec3{glm::sin(ImGui::GetTime()) * 2,0,glm::cos(ImGui::GetTime()) * 2});
-                material->SetCurrentUniformData("pointLight.position", Parent->GetPos());
+                ParentObject->SetPos(glm::vec3{glm::sin(ImGui::GetTime()) * 2,0,glm::cos(ImGui::GetTime()) * 2});
+                material->SetCurrentUniformData("pointLight.position", ParentObject->GetPos());
             }
         }
     };
@@ -83,37 +84,17 @@ namespace
         ImGui::Begin("UIDemo");
         ImGui::SetWindowPos(ImVec2(0, 0));
         ImGui::Text("Hello, world!");
-        // ImGui::SliderFloat("float", &Parent->GetPos().x, 0.0f, 1.0f);
-        auto pos = Parent->GetPos();
+        // ImGui::SliderFloat("float", &ParentObject->GetPos().x, 0.0f, 1.0f);
+        auto pos = ParentObject->GetPos();
         float p[3] = {pos.x, pos.y, pos.z};
         ImGui::DragFloat3("LightPos", p, 0.001f);
         ImGui::DragFloat("LightStrength", &LightStrength, 0.001f);
         ImGui::Checkbox("Turn", &Turn);
         ImGui::End();
 
-        Parent->SetPos(glm::vec3{p[0], p[1], p[2]});
-        material->SetCurrentUniformData("pointLight.position", Parent->GetPos());
+        ParentObject->SetPos(glm::vec3{p[0], p[1], p[2]});
+        material->SetCurrentUniformData("pointLight.position", ParentObject->GetPos());
         material->SetCurrentUniformData("pointLight.strength", LightStrength);
-    }
-
-    class SkyBoxComponent : public Component
-    {
-        SPtr<TextureCube> cube;
-    public:
-        SkyBoxComponent()
-        {
-            Component();
-            cube = std::make_shared<TextureCube>("skybox");
-        }
-
-        virtual void Draw(const RenderInfo& RenderInfo) override;
-    };
-
-    void SkyBoxComponent::Draw(const RenderInfo& RenderInfo)
-    {
-        Component::Draw(RenderInfo);
-
-        
     }
 }
 
@@ -127,7 +108,7 @@ void DrawLightCube::Init()
     {
         auto obj = NewObject();
         // obj->CreateAttach<AutoRot>();
-        auto cube = obj->CreateAttach<CubeComponent>("PointLightCube");
+        auto cube = obj->CreateSetRootComponent<CubeComponent>("PointLightCube");
         m = cube->material.get();
         m->SetTexture("texture0", "container2.png");
         m->SetTexture("texture1", "container2_specular.png");
@@ -142,19 +123,21 @@ void DrawLightCube::Init()
     
     {
         auto light = NewObject();
+        light->CreateSetRootComponent<CubeComponent>("DrawTexCube");
         light->CreateAttach<UIDemo>(m);
         light->CreateAttach<Light>();
         light->CreateAttach<AutoMov>(m);
-        light->CreateAttach<CubeComponent>("DrawTexCube");
+        // light->CreateAttach<CubeComponent>("DrawTexCube");
         light->SetScale(glm::vec3{0.1});
         light->SetPos(glm::vec3{0,0,2});
         light->CreateAttach<BasicCameraMove>();
         light->CreateAttach<PressEscExit>();
+
     }
 
     {
         auto skyBox = NewObject();
-        // skyBox->CreateAttach<SkyBoxComponent>();
+        // skyBox->CreateSetRootComponent<Skybox>("CommonSkyBox");
     }
 }
-// LevelRegister(DrawLightCube);
+LevelRegister(DrawLightCube);

@@ -5,10 +5,10 @@
 class RenderInfo;
 class Object;
 
-class Component
+class Component : public std::enable_shared_from_this<Component>
 {
 public:
-    Object* Parent = nullptr;
+    Object* ParentObject = nullptr;
     
     bool operator==(Component* c);
     bool operator==(const char* c);
