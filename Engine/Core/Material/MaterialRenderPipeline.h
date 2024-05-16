@@ -30,7 +30,7 @@ public:
 
     virtual ~MaterialRenderPipelineInfo();
     
-    virtual VkPipelineVertexInputStateCreateInfo* PipelineVertexInputStateCreateInfo() const;
+    virtual VkPipelineVertexInputStateCreateInfo* PipelineVertexInputStateCreateInfo(MeshVertexBuffer* VertexBuffer = nullptr) const;
     virtual VkPipelineInputAssemblyStateCreateInfo* PipelineInputAssemblyStateCreateInfo()const;
     virtual VkPipelineViewportStateCreateInfo* PipelineViewportStateCreateInfo()const;
     virtual VkPipelineRasterizationStateCreateInfo* PipelineRasterizationStateCreateInfo()const;

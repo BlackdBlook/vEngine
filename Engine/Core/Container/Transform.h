@@ -17,6 +17,9 @@ public:
     Transform operator*(const Transform& other);
     Transform& operator*=(const Transform& other);
 
+    glm::mat4 operator*(const glm::mat4& translate);
+
     glm::vec3 ToWorldPos(const glm::vec3& relativePos);
 
 };
+extern void operator*=(const Transform& transform, glm::mat4& translate);

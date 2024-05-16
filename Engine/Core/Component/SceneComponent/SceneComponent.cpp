@@ -10,6 +10,28 @@ SceneComponent::SceneComponent()
 
 SceneComponent::~SceneComponent()
 {
+    if(renderInfoCache)
+    {
+        delete renderInfoCache;
+        renderInfoCache = nullptr;
+    }
+}
+
+glm::mat4 SceneComponent::GetModelMat()
+{
+    Transform worldTransform = GetWorldTransform();
+    glm::mat4 m {1.f};
+    // 平移
+    m = glm::translate(m, worldTransform.pos);
+
+    // 旋转
+    glm::mat4 rotationMatrix = glm::mat4_cast(worldTransform.rot);
+    m *= rotationMatrix;
+
+    // 缩放
+    m = glm::scale(m, worldTransform.scale);
+
+    return m;
 }
 
 uint32 SceneComponent::FindComponentIndex(
@@ -98,6 +120,7 @@ void SceneComponent::OnAttached()
     {
         c->ParentObject = ParentObject;
     }
+    MarkRenderInfoDirty();
 }
 
 void SceneComponent::OnDettached()
@@ -107,4 +130,5 @@ void SceneComponent::OnDettached()
     {
         c->ParentObject = ParentObject;
     }
+    MarkRenderInfoDirty();
 }

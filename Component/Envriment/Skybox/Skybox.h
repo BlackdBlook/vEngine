@@ -26,6 +26,8 @@ struct SkyBoxMeshVertex
     static VkVertexInputBindingDescription getBindingDescription();
 
     static std::array<VkVertexInputAttributeDescription, 1> getAttributeDescriptions();
+
+    static size_t GetVertexStep();
 };
 
 class Skybox : public SceneComponent

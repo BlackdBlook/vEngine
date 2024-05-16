@@ -10,6 +10,8 @@ struct MeshVertex
     static VkVertexInputBindingDescription getBindingDescription();
 
     static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
+
+    static size_t GetVertexStep();
 };
 
 class MeshVertexBuffer
@@ -17,6 +19,10 @@ class MeshVertexBuffer
     VkBuffer Buffer;
 
     VkDeviceMemory vertexBufferMemory;
+
+    size_t Size = 0;
+
+    size_t BufferStep = 8;
     
 public:
     MeshVertexBuffer(size_t Size, const void* Data);
@@ -24,4 +30,14 @@ public:
     
     void CmdBind(VkCommandBuffer CommandBuffer);
 
+    template<typename T = MeshVertex>
+    void SetBufferStep()
+    {
+        BufferStep = T::GetVertexStep();
+    }
+
+    uint32 GetVertexNumber()
+    {
+        return static_cast<uint32>(Size / BufferStep);
+    }
 };

@@ -40,12 +40,19 @@ std::array<VkVertexInputAttributeDescription, 3> MeshVertex::getAttributeDescrip
     return attributeDescriptions;
 }
 
+size_t MeshVertex::GetVertexStep()
+{
+    return 3 + 3 + 2;
+}
+
 MeshVertexBuffer::MeshVertexBuffer(size_t Size, const void* Data)
 {
     if(Size == 0)
     {
         return;
     }
+
+    this->Size = Size;
 
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;

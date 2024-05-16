@@ -38,7 +38,7 @@ MaterialRenderPipelineInfo::~MaterialRenderPipelineInfo()
     }
 }
 
-VkPipelineVertexInputStateCreateInfo* MaterialRenderPipelineInfo::PipelineVertexInputStateCreateInfo()const
+VkPipelineVertexInputStateCreateInfo* MaterialRenderPipelineInfo::PipelineVertexInputStateCreateInfo(MeshVertexBuffer* VertexBuffer)const
 {
     static VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     static auto bindingDescription = MeshVertex::getBindingDescription();
@@ -50,6 +50,11 @@ VkPipelineVertexInputStateCreateInfo* MaterialRenderPipelineInfo::PipelineVertex
     vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
     vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
 
+    if(VertexBuffer)
+    {
+        VertexBuffer->SetBufferStep<MeshVertex>();
+    }
+    
     return &vertexInputInfo;
 }
 

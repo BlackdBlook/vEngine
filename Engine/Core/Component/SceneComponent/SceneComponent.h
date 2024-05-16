@@ -16,7 +16,7 @@ class SceneComponent : public Component
     friend Object;
     SceneComponent* ParentComponent = nullptr;
     Transform relativeTransform;
-
+protected:
     SceneComponentRenderInfo* renderInfoCache = nullptr;
     
 public:
@@ -95,6 +95,8 @@ public:
             ParentComponent->GetRelativeTransform() * relativeTransform :
             relativeTransform;
     }
+
+    glm::mat4 GetModelMat();
 
     template<typename T>
     SPtr<T> FindComponent(uint32 StartIndex = 0);

@@ -13,7 +13,7 @@ class SkyboxMaterialRenderPipelineInfo: public MaterialRenderPipelineInfo
 {
 public:
     SkyboxMaterialRenderPipelineInfo(const string& shader);
-    virtual VkPipelineVertexInputStateCreateInfo* PipelineVertexInputStateCreateInfo() const override;
+    virtual VkPipelineVertexInputStateCreateInfo* PipelineVertexInputStateCreateInfo(MeshVertexBuffer* VertexBuffer = nullptr) const override;
 };
 
 SkyboxMaterialRenderPipelineInfo::SkyboxMaterialRenderPipelineInfo(const string& shader) :
@@ -22,7 +22,7 @@ SkyboxMaterialRenderPipelineInfo::SkyboxMaterialRenderPipelineInfo(const string&
 
 }
 
-VkPipelineVertexInputStateCreateInfo* SkyboxMaterialRenderPipelineInfo::PipelineVertexInputStateCreateInfo() const
+VkPipelineVertexInputStateCreateInfo* SkyboxMaterialRenderPipelineInfo::PipelineVertexInputStateCreateInfo(MeshVertexBuffer* VertexBuffer) const
 {
     static VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     static auto bindingDescription = SkyBoxMeshVertex::getBindingDescription();
@@ -33,6 +33,11 @@ VkPipelineVertexInputStateCreateInfo* SkyboxMaterialRenderPipelineInfo::Pipeline
     vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size());
     vertexInputInfo.pVertexBindingDescriptions = &bindingDescription;
     vertexInputInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+      
+    if(VertexBuffer)
+    {
+        VertexBuffer->SetBufferStep<SkyBoxMeshVertex>();
+    }
 
     return &vertexInputInfo;
 }
@@ -57,6 +62,11 @@ std::array<VkVertexInputAttributeDescription, 1> SkyBoxMeshVertex::getAttributeD
     attributeDescriptions[0].offset = offsetof(SkyBoxMeshVertex, Pos);
     
     return attributeDescriptions;
+}
+
+size_t SkyBoxMeshVertex::GetVertexStep()
+{
+    return 3;
 }
 
 SkyBoxMeshVertexBuffer::SkyBoxMeshVertexBuffer(size_t Size, const void* Data)

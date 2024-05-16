@@ -1,5 +1,7 @@
 #include "Transform.h"
 
+#include "Engine/Toolkit/math_utils.h"
+
 Transform Transform::operator+(const Transform& other)
 {
     Transform result;
@@ -34,6 +36,23 @@ Transform& Transform::operator*=(const Transform& other)
     return *this;
 }
 
+glm::mat4 Transform::operator*(const glm::mat4& translate)
+{
+    glm::mat4 m = translate;
+
+    // 平移
+    m = glm::translate(m, pos);
+
+    // 旋转
+    glm::mat4 rotationMatrix = glm::mat4_cast(rot);
+    m *= rotationMatrix;
+
+    // 缩放
+    m = glm::scale(m, scale);
+
+    return m;
+}
+
 glm::vec3 Transform::ToWorldPos(const glm::vec3& relativePos)
 {
     // 将相对位置旋转到世界坐标系
@@ -41,4 +60,17 @@ glm::vec3 Transform::ToWorldPos(const glm::vec3& relativePos)
     // 加上当前变换的位置
     glm::vec3 worldPos = pos + rotatedPos;
     return worldPos;
+}
+
+void operator*=(const Transform& transform, glm::mat4& translate)
+{
+    // 平移
+    translate = glm::translate(translate, transform.pos);
+
+    // 旋转
+    glm::mat4 rotationMatrix = glm::mat4_cast(transform.rot);
+    translate *= rotationMatrix;
+
+    // 缩放
+    translate = glm::scale(translate, transform.scale);
 }
