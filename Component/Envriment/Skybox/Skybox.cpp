@@ -1,7 +1,9 @@
 #include "Skybox.h"
 
+#include <array>
+
 #include "Engine/vEngine.h"
-#include "Engine/Core/FrameInfo/RenderInfo.h"
+#include "Engine/Core/FrameInfo/FrameInfo.h"
 #include "Engine/Core/Material/Material.h"
 #include "Engine/Core/Object/Object.h"
 #include "Meshs/Box/BoxVertices.h"
@@ -127,6 +129,7 @@ Skybox::Skybox(const string& shader):
         buffer(sizeof(SkyBoxVertices), SkyBoxVertices)
 {
     SPtr<MaterialRenderPipelineInfo> info = NewSPtr<SkyboxMaterialRenderPipelineInfo>(shader);
+    info->RenderType = MaterialRenderType::Sky;
     material = NewSPtr<Material>(info);
 }
 
@@ -136,13 +139,13 @@ Skybox::~Skybox()
 
 void Skybox::Update(float DeltaTime)
 {
-    Component::Update(DeltaTime);
+    SceneComponent::Update(DeltaTime);
     
 }
 
-void Skybox::Draw(const RenderInfo& RenderInfo)
+void Skybox::Draw(FrameInfo& RenderInfo)
 {
-    Component::Draw(RenderInfo);
+    SceneComponent::Draw(RenderInfo);
     
     material->Draw(RenderInfo);
 

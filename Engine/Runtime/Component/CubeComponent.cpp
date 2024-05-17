@@ -1,5 +1,5 @@
 #include "CubeComponent.h"
-#include "Engine/Core/FrameInfo/RenderInfo.h"
+#include "Engine/Core/FrameInfo/FrameInfo.h"
 #include "Engine/Core/Object/Object.h"
 #include "Engine/Core/Render/SceneComponentRenderInfo.h"
 #include "Meshs/Box/BoxVertices.h"
@@ -20,7 +20,7 @@ void CubeComponent::Update(float DeltaTime)
     
 }
 
-void CubeComponent::Draw(const RenderInfo& RenderInfo)
+void CubeComponent::Draw(FrameInfo& RenderInfo)
 {
     SceneComponent::Draw(RenderInfo);
 
@@ -28,13 +28,14 @@ void CubeComponent::Draw(const RenderInfo& RenderInfo)
 
     material->SetCurrentUniformData("model.model", model);
     
-    material->Draw(RenderInfo);
+    // material->Draw(RenderInfo);
+    //
+    // buffer.CmdBind(RenderInfo.CommmandBuffer);
+    //
+    // vkCmdDraw(RenderInfo.CommmandBuffer,
+    //     buffer.GetVertexNumber(), 1, 0, 0);
 
-    buffer.CmdBind(RenderInfo.CommmandBuffer);
-    
-    vkCmdDraw(RenderInfo.CommmandBuffer,
-        buffer.GetVertexNumber(), 1, 0, 0);
-    
+    RenderInfo.SceneComponentRenderInfos.Enqueue(GenRenderInfo());
 }
 
 SceneComponentRenderInfo* CubeComponent::GenRenderInfo()
@@ -45,6 +46,7 @@ SceneComponentRenderInfo* CubeComponent::GenRenderInfo()
         renderInfoCache->component = this;
         renderInfoCache->material = material.get();
         renderInfoCache->Model = GetModelMat();
+        renderInfoCache->VertexBuffer = &buffer;
     }
 
     return renderInfoCache;

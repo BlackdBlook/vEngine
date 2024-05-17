@@ -8,8 +8,11 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "Core/Camera/Camera.h"
 #include "Core/CommonRenderCmd/CommonRenderCmd.h"
-#include "Core/FrameInfo/RenderInfo.h"
+#include "Core/FrameInfo/FrameInfo.h"
 #include "Core/Level/Level.h"
+#include "Core/Material/Material.h"
+#include "Core/Render/RenderCommandQueue.h"
+#include "Core/Render/SceneComponentRenderInfo.h"
 #include "Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Level/Cube/DrawCube.h"
 #include "Level/Cube/DrawTexCube.h"
@@ -18,6 +21,7 @@
 #include "Toolkit/Timer/Timer.h"
 #include "VulkanHelper/VkHelper.h"
 
+class SceneComponentRenderInfo;
 uint32 vEngine::WindowX = 2560;
 uint32 vEngine::WindowY = 1440;
 
@@ -82,13 +86,137 @@ void vEngine::UpdateLevel(float DeltaTime)
     CurrentLevel->LateUpdate(DeltaTime);
 }
 
-void vEngine::DrawLevel(VkCommandBuffer cmd)
+void vEngine::DrawLevel(ImGui_ImplVulkanH_Frame* fd)
 {
-    const RenderInfo RenderInfo {cmd, vkHelper.swapChainExtent};
+    RenderCommandQueue queue;
 
-    CommonRenderCmd::CmdSetFullWindow(RenderInfo);
+    ImGui_ImplVulkanH_Window* wd = &vkHelper.MainWindowData;
+    
+    {   // Prepass
+        {
+            std::array<VkClearValue, 2> clearValues = {};
+            clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+            clearValues[1].depthStencil = {1.0f, 0};
+            
+            VkRenderPassBeginInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            info.renderPass = vkHelper.PreRenderPass;
+            info.framebuffer = vkHelper.PreRenderPassFramebuffers[wd->FrameIndex];
+            // info.framebuffer = fd->Framebuffer;
+            info.renderArea.extent.width = wd->Width;
+            info.renderArea.extent.height = wd->Height;
+            info.clearValueCount = static_cast<uint32_t>(clearValues.size());
+            info.pClearValues = clearValues.data();
+        
+            vkCmdBeginRenderPass(fd->CommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
+        }
+        FrameInfo RenderInfo {
+            fd->CommandBuffer,
+            vkHelper.swapChainExtent,
+            {}
+        };
 
-    CurrentLevel->Draw(RenderInfo);
+        CommonRenderCmd::CmdSetFullWindow(RenderInfo);
+
+        CurrentLevel->Draw(RenderInfo);
+        queue.PushRenderCommand(RenderInfo);
+
+        if(queue.SkyRenderInfo)
+        {
+        
+            auto mt = queue.SkyRenderInfo->material;
+            mt->Draw(RenderInfo);
+        
+            queue.SkyRenderInfo->VertexBuffer->CmdBind(RenderInfo.CommmandBuffer);
+
+            vkCmdDraw(RenderInfo.CommmandBuffer, queue.SkyRenderInfo->VertexBuffer->GetVertexNumber(),
+                1, 0, 0);
+        }
+
+        // Submit command buffer
+        vkCmdEndRenderPass(fd->CommandBuffer);
+    }
+
+    if(!queue.OpaqueOrderInfo.empty())
+    {   // Opaque
+        {
+            std::array<VkClearValue, 2> clearValues = {};
+            clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+            clearValues[1].depthStencil = {1.0f, 0};
+            
+            VkRenderPassBeginInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            info.renderPass = vkHelper.OpaqueRenderPass;
+            info.framebuffer = vkHelper.OpaqueRenderPassFramebuffers[wd->FrameIndex];
+            // info.framebuffer = fd->Framebuffer;
+            info.renderArea.extent.width = wd->Width;
+            info.renderArea.extent.height = wd->Height;
+            info.clearValueCount = static_cast<uint32_t>(clearValues.size());
+            info.pClearValues = clearValues.data();
+        
+            vkCmdBeginRenderPass(fd->CommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
+        }
+
+        FrameInfo RenderInfo {
+            fd->CommandBuffer,
+            vkHelper.swapChainExtent,
+            {}
+        };
+
+        for(auto it = queue.OpaqueOrderInfo.begin(); it != queue.OpaqueOrderInfo.end(); ++it)
+        {
+            auto info = it->second;
+            auto mt = info->material;
+            mt->Draw(RenderInfo);
+        
+            info->VertexBuffer->CmdBind(fd->CommandBuffer);
+
+            vkCmdDraw(fd->CommandBuffer, info->VertexBuffer->GetVertexNumber(),
+                1, 0, 0);
+        }
+
+        // Submit command buffer
+        vkCmdEndRenderPass(fd->CommandBuffer);
+    }
+
+    if(!queue.TranslucentOrderInfo.empty())
+    {
+        // Translucent
+        {
+            VkRenderPassBeginInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            info.renderPass = vkHelper.TranslucentRenderPass;
+            info.framebuffer = vkHelper.TranslucentRenderPassFramebuffers[wd->FrameIndex];
+            // info.framebuffer = fd->Framebuffer;
+            info.renderArea.extent.width = wd->Width;
+            info.renderArea.extent.height = wd->Height;
+            info.clearValueCount = 0;
+            info.pClearValues = nullptr;
+        
+            vkCmdBeginRenderPass(fd->CommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
+        }
+        FrameInfo RenderInfo {
+            fd->CommandBuffer,
+            vkHelper.swapChainExtent,
+            {}
+        };
+
+        for(auto it = queue.TranslucentOrderInfo.cbegin(); it != queue.TranslucentOrderInfo.cbegin(); ++it)
+        {
+            auto info = it->second;
+            auto mt = info->material;
+            mt->Draw(RenderInfo);
+        
+            info->VertexBuffer->CmdBind(fd->CommandBuffer);
+
+            vkCmdDraw(fd->CommandBuffer, info->VertexBuffer->GetVertexNumber(),
+                1, 0, 0);
+        }
+
+        // Submit command buffer
+        vkCmdEndRenderPass(fd->CommandBuffer);
+    }
+    
 }
 
 void vEngine::FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data)
@@ -123,31 +251,8 @@ void vEngine::FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data)
         VkHelper::check_vk_result(err);
     }
 
+    DrawLevel(fd);
     
-
-    {
-        std::array<VkClearValue, 2> clearValues = {};
-        clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
-        clearValues[1].depthStencil = {1.0f, 0};
-
-        
-        
-        VkRenderPassBeginInfo info = {};
-        info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-        info.renderPass = vkHelper.renderPass;
-        info.framebuffer = vkHelper.swapChainFramebuffers[wd->FrameIndex];
-        // info.framebuffer = fd->Framebuffer;
-        info.renderArea.extent.width = wd->Width;
-        info.renderArea.extent.height = wd->Height;
-        info.clearValueCount = static_cast<uint32_t>(clearValues.size());
-        info.pClearValues = clearValues.data();
-        
-        vkCmdBeginRenderPass(fd->CommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
-    }
-    
-    DrawLevel(fd->CommandBuffer);
-    // Submit command buffer
-    vkCmdEndRenderPass(fd->CommandBuffer);
     {
         VkRenderPassBeginInfo info = {};
         info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;

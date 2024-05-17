@@ -1,17 +1,13 @@
 #pragma once
-#include <array>
 
 #include "MaterialRenderPipeline.h"
 #include "Engine/TypeDef.h"
-#include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
 #include "Engine/Core/ShaderModule/DescriptorHelper.h"
 #include "Engine/Core/ShaderModule/Shader.h"
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
-class MaterialRenderPipeline;
 class MaterialRenderPipelineInfo;
-class RenderInfo;
-
+class FrameInfo;
 
 class Material
 {
@@ -20,6 +16,7 @@ class Material
     void Init();
     
 public:
+    
     MaterialRenderPipeline pipeline;
 
     SPtr<DescriptorHelper> descriptor;
@@ -49,7 +46,7 @@ public:
     template<typename T>
     void SetAllUniformData(const Container::Name& MemberName, const T& Src);
 
-    void Draw(const RenderInfo& RenderInfo);
+    void Draw(const FrameInfo& RenderInfo);
 };
 
 template <typename T>

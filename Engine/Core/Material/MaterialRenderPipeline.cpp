@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "Material.h"
 #include "Engine/vEngine.h"
 #include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
 #include "Engine/Core/ShaderModule/Shader.h"
@@ -10,19 +11,21 @@
 
 MaterialRenderPipelineInfo::MaterialRenderPipelineInfo()
 {
-     
+     RenderType = MaterialRenderType::Opaque;
 }
 
 MaterialRenderPipelineInfo::MaterialRenderPipelineInfo(const string& shaderName, ShaderCodeType codeType)
 {
     VertShader = NewSPtr<vShader>(shaderName.c_str(), ShaderType::Vertex, UniformBufferBlocks.get(), codeType);
     FragShader = NewSPtr<vShader>(shaderName.c_str(), ShaderType::Fragment, UniformBufferBlocks.get(), codeType);
+    RenderType = MaterialRenderType::Opaque;
 }
 
 MaterialRenderPipelineInfo::MaterialRenderPipelineInfo(const string& VertShaderName, const string& FragShaderName, ShaderCodeType codeType)
 {
     VertShader = NewSPtr<vShader>(VertShaderName.c_str(), ShaderType::Vertex, UniformBufferBlocks.get(), codeType);
     FragShader = NewSPtr<vShader>(FragShaderName.c_str(), ShaderType::Fragment, UniformBufferBlocks.get(), codeType);
+    RenderType = MaterialRenderType::Opaque;
 }
 
 MaterialRenderPipelineInfo::~MaterialRenderPipelineInfo()
@@ -185,7 +188,16 @@ VkPipelineLayout MaterialRenderPipelineInfo::PipelineLayout()const
 
 VkRenderPass MaterialRenderPipelineInfo::PipelineRenderPass()const
 {
-    return GlobalVkRenderPass;
+    switch (RenderType)
+    {
+    case MaterialRenderType::Opaque:
+        return VkHelperInstance->OpaqueRenderPass;
+    case MaterialRenderType::Translucent:
+        return VkHelperInstance->TranslucentRenderPass;
+    case MaterialRenderType::Sky:
+        return VkHelperInstance->PreRenderPass;
+    }
+    return VkHelperInstance->OpaqueRenderPass;
 }
 
 uint32 MaterialRenderPipelineInfo::PipelineSubpass()

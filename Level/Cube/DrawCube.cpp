@@ -7,7 +7,7 @@
 
 #include "Engine/vEngine.h"
 #include "Engine/Core/Component/Component.h"
-#include "Engine/Core/FrameInfo/RenderInfo.h"
+#include "Engine/Core/FrameInfo/FrameInfo.h"
 #include "Engine/Core/Material/Material.h"
 #include "Engine/Core/Material/MaterialRenderPipeline.h"
 #include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
@@ -42,7 +42,7 @@ namespace
 
         void Update(float DeltaTime) override;
 
-        void Draw(const RenderInfo& RenderInfo) override;
+        void Draw(FrameInfo& RenderInfo) override;
     };
 }
 
@@ -92,7 +92,7 @@ void Cube::Update(float DeltaTime)
 
 }
 
-void Cube::Draw(const RenderInfo& RenderInfo)
+void Cube::Draw(FrameInfo& RenderInfo)
 {
     Component::Draw(RenderInfo);
 

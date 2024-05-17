@@ -30,9 +30,9 @@ Camera::Camera(std::function<void(float)> update)
 
 void Camera::Reset(std::function<void(float)> update)
 {
-    pos = VEC3_ZERO;
+    ObjectTransform.pos = VEC3_ZERO;
 
-    rot = glm::quat{};
+    ObjectTransform.rot = glm::quat{};
 
     needUpdateView = true;
 
@@ -70,7 +70,8 @@ glm::mat4 Camera::GetCameraView()
         // auto font = -GetFont();
         // auto right = glm::normalize(glm::cross(glm::vec3(0, 1, 0), font));
         // auto up = glm::normalize(glm::cross(font, right));
-        viewmat = glm::lookAt(pos, pos + GetFont(), GetUp());
+        viewmat = glm::lookAt(ObjectTransform.pos,
+            ObjectTransform.pos + GetFont(), GetUp());
     }
     return viewmat;
 }
@@ -126,7 +127,7 @@ void Camera::SetLookAt(const glm::vec3& pos)
 
 glm::vec3 Camera::GetFont()
 {
-    return QuaternionUtils::forwardVectorFromQuat(rot);
+    return QuaternionUtils::forwardVectorFromQuat(ObjectTransform.rot);
 }
 
 glm::vec3 Camera::GetRight()

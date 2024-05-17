@@ -36,6 +36,11 @@ public:
         BufferStep = T::GetVertexStep();
     }
 
+    VkBuffer GetVkBuffer()
+    {
+        return Buffer;
+    }
+
     uint32 GetVertexNumber()
     {
         return static_cast<uint32>(Size / BufferStep);

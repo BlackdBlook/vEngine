@@ -2,7 +2,7 @@
 
 #include "MaterialRenderPipeline.h"
 #include "Engine/vEngine.h"
-#include "Engine/Core/FrameInfo/RenderInfo.h"
+#include "Engine/Core/FrameInfo/FrameInfo.h"
 #include "Engine/Core/ShaderModule/Shader.h"
 #include "Engine/Core/Texture/Texture2D/Texture2D.h"
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"
@@ -109,7 +109,7 @@ void Material::SetAllUniformData(const Container::Name& MemberName, uint8* Src, 
     }
 }
 
-void Material::Draw(const RenderInfo& RenderInfo)
+void Material::Draw(const FrameInfo& RenderInfo)
 {
     pipeline.CmdBind(RenderInfo.CommmandBuffer);
 

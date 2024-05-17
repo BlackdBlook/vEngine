@@ -1,6 +1,6 @@
 #include "Level.h"
 
-#include "Engine/Core/FrameInfo/RenderInfo.h"
+#include "Engine/Core/FrameInfo/FrameInfo.h"
 #include "Engine/Core/Object/Object.h"
 
 Level* Level::CurrentLevel = nullptr;
@@ -31,7 +31,7 @@ void Level::LateUpdate(float DeltaTime)
     }
 }
 
-void Level::Draw(const RenderInfo& RenderInfo)
+void Level::Draw(FrameInfo& RenderInfo)
 {
     for(auto o : ObjectMap)
     {

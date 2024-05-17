@@ -9,9 +9,9 @@
 
 Object::Object()
 {
-    pos = glm::vec3{0,0,0};
-    rot = glm::vec3{0,0,0};
-    scale = glm::vec3{1,1,1};
+    ObjectTransform.pos = glm::vec3{0,0,0};
+    ObjectTransform.rot = glm::vec3{0,0,0};
+    ObjectTransform.scale = glm::vec3{1,1,1};
     GetModelMat();
     Components = {};
 }
@@ -29,7 +29,7 @@ void Object::Update(float DeltaTime)
     }
 }
 
-void Object::Draw(const RenderInfo& RenderInfo)
+void Object::Draw(FrameInfo& RenderInfo)
 {
     for(auto& c : Components)
     {
@@ -106,18 +106,18 @@ Object::~Object()
 
 void Object::SetPos(const glm::vec3& newPos)
 {
-    pos = newPos;
+    ObjectTransform.pos = newPos;
     needUpdateModelMat = true;
 }
 
 glm::vec3 Object::GetPos()
 {
-    return pos;
+    return ObjectTransform.pos;
 }
 
 void Object::SetRot(const glm::quat& newRot)
 {
-    rot = newRot;
+    ObjectTransform.rot = newRot;
     needUpdateModelMat = true;
 }
 
@@ -129,37 +129,47 @@ void AddRotateToQuat(glm::quat& quat, const glm::vec3 axis, float angle)
 void Object::SetRot(const glm::vec3& newRot)
 {
     // 传入应为角度制
-    rot = glm::vec3{0};
-    AddRotateToQuat(rot, glm::vec3{0,0,1}, newRot.z);
-    AddRotateToQuat(rot, glm::vec3{0,1,0}, newRot.y);
-    AddRotateToQuat(rot, glm::vec3{1,0,0}, newRot.x);
+    ObjectTransform.rot = glm::vec3{0};
+    AddRotateToQuat(ObjectTransform.rot, glm::vec3{0,0,1}, newRot.z);
+    AddRotateToQuat(ObjectTransform.rot, glm::vec3{0,1,0}, newRot.y);
+    AddRotateToQuat(ObjectTransform.rot, glm::vec3{1,0,0}, newRot.x);
     
     needUpdateModelMat = true;
 }
 
 void Object::AddRot(const glm::vec3& newRot)
 {
-    AddRotateToQuat(rot, glm::vec3{0,0,1}, newRot.z);
-    AddRotateToQuat(rot, glm::vec3{0,1,0}, newRot.y);
-    AddRotateToQuat(rot, glm::vec3{1,0,0}, newRot.x);
+    AddRotateToQuat(ObjectTransform.rot, glm::vec3{0,0,1}, newRot.z);
+    AddRotateToQuat(ObjectTransform.rot, glm::vec3{0,1,0}, newRot.y);
+    AddRotateToQuat(ObjectTransform.rot, glm::vec3{1,0,0}, newRot.x);
     
     needUpdateModelMat = true;
 }
 
 glm::quat Object::GetRot()
 {
-    return rot;
+    return ObjectTransform.rot;
 }
 
 void Object::SetScale(const glm::vec3& newScale)
 {
-    scale = newScale;
+    ObjectTransform.scale = newScale;
     needUpdateModelMat = true;
 }
 
 glm::vec3 Object::GetScale()
 {
-    return scale;
+    return ObjectTransform.scale;
+}
+
+Transform Object::GetTransform()
+{
+    return ObjectTransform;
+}
+
+void Object::SetTransform(const Transform& transform)
+{
+    ObjectTransform = transform;
 }
 
 SceneComponent* Object::GetRootComponent()
@@ -174,14 +184,14 @@ const glm::mat4& Object::GetModelMat()
         MAT4(m);
 
         // 平移
-        m = glm::translate(m, pos);
+        m = glm::translate(m, ObjectTransform.pos);
 
         // 旋转
-        glm::mat4 rotationMatrix = glm::mat4_cast(rot);
+        glm::mat4 rotationMatrix = glm::mat4_cast(ObjectTransform.rot);
         m *= rotationMatrix;
 
         // 缩放
-        m = glm::scale(m, scale);
+        m = glm::scale(m, ObjectTransform.scale);
 
         this->model = m;
 

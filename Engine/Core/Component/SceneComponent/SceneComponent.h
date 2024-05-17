@@ -4,6 +4,7 @@
 
 #include "Engine/Core/Component/Component.h"
 #include "Engine/Core/Container/Transform.h"
+#include "Engine/Core/Object/Object.h"
 
 class SceneComponentRenderInfo;
 struct Transform;
@@ -93,7 +94,7 @@ public:
     {
         return ParentComponent ?
             ParentComponent->GetRelativeTransform() * relativeTransform :
-            relativeTransform;
+            ParentObject->GetTransform();
     }
 
     glm::mat4 GetModelMat();
@@ -108,7 +109,7 @@ public:
     uint32 FindComponentIndex(SceneComponent* component) const;
 
     virtual void Update(float DeltaTime) override;
-    virtual void Draw(const RenderInfo& RenderInfo) override;
+    virtual void Draw(FrameInfo& RenderInfo) override;
 
     virtual void AttachComponent(SPtr<SceneComponent> NewChild);
     virtual void RemoveComponent(SceneComponent* Child);
@@ -124,6 +125,9 @@ public:
     virtual void OnAttached() override;
     virtual void OnDettached() override;
 };
+
+#undef Set
+#undef Get
 
 template <typename T>
 SPtr<T> SceneComponent::FindComponent(uint32 StartIndex)

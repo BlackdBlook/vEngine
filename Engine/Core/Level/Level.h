@@ -6,7 +6,7 @@
 
 #include "Engine/TypeDef.h"
 
-class RenderInfo;
+class FrameInfo;
 class Object;
 struct ObjectHandle;
 
@@ -23,7 +23,7 @@ public:
     virtual void Start();
     virtual void Update(float DeltaTime);
     virtual void LateUpdate(float DeltaTime);
-    virtual void Draw(const RenderInfo& RenderInfo);
+    virtual void Draw(FrameInfo& RenderInfo);
     
     Level();
     virtual ~Level();

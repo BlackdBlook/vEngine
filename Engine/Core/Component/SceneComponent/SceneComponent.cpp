@@ -61,7 +61,7 @@ void SceneComponent::Update(float DeltaTime)
     }
 }
 
-void SceneComponent::Draw(const RenderInfo& RenderInfo)
+void SceneComponent::Draw(FrameInfo& RenderInfo)
 {
     for(auto& c : ChildComponents)
     {

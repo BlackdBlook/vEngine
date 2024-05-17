@@ -28,7 +28,7 @@ class vEngine
     void InitLevelList();
     
     void UpdateLevel(float DeltaTime);
-    void DrawLevel(VkCommandBuffer cmd);
+    void DrawLevel(ImGui_ImplVulkanH_Frame* fd);
     void FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
     void FramePresent(ImGui_ImplVulkanH_Window* wd);
     void RebuildSwapChain();
@@ -55,7 +55,7 @@ public:
     
     VkRenderPass GetVkRenderPass()
     {
-        return vkHelper.renderPass;
+        return vkHelper.OpaqueRenderPass;
     }
     
     size_t GetCurrentFrame()

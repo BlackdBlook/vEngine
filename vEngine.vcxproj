@@ -244,7 +244,7 @@
       <LinkCompiled>true</LinkCompiled>
     </ClCompile>
     <ClCompile Include="Engine\Core\Fence\Fence.cpp" />
-    <ClCompile Include="Engine\Core\FrameInfo\RenderInfo.cpp" />
+    <ClCompile Include="Engine\Core\FrameInfo\FrameInfo.cpp" />
     <ClCompile Include="Engine\Core\Level\Level.cpp" />
     <ClCompile Include="Engine\Core\Material\Material.cpp" />
     <ClCompile Include="Engine\Core\Material\MaterialRenderPipeline.cpp" />
@@ -253,6 +253,8 @@
     <ClCompile Include="Engine\Core\Object\ObjectHandle\ObjectHandle.cpp" />
     <ClCompile Include="Engine\Core\Render\RenderCommand.cpp" />
     <ClCompile Include="Engine\Core\Render\RenderCommandQueue.cpp" />
+    <ClCompile Include="Engine\Core\Render\RenderPass\RenderPass.cpp" />
+    <ClCompile Include="Engine\Core\Render\RenderThread\RenderThread.cpp" />
     <ClCompile Include="Engine\Core\Render\SceneComponentRenderInfo.cpp" />
     <ClCompile Include="Engine\Core\Semaphore\Semaphore.cpp" />
     <ClCompile Include="Engine\Core\ShaderModule\DescriptorHelper.cpp" />
@@ -629,7 +631,7 @@
     <ClInclude Include="Engine\Core\Container\Name.h" />
     <ClInclude Include="Engine\Core\Container\Transform.h" />
     <ClInclude Include="Engine\Core\Fence\Fence.h" />
-    <ClInclude Include="Engine\Core\FrameInfo\RenderInfo.h" />
+    <ClInclude Include="Engine\Core\FrameInfo\FrameInfo.h" />
     <ClInclude Include="Engine\Core\Level\Level.h" />
     <ClInclude Include="Engine\Core\Material\Material.h" />
     <ClInclude Include="Engine\Core\Material\MaterialRenderPipeline.h" />
@@ -638,6 +640,8 @@
     <ClInclude Include="Engine\Core\Object\ObjectHandle\ObjectHandle.h" />
     <ClInclude Include="Engine\Core\Render\RenderCommand.h" />
     <ClInclude Include="Engine\Core\Render\RenderCommandQueue.h" />
+    <ClInclude Include="Engine\Core\Render\RenderPass\RenderPass.h" />
+    <ClInclude Include="Engine\Core\Render\RenderThread\RenderThread.h" />
     <ClInclude Include="Engine\Core\Render\SceneComponentRenderInfo.h" />
     <ClInclude Include="Engine\Core\Semaphore\Semaphore.h" />
     <ClInclude Include="Engine\Core\ShaderModule\DescriptorHelper.h" />

@@ -48,13 +48,23 @@ public:
     // Create Window Surface
     VkSurfaceKHR surface;
     VkExtent2D swapChainExtent;
-    VkImage depthImage;
-    VkDeviceMemory depthImageMemory;
-    VkImageView depthImageView;
+    VkImage depthImage[MAX_FRAMES_IN_FLIGHTS];
+    VkDeviceMemory depthImageMemory[MAX_FRAMES_IN_FLIGHTS];
+    VkImageView depthImageView[MAX_FRAMES_IN_FLIGHTS];
     VkSampler textureSampler;
-    VkRenderPass renderPass;
+
+    
+    VkRenderPass PreRenderPass;
+    std::vector<VkFramebuffer> PreRenderPassFramebuffers;
+    VkRenderPass OpaqueRenderPass;
+    std::vector<VkFramebuffer> OpaqueRenderPassFramebuffers;
+    VkRenderPass TranslucentRenderPass;
+    std::vector<VkFramebuffer> TranslucentRenderPassFramebuffers;
+    VkRenderPass PostRenderPass;
+    std::vector<VkFramebuffer> PostRenderPassFramebuffers;
+
+
     VkSurfaceFormatKHR SwapSurfaceFormat;
-    std::vector<VkFramebuffer> swapChainFramebuffers;
     // 首先，你需要定义一个函数指针来获取vkDebugMarkerSetObjectNameEXT函数的地址
     PFN_vkDebugMarkerSetObjectNameEXT pfnDebugMarkerSetObjectNameEXT;
 
@@ -62,12 +72,15 @@ public:
     void SetupVulkan(ImVector<const char*> instance_extensions);
     void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
     void Init();
-    void createRenderPass();
+    void createPreRenderPass();
+    void createOpaqueRenderPass();
+    void createTranslucentRenderPass();
+    void createPostRenderPass();
     VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling,
                                  VkFormatFeatureFlags features);
     VkFormat findDepthFormat();
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-    void createFramebuffers();
+    std::vector<VkFramebuffer> createFramebuffers(VkRenderPass RenderPass, std::vector<VkImageView>& images);
 
     void createImage(uint32_t width, uint32_t height, VkFormat format,VkImageCreateFlags flags,
         VkImageTiling tiling, VkImageUsageFlags usage,

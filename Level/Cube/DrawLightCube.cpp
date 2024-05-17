@@ -137,7 +137,7 @@ void DrawLightCube::Init()
 
     {
         auto skyBox = NewObject();
-        // skyBox->CreateSetRootComponent<Skybox>("CommonSkyBox");
+        skyBox->CreateSetRootComponent<Skybox>("CommonSkyBox");
     }
 }
 LevelRegister(DrawLightCube);

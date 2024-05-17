@@ -5,6 +5,13 @@
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
 
+enum class MaterialRenderType
+{
+    Opaque,
+    Translucent,
+    Sky
+};
+enum class MaterialRenderType;
 class ITexture;
 class Texture2D;
 class vShader;
@@ -15,7 +22,8 @@ protected:
     mutable VkDescriptorSetLayout descriptorSetLayout = nullptr;
     mutable VkPipelineLayout pipelineLayout = nullptr;
 public:
-    SPtr<ShaderUniformBufferBlocks> UniformBufferBlocks = NewSPtr<ShaderUniformBufferBlocks>();;
+    MaterialRenderType RenderType; 
+    SPtr<ShaderUniformBufferBlocks> UniformBufferBlocks = NewSPtr<ShaderUniformBufferBlocks>();
     SPtr<vShader> VertShader;
     SPtr<vShader> FragShader;
     MaterialRenderPipelineInfo();

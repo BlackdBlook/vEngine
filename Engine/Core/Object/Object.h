@@ -7,10 +7,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Engine/TypeDef.h"
+#include "Engine/Core/Container/Transform.h"
 
 
 class SceneComponent;
-class RenderInfo;
+class FrameInfo;
 class Level;
 class Component;
 
@@ -18,9 +19,11 @@ class Component;
 class Object : public std::enable_shared_from_this<Object>
 {
 protected:
-    glm::vec3 pos;
-    glm::quat rot;
-    glm::vec3 scale;
+    // glm::vec3 pos;
+    // glm::quat rot;
+    // glm::vec3 scale;
+
+    Transform ObjectTransform;
     
     glm::mat4 model;
 
@@ -33,7 +36,7 @@ public:
     Object();
     virtual void Start();
     virtual void Update(float DeltaTime);
-    virtual void Draw(const RenderInfo& RenderInfo);
+    virtual void Draw(FrameInfo& RenderInfo);
 
     template<typename T>
     SPtr<T> FindComponent(uint32 Index = 0);
@@ -61,6 +64,8 @@ public:
     virtual glm::quat GetRot();
     virtual void SetScale(const glm::vec3& newScale);
     virtual glm::vec3 GetScale();
+    virtual Transform GetTransform();
+    virtual void SetTransform(const Transform& transform);
     SceneComponent* GetRootComponent();
 
     const glm::mat4& GetModelMat();
