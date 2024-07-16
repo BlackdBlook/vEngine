@@ -251,8 +251,9 @@
     <ClCompile Include="Engine\Core\MemoryBuffer\MeshVertexBuffer.cpp" />
     <ClCompile Include="Engine\Core\Object\Object.cpp" />
     <ClCompile Include="Engine\Core\Object\ObjectHandle\ObjectHandle.cpp" />
-    <ClCompile Include="Engine\Core\Render\RenderCommand.cpp" />
     <ClCompile Include="Engine\Core\Render\RenderCommandQueue.cpp" />
+    <ClCompile Include="Engine\Core\Render\Rendering\ForwardRendering\ForwardRendering.cpp" />
+    <ClCompile Include="Engine\Core\Render\Rendering\IRendering.cpp" />
     <ClCompile Include="Engine\Core\Render\RenderPass\RenderPass.cpp" />
     <ClCompile Include="Engine\Core\Render\RenderThread\RenderThread.cpp" />
     <ClCompile Include="Engine\Core\Render\SceneComponentRenderInfo.cpp" />
@@ -638,8 +639,9 @@
     <ClInclude Include="Engine\Core\MemoryBuffer\MeshVertexBuffer.h" />
     <ClInclude Include="Engine\Core\Object\Object.h" />
     <ClInclude Include="Engine\Core\Object\ObjectHandle\ObjectHandle.h" />
-    <ClInclude Include="Engine\Core\Render\RenderCommand.h" />
     <ClInclude Include="Engine\Core\Render\RenderCommandQueue.h" />
+    <ClInclude Include="Engine\Core\Render\Rendering\ForwardRendering\ForwardRendering.h" />
+    <ClInclude Include="Engine\Core\Render\Rendering\IRendering.h" />
     <ClInclude Include="Engine\Core\Render\RenderPass\RenderPass.h" />
     <ClInclude Include="Engine\Core\Render\RenderThread\RenderThread.h" />
     <ClInclude Include="Engine\Core\Render\SceneComponentRenderInfo.h" />

@@ -9,6 +9,7 @@
 #include "Engine/TypeDef.h"
 #include "ThirdParty/StringFormater/StringFormater.h"
 
+class IRendering;
 class TextureFileArray;
 class TexutreFile;
 extern class VkHelper* VkHelperInstance;
@@ -48,24 +49,23 @@ public:
     // Create Window Surface
     VkSurfaceKHR surface;
     VkExtent2D swapChainExtent;
-    VkImage depthImage[MAX_FRAMES_IN_FLIGHTS];
-    VkDeviceMemory depthImageMemory[MAX_FRAMES_IN_FLIGHTS];
-    VkImageView depthImageView[MAX_FRAMES_IN_FLIGHTS];
+
     VkSampler textureSampler;
 
+    std::shared_ptr<IRendering> Rendering = nullptr;
     
     VkRenderPass PreRenderPass;
     std::vector<VkFramebuffer> PreRenderPassFramebuffers;
-    VkRenderPass OpaqueRenderPass;
-    std::vector<VkFramebuffer> OpaqueRenderPassFramebuffers;
-    VkRenderPass TranslucentRenderPass;
-    std::vector<VkFramebuffer> TranslucentRenderPassFramebuffers;
+    // VkRenderPass OpaqueRenderPass;
+    // std::vector<VkFramebuffer> OpaqueRenderPassFramebuffers;
+    // VkRenderPass TranslucentRenderPass;
+    // std::vector<VkFramebuffer> TranslucentRenderPassFramebuffers;
     VkRenderPass PostRenderPass;
     std::vector<VkFramebuffer> PostRenderPassFramebuffers;
 
 
     VkSurfaceFormatKHR SwapSurfaceFormat;
-    // 首先，你需要定义一个函数指针来获取vkDebugMarkerSetObjectNameEXT函数的地址
+    // 首先需要定义一个函数指针来获取vkDebugMarkerSetObjectNameEXT函数的地址
     PFN_vkDebugMarkerSetObjectNameEXT pfnDebugMarkerSetObjectNameEXT;
 
     VkPhysicalDevice SetupVulkan_SelectPhysicalDevice();
@@ -73,8 +73,6 @@ public:
     void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
     void Init();
     void createPreRenderPass();
-    void createOpaqueRenderPass();
-    void createTranslucentRenderPass();
     void createPostRenderPass();
     VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling,
                                  VkFormatFeatureFlags features);
@@ -100,8 +98,7 @@ public:
                                    VkImageLayout oldLayout,
                                    VkImageLayout newLayout);
     VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, VkImageViewType viewType);
-    void createDepthResources();
-    void ReleaseDepthResources();
+    
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     VkCommandBuffer BeginSingleTimeCommands();
     void EndSingleTimeCommands(VkCommandBuffer commandBuffer);
@@ -111,9 +108,9 @@ public:
     void WaitDeviceIdle();
     uint32 GetUniformBufferAlignment();
     uint32 GetUniformBufferOffsetByElementSize(uint32 size);
+    std::shared_ptr<IRendering> CreateRendering();
     void RebuildSwapChain(bool& outNeedRebuild);
-
-    void SetObjectMarkName(uint64 object, const char* name);
+    void SetObjectMarkName(uint64 uint64, const char* c_str);
 
     static void check_vk_result(VkResult err)
     {

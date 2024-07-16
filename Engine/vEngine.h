@@ -3,10 +3,12 @@
 #include <vulkan/vulkan_core.h>
 
 #include "TypeDef.h"
+#include "Core/Render/Rendering/IRendering.h"
 #include "Toolkit/Container/Queue.h"
 #include "VulkanHelper/VkHelper.h"
 
 
+class IRendering;
 class Level;
 class VkHelper;
 
@@ -29,12 +31,16 @@ class vEngine
     
     void UpdateLevel(float DeltaTime);
     void DrawLevel(ImGui_ImplVulkanH_Frame* fd);
+    void DrawUI(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
+    void CombineColorAttachment();
     void FrameRender(ImGui_ImplVulkanH_Window* wd, ImDrawData* draw_data);
     void FramePresent(ImGui_ImplVulkanH_Window* wd);
     void RebuildSwapChain();
     void DrawFrameRateInfoWindow(float DeltaTime);
     void Run();
+    
 
+    std::shared_ptr<IRendering> GetRendering();
     
     
 public:
@@ -55,7 +61,7 @@ public:
     
     VkRenderPass GetVkRenderPass()
     {
-        return vkHelper.OpaqueRenderPass;
+        return vkHelper.Rendering->GetOpaqueRenderPass();
     }
     
     size_t GetCurrentFrame()

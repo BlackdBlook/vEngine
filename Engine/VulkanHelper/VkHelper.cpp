@@ -11,6 +11,7 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_vulkan.h"
 #include "Engine/vEngine.h"
+#include "Engine/Core/Render/Rendering/ForwardRendering/ForwardRendering.h"
 #include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/TextureFile/TextureFile.h"
 #include "LogPrinter/Log.h"
@@ -297,7 +298,7 @@ void VkHelper::SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surf
     vkGetPhysicalDeviceSurfaceSupportKHR(PhysicalDevice, QueueFamily, surface, &res);
     if (res != VK_TRUE)
     {
-        fprintf(stderr, "Error no WSI support on physical device 0\n");
+        std::cerr << "Error no WSI support on physical device 0\n";
         exit(-1);
     }
 
@@ -406,9 +407,7 @@ void VkHelper::Init()
     // vkGetSwapchainImagesKHR(Device, MainWindowData.Swapchain, &imageCount, nullptr);
     // swapChainImages.resize(imageCount);
     // vkGetSwapchainImagesKHR(Device, MainWindowData.Swapchain, &imageCount, swapChainImages.data());
-
     
-
     SwapChainSupportDetails swapChainSupport = querySwapChainSupport();
     
     swapChainExtent = chooseSwapExtent(swapChainSupport);
@@ -416,11 +415,8 @@ void VkHelper::Init()
     // SwapSurfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
     SwapSurfaceFormat = MainWindowData.SurfaceFormat;
 
-    createDepthResources();
-
     createPreRenderPass();
-    createOpaqueRenderPass();
-    createTranslucentRenderPass();
+    Rendering = CreateRendering();
     createPostRenderPass();
     
     // createSwapChainImageViews();
@@ -493,148 +489,7 @@ void VkHelper::createPreRenderPass()
     }
 }
 
-void VkHelper::createOpaqueRenderPass() {
-    VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = SwapSurfaceFormat.format;
-    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 
-    // 不清除颜色
-    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-
-    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-
-    VkAttachmentReference colorAttachmentRef{};
-    colorAttachmentRef.attachment = 0;
-    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-
-    VkAttachmentDescription depthAttachment = {};
-    depthAttachment.format = findDepthFormat();
-    depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-    // 清除深度
-    depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-    depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-    depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-
-    VkAttachmentReference depthAttachmentRef = {};
-    depthAttachmentRef.attachment = 1;
-    depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-    
-    std::array<VkAttachmentDescription, 2> attachments = {colorAttachment, depthAttachment};
-
-    VkSubpassDescription subpass = {};
-    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass.colorAttachmentCount = 1;
-    subpass.pColorAttachments = &colorAttachmentRef;
-    subpass.pDepthStencilAttachment = &depthAttachmentRef;
-
-    VkRenderPassCreateInfo renderPassInfo = {};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-    renderPassInfo.pAttachments = attachments.data();
-    renderPassInfo.subpassCount = 1;
-    renderPassInfo.pSubpasses = &subpass;
-    // renderPassInfo.dependencyCount = 1;
-    // renderPassInfo.pDependencies = &dependency;
-
-    
-    if (vkCreateRenderPass(Device, &renderPassInfo, nullptr, &OpaqueRenderPass) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create render pass!");
-    }
-    
-    {
-        OpaqueRenderPassFramebuffers.resize(MainWindowData.ImageCount);
-        for (size_t i = 0; i < MainWindowData.ImageCount; i++) {
-            std::array<VkImageView, 2> attachmentViews{
-                MainWindowData.Frames[i].BackbufferView,
-                depthImageView[i]
-            };
-    
-            
-            VkFramebufferCreateInfo framebufferInfo = {};
-            framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            framebufferInfo.renderPass = OpaqueRenderPass;
-            framebufferInfo.attachmentCount = attachmentViews.size();
-            framebufferInfo.pAttachments = attachmentViews.data();
-            framebufferInfo.width = swapChainExtent.width;
-            framebufferInfo.height = swapChainExtent.height;
-            framebufferInfo.layers = 1;
-
-            if (vkCreateFramebuffer(Device, &framebufferInfo, nullptr, &OpaqueRenderPassFramebuffers[i]) != VK_SUCCESS) {
-                throw std::runtime_error("failed to create framebuffer!");
-            }
-        }
-    }
-}
-
-void VkHelper::createTranslucentRenderPass()
-{
-    VkAttachmentDescription colorAttachment{};
-    colorAttachment.format = SwapSurfaceFormat.format;
-    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-
-    // 不清除颜色
-    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-
-    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-
-    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-
-
-    VkAttachmentReference colorAttachmentRef{};
-    colorAttachmentRef.attachment = 0;
-    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
-    
-    std::array<VkAttachmentDescription, 1> attachments = {colorAttachment};
-
-    VkSubpassDescription subpass = {};
-    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-    subpass.colorAttachmentCount = 1;
-    subpass.pColorAttachments = &colorAttachmentRef;
-
-    VkRenderPassCreateInfo renderPassInfo = {};
-    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-    renderPassInfo.pAttachments = attachments.data();
-    renderPassInfo.subpassCount = 1;
-    renderPassInfo.pSubpasses = &subpass;
-    // renderPassInfo.dependencyCount = 1;
-    // renderPassInfo.pDependencies = &dependency;
-
-    
-    if (vkCreateRenderPass(Device, &renderPassInfo, nullptr, &TranslucentRenderPass) != VK_SUCCESS) {
-        throw std::runtime_error("failed to create render pass!");
-    }
-    
-    {
-        TranslucentRenderPassFramebuffers.resize(MainWindowData.ImageCount);
-        for (size_t i = 0; i < MainWindowData.ImageCount; i++) {
-            VkFramebufferCreateInfo framebufferInfo = {};
-            framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            framebufferInfo.renderPass = TranslucentRenderPass;
-            framebufferInfo.attachmentCount = 1;
-            framebufferInfo.pAttachments = &MainWindowData.Frames[i].BackbufferView;
-            framebufferInfo.width = swapChainExtent.width;
-            framebufferInfo.height = swapChainExtent.height;
-            framebufferInfo.layers = 1;
-
-            if (vkCreateFramebuffer(Device, &framebufferInfo, nullptr, &TranslucentRenderPassFramebuffers[i]) != VK_SUCCESS) {
-                throw std::runtime_error("failed to create framebuffer!");
-            }
-        }
-    }
-}
 
 void VkHelper::createPostRenderPass()
 {
@@ -1036,6 +891,16 @@ void VkHelper::transitionImageLayout(VkCommandBuffer commandBuffer,
 	    sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
 	    destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
     }
+    else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout
+        == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL)
+    {
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask =
+            VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        
+        sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    }
     else
     {
 	    throw std::invalid_argument("unsupported layout transition!");
@@ -1161,41 +1026,7 @@ VkImageView VkHelper::createImageView(VkImage image, VkFormat format, VkImageAsp
     return imageView;
 }
 
-void VkHelper::createDepthResources()
-{
-    VkFormat depthFormat = findDepthFormat();
 
-    auto cmd = BeginSingleTimeCommands();
-    for(int i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
-    {
-        createImage(swapChainExtent.width, swapChainExtent.height,
-                    depthFormat, 0, VK_IMAGE_TILING_OPTIMAL,
-                    VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
-                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage[i],
-                    depthImageMemory[i]);
-    
-        depthImageView[i] = createImageView(depthImage[i], depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D);
-    
-
-        transitionImageLayout(cmd, depthImage[i], depthFormat, VK_IMAGE_LAYOUT_UNDEFINED,
-                VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
-
-    }
-    EndSingleTimeCommands(cmd);
-
-
-    
-}
-
-void VkHelper::ReleaseDepthResources()
-{
-    for(int i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
-    {
-        vkDestroyImageView(Device, depthImageView[i], nullptr);
-        vkDestroyImage(Device, depthImage[i], nullptr);
-        vkFreeMemory(Device, depthImageMemory[i], nullptr);
-    }
-}
 
 uint32_t VkHelper::FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
@@ -1258,8 +1089,7 @@ void VkHelper::CleanupVulkan()
     GlobalUniformBufferManager::Get()->cleanUp();
     
     vkDestroyRenderPass(Device, PreRenderPass, Allocator);
-    vkDestroyRenderPass(Device, OpaqueRenderPass, Allocator);
-    vkDestroyRenderPass(Device, TranslucentRenderPass, Allocator);
+    
     vkDestroyRenderPass(Device, PostRenderPass, Allocator);
     
     vkDestroySampler(Device, textureSampler, Allocator);
@@ -1271,21 +1101,14 @@ void VkHelper::CleanupVulkan()
         {
             vkDestroyFramebuffer(Device, framebuffer, Allocator);
         }
-        for(auto framebuffer : OpaqueRenderPassFramebuffers)
-        {
-            vkDestroyFramebuffer(Device, framebuffer, Allocator);
-        }
-        for(auto framebuffer : TranslucentRenderPassFramebuffers)
-        {
-            vkDestroyFramebuffer(Device, framebuffer, Allocator);
-        }
+        
         for(auto framebuffer : PostRenderPassFramebuffers)
         {
             vkDestroyFramebuffer(Device, framebuffer, Allocator);
         }
     }
-        
-    ReleaseDepthResources();
+
+    Rendering.reset();
 
 #ifdef APP_USE_VULKAN_DEBUG_REPORT
     // Remove the debug report callback
@@ -1341,6 +1164,11 @@ uint32 VkHelper::GetUniformBufferOffsetByElementSize(uint32 size)
     return alignedOffset;
 }
 
+std::shared_ptr<IRendering> VkHelper::CreateRendering()
+{
+    return NewSPtr<ForwardRendering>();
+}
+
 void VkHelper::RebuildSwapChain(bool& outNeedRebuild)
 {
     int width, height;
@@ -1358,28 +1186,33 @@ void VkHelper::RebuildSwapChain(bool& outNeedRebuild)
             width,
             height,
             MAX_FRAMES_IN_FLIGHTS);
-        
-        vkDestroyRenderPass(Device, OpaqueRenderPass, Allocator);
+
         {
+        
+            // vkDestroyRenderPass(Device, OpaqueRenderPass, Allocator);
+            // vkDestroyRenderPass(Device, TranslucentRenderPass, Allocator);
+            Rendering.reset();
+            
+            
             for(auto framebuffer : PreRenderPassFramebuffers)
             {
                 vkDestroyFramebuffer(Device, framebuffer, Allocator);
             }
-            for(auto framebuffer : OpaqueRenderPassFramebuffers)
-            {
-                vkDestroyFramebuffer(Device, framebuffer, Allocator);
-            }
-            for(auto framebuffer : TranslucentRenderPassFramebuffers)
-            {
-                vkDestroyFramebuffer(Device, framebuffer, Allocator);
-            }
+            
+            // for(auto framebuffer : OpaqueRenderPassFramebuffers)
+            // {
+            //     vkDestroyFramebuffer(Device, framebuffer, Allocator);
+            // }
+            // for(auto framebuffer : TranslucentRenderPassFramebuffers)
+            // {
+            //     vkDestroyFramebuffer(Device, framebuffer, Allocator);
+            // }
+            
             for(auto framebuffer : PostRenderPassFramebuffers)
             {
                 vkDestroyFramebuffer(Device, framebuffer, Allocator);
             }
         }
-        
-        ReleaseDepthResources();
 
         SwapChainSupportDetails swapChainSupport = querySwapChainSupport();
     
@@ -1388,11 +1221,11 @@ void VkHelper::RebuildSwapChain(bool& outNeedRebuild)
         // SwapSurfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
         SwapSurfaceFormat = MainWindowData.SurfaceFormat;
         
-        createDepthResources();
+        Rendering = CreateRendering();
         
         createPreRenderPass();
-        createOpaqueRenderPass();
-        createTranslucentRenderPass();
+        // createOpaqueRenderPass();
+        // createTranslucentRenderPass();
         createPostRenderPass();
         
         MainWindowData.FrameIndex = 0;

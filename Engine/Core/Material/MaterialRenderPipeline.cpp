@@ -5,6 +5,7 @@
 #include "Material.h"
 #include "Engine/vEngine.h"
 #include "Engine/Core/MemoryBuffer/MeshVertexBuffer.h"
+#include "Engine/Core/Render/Rendering/IRendering.h"
 #include "Engine/Core/ShaderModule/Shader.h"
 #include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "LogPrinter/Log.h"
@@ -191,13 +192,13 @@ VkRenderPass MaterialRenderPipelineInfo::PipelineRenderPass()const
     switch (RenderType)
     {
     case MaterialRenderType::Opaque:
-        return VkHelperInstance->OpaqueRenderPass;
+        return VkHelperInstance->Rendering->GetOpaqueRenderPass();
     case MaterialRenderType::Translucent:
-        return VkHelperInstance->TranslucentRenderPass;
+        return VkHelperInstance->Rendering->GetTranslucentRenderPass();
     case MaterialRenderType::Sky:
         return VkHelperInstance->PreRenderPass;
     }
-    return VkHelperInstance->OpaqueRenderPass;
+    return VkHelperInstance->Rendering->GetOpaqueRenderPass();
 }
 
 uint32 MaterialRenderPipelineInfo::PipelineSubpass()
