@@ -23,7 +23,12 @@ struct SwapChainSupportDetails {
     std::vector<VkPresentModeKHR> presentModes;
 };
 
-
+struct Attachment
+{
+    VkImage Image;
+    VkImageView ImageView;
+    VkDeviceMemory Memory;
+};
 
 
 

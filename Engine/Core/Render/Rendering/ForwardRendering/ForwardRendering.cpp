@@ -150,7 +150,7 @@ void ForwardRendering::createOpaqueRenderPass()
         OpaqueRenderPassFramebuffers.resize(VkHelperInstance->MainWindowData.ImageCount);
         for (size_t i = 0; i < VkHelperInstance->MainWindowData.ImageCount; i++) {
             std::array<VkImageView, 2> attachmentViews{
-                colorImageView[i],
+                VkHelperInstance->MainWindowData.Frames[i].BackbufferView,
                 depthImageView[i]
             };
     
@@ -221,7 +221,7 @@ void ForwardRendering::createTranslucentRenderPass()
             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebufferInfo.renderPass = TranslucentRenderPass;
             framebufferInfo.attachmentCount = 1;
-            framebufferInfo.pAttachments = &colorImageView[i];
+            framebufferInfo.pAttachments = &VkHelperInstance->MainWindowData.Frames[i].BackbufferView;
             framebufferInfo.width = VkHelperInstance->swapChainExtent.width;
             framebufferInfo.height = VkHelperInstance->swapChainExtent.height;
             framebufferInfo.layers = 1;
