@@ -14,29 +14,22 @@ struct MeshVertex
     static size_t GetVertexStep();
 };
 
-class MeshVertexBuffer
+class VertexBuffer
 {
-    VkBuffer Buffer;
+protected:
+    VkBuffer Buffer = VK_NULL_HANDLE;
 
-    VkDeviceMemory vertexBufferMemory;
+    VkDeviceMemory vertexBufferMemory = VK_NULL_HANDLE;
 
     size_t Size = 0;
 
     size_t BufferStep = 8;
+
+    virtual ~VertexBuffer();
+
     
 public:
-    MeshVertexBuffer(size_t Size, const void* Data);
-    ~MeshVertexBuffer();
-    
-    void CmdBind(VkCommandBuffer CommandBuffer);
-
-    template<typename T = MeshVertex>
-    void SetBufferStep()
-    {
-        BufferStep = T::GetVertexStep();
-    }
-
-    VkBuffer GetVkBuffer()
+    virtual VkBuffer GetVkBuffer()
     {
         return Buffer;
     }
@@ -45,4 +38,21 @@ public:
     {
         return static_cast<uint32>(Size / BufferStep);
     }
+
+    virtual void CmdBind(VkCommandBuffer CommandBuffer) = 0;
+
+    template<typename T = MeshVertex>
+    void SetBufferStep()
+    {
+        BufferStep = T::GetVertexStep();
+    }
+};
+
+class MeshVertexBuffer : public VertexBuffer
+{
+public:
+    MeshVertexBuffer(size_t Size, const void* Data);
+    ~MeshVertexBuffer() override;
+    
+    virtual void CmdBind(VkCommandBuffer CommandBuffer) override;
 };

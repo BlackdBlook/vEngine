@@ -11,7 +11,7 @@
 
 
 class SceneComponent;
-class FrameInfo;
+class FrameRenderInfo;
 class Level;
 class Component;
 
@@ -36,7 +36,7 @@ public:
     Object();
     virtual void Start();
     virtual void Update(float DeltaTime);
-    virtual void Draw(FrameInfo& RenderInfo);
+    virtual void Draw(FrameRenderInfo& RenderInfo);
 
     template<typename T>
     SPtr<T> FindComponent(uint32 Index = 0);

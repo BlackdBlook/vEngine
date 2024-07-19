@@ -3,7 +3,6 @@
 #include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/Toolkit/math_utils.h"
 
-class MeshVertexBuffer;
 class Material;
 class SceneComponent;
 
@@ -12,6 +11,6 @@ class SceneComponentRenderInfo
 public:
     SceneComponent* component;
     Material* material;
-    MeshVertexBuffer* VertexBuffer;
+    VertexBuffer* VertexBuffer;
     MAT4(Model);
 };

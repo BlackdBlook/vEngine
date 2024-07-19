@@ -34,6 +34,9 @@ public:
     int texChannels = 0;
     stbi_uc* pixels = nullptr;
 
+    //存储纹理image及其对应device memory
+    VkImage textureImage = nullptr;
+    VkDeviceMemory textureImageMemory = nullptr;
     
     ~TexutreFile();
 private:
@@ -47,7 +50,7 @@ class TextureFileArray
 {
 public:
     TextureFileArray(const std::vector<Container::Name>& FileNames);
-    
+    ~TextureFileArray();
     std::vector<TexutreFilePtr> SourceFiles;
 
     template<size_t T>
@@ -70,6 +73,10 @@ public:
     int GetTexWidth();
     int GetTexHeight();
     int GetTexChannels();
+
+    //存储纹理image及其对应device memory
+    VkImage textureImage;
+    VkDeviceMemory textureImageMemory;
     
     VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
     VkImageTiling tiling = VK_IMAGE_TILING_OPTIMAL;

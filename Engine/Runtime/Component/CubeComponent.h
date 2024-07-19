@@ -17,7 +17,7 @@ public:
 
     virtual void Update(float DeltaTime) override;
 
-    virtual void Draw(FrameInfo& RenderInfo) override;
+    virtual void Draw(FrameRenderInfo& RenderInfo) override;
 
     virtual SceneComponentRenderInfo* GenRenderInfo() override;
 };

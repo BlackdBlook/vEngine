@@ -7,7 +7,7 @@
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
 class MaterialRenderPipelineInfo;
-class FrameInfo;
+class FrameRenderInfo;
 
 class Material
 {
@@ -32,8 +32,13 @@ public:
     Material(SPtr<MaterialRenderPipelineInfo> Info);
 
     ~Material();
-
-    void SetTexture(const string& TargetName, const string& NewTextureName);
+ 
+    void SetTexture(const string& TargetName,
+        const string& NewTextureName, bool ClearOld = true);
+    void SetTexture(const string& TargetName,
+        VkImageView ImageView, bool ClearOld = true);
+    void SetTextureAtFream(const string& TargetName,
+        VkImageView ImageView, uint32 FreamIndex, bool ClearOld = true);
     
     void SetCurrentUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset);
     void SetAllUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset);
@@ -46,7 +51,7 @@ public:
     template<typename T>
     void SetAllUniformData(const Container::Name& MemberName, const T& Src);
 
-    void Draw(const FrameInfo& RenderInfo);
+    void Draw(const FrameRenderInfo& RenderInfo);
 };
 
 template <typename T>

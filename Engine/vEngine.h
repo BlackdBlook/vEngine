@@ -4,6 +4,7 @@
 
 #include "TypeDef.h"
 #include "Core/Render/Rendering/IRendering.h"
+#include "Core/Render/RenderPostProcessing/RenderPostProcessing.h"
 #include "Toolkit/Container/Queue.h"
 #include "VulkanHelper/VkHelper.h"
 
@@ -23,7 +24,8 @@ class vEngine
     float DeltaTime = 0;
     bool SwapChainRebuild = false;
     uint64 FrameCount = 0;
-    uint64 currentFrame = 0;
+
+    bool LimtFps = false;
 
     void processInput();
 
@@ -66,7 +68,7 @@ public:
     
     size_t GetCurrentFrame()
     {
-        return currentFrame;
+        return vkHelper.MainWindowData.FrameIndex;
     }
 
     uint64 GetFrameCount()

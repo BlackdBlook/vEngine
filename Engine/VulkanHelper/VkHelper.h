@@ -9,6 +9,8 @@
 #include "Engine/TypeDef.h"
 #include "ThirdParty/StringFormater/StringFormater.h"
 
+class RenderPostProcessing;
+struct FrameBufferData;
 class IRendering;
 class TextureFileArray;
 class TexutreFile;
@@ -58,17 +60,8 @@ public:
     VkSampler textureSampler;
 
     std::shared_ptr<IRendering> Rendering = nullptr;
+    SPtr<RenderPostProcessing> PostProcessing;
     
-    VkRenderPass PreRenderPass;
-    std::vector<VkFramebuffer> PreRenderPassFramebuffers;
-    // VkRenderPass OpaqueRenderPass;
-    // std::vector<VkFramebuffer> OpaqueRenderPassFramebuffers;
-    // VkRenderPass TranslucentRenderPass;
-    // std::vector<VkFramebuffer> TranslucentRenderPassFramebuffers;
-    VkRenderPass PostRenderPass;
-    std::vector<VkFramebuffer> PostRenderPassFramebuffers;
-
-
     VkSurfaceFormatKHR SwapSurfaceFormat;
     // 首先需要定义一个函数指针来获取vkDebugMarkerSetObjectNameEXT函数的地址
     PFN_vkDebugMarkerSetObjectNameEXT pfnDebugMarkerSetObjectNameEXT;
@@ -77,13 +70,12 @@ public:
     void SetupVulkan(ImVector<const char*> instance_extensions);
     void SetupVulkanWindow(ImGui_ImplVulkanH_Window* wd, VkSurfaceKHR surface, int width, int height);
     void Init();
-    void createPreRenderPass();
-    void createPostRenderPass();
+    // void createPostRenderPass();
     VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling,
                                  VkFormatFeatureFlags features);
-    VkFormat findDepthFormat();
+    VkFormat findDepthAttachmentFormat();
+    VkFormat findColorAttachmentFormat();
     VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-    std::vector<VkFramebuffer> createFramebuffers(VkRenderPass RenderPass, std::vector<VkImageView>& images);
 
     void createImage(uint32_t width, uint32_t height, VkFormat format,VkImageCreateFlags flags,
         VkImageTiling tiling, VkImageUsageFlags usage,
@@ -124,3 +116,6 @@ public:
         throw std::runtime_error(StrFormat("[vulkan] Error: VkResult = ", err));
     }
 };
+
+#define GAllocatorCallback VkHelperInstance->Allocator
+#define GWindowData VkHelperInstance->MainWindowData

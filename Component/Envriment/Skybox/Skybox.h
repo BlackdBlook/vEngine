@@ -5,17 +5,13 @@
 
 class Material;
 
-class SkyBoxMeshVertexBuffer
+class SkyBoxMeshVertexBuffer : public VertexBuffer
 {
-    VkBuffer Buffer;
-
-    VkDeviceMemory vertexBufferMemory;
-    
 public:
     SkyBoxMeshVertexBuffer(size_t Size, const void* Data);
-    ~SkyBoxMeshVertexBuffer();
+    ~SkyBoxMeshVertexBuffer() override;
     
-    void CmdBind(VkCommandBuffer CommandBuffer);
+    void CmdBind(VkCommandBuffer CommandBuffer) override;
 
 };
 
@@ -40,7 +36,7 @@ public:
 
     ~Skybox() override;
 
-    virtual void Update(float DeltaTime) override;
+    virtual SceneComponentRenderInfo* GenRenderInfo() override;
 
-    virtual void Draw(FrameInfo& RenderInfo) override; 
+    virtual void Draw(FrameRenderInfo& RenderInfo) override; 
 };

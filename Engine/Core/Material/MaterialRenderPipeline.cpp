@@ -191,12 +191,11 @@ VkRenderPass MaterialRenderPipelineInfo::PipelineRenderPass()const
 {
     switch (RenderType)
     {
+    case MaterialRenderType::Sky:
     case MaterialRenderType::Opaque:
         return VkHelperInstance->Rendering->GetOpaqueRenderPass();
     case MaterialRenderType::Translucent:
         return VkHelperInstance->Rendering->GetTranslucentRenderPass();
-    case MaterialRenderType::Sky:
-        return VkHelperInstance->PreRenderPass;
     }
     return VkHelperInstance->Rendering->GetOpaqueRenderPass();
 }
@@ -218,7 +217,7 @@ void MaterialRenderPipelineInfo::FillVkDescriptorPoolSize(std::vector<VkDescript
         VkDescriptorPoolSize& size = sizes.emplace_back();
 
         size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        size.descriptorCount = (uint32)UniformBufferBlocks->UniformBlocks.size();
+        size.descriptorCount = (uint32)UniformBufferBlocks->UniformBlocks.size() * MAX_FRAMES_IN_FLIGHTS;
     }
 
     uint32 textureNum = 0;
@@ -233,21 +232,21 @@ void MaterialRenderPipelineInfo::FillVkDescriptorPoolSize(std::vector<VkDescript
         VkDescriptorPoolSize& size = sizes.emplace_back();
 
         size.type = VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
-        size.descriptorCount = textureNum;
+        size.descriptorCount = textureNum * MAX_FRAMES_IN_FLIGHTS;
     }
     if(samplerNum != 0)
     {
         VkDescriptorPoolSize& size = sizes.emplace_back();
 
         size.type = VK_DESCRIPTOR_TYPE_SAMPLER;
-        size.descriptorCount = samplerNum;
+        size.descriptorCount = samplerNum * MAX_FRAMES_IN_FLIGHTS;
     }
     if(CombindImageNum != 0)
     {
         VkDescriptorPoolSize& size = sizes.emplace_back();
 
         size.type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-        size.descriptorCount = CombindImageNum;
+        size.descriptorCount = CombindImageNum * MAX_FRAMES_IN_FLIGHTS;
     }
 }
 
@@ -322,7 +321,7 @@ void MaterialRenderPipelineInfo::MakeInputTextures(std::unordered_map<string, SP
         VertShader->ShaderTextureInputs.Members)
     {
         auto texture = tex.second.CreateTextureObject();
-        out.emplace(tex.first, tex.second.CreateTextureObject());
+        out.emplace(tex.first, texture);
     }
 
     for(auto& tex :

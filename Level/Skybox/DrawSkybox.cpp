@@ -5,7 +5,7 @@
 #include "Component/Envriment/Skybox/Skybox.h"
 #include "Engine/vEngine.h"
 #include "Engine/Core/Component/Component.h"
-#include "Engine/Core/FrameInfo/FrameInfo.h"
+#include "Engine/Core/FrameInfo/FrameRenderInfo.h"
 #include "Engine/Core/Object/Object.h"
 #include "Engine/Runtime/Component/CubeComponent.h"
 #include "Meshs/Box/BoxVertices.h"

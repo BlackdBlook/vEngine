@@ -10,7 +10,7 @@ void TextureCube::SetTexture_Internel(const string& TextureName)
 {
     std::array<SPtr<TextureBuffer>, 6> buffers;
 
-    TextureFileArray file_array
+    SourceFiles = NewSPtr<TextureFileArray>
     (
         std::vector<Container::Name>{
             Container::Name{"right.jpg"},   // x+
@@ -22,14 +22,12 @@ void TextureCube::SetTexture_Internel(const string& TextureName)
         }
     );
 
-    file_array.FillBuffer(buffers);
+    SourceFiles->FillBuffer(buffers);
     
-    VkHelperInstance->createImage(file_array, VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT, textureImage, textureImageMemory);
-
     auto cmd = VkHelperInstance->BeginSingleTimeCommands();
 
     //将texture image转换到VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
-    VkHelperInstance->transitionCubeImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB,
+    VkHelperInstance->transitionCubeImageLayout(cmd, SourceFiles->textureImage, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
     for(int i = 0; i < 6; i++)
@@ -47,8 +45,8 @@ void TextureCube::SetTexture_Internel(const string& TextureName)
 
         region.imageOffset = { 0, 0, 0 };
         region.imageExtent = {
-            (uint32)file_array.SourceFiles[i]->texWidth,
-            (uint32)file_array.SourceFiles[i]->texHeight,
+            (uint32)SourceFiles->SourceFiles[i]->texWidth,
+            (uint32)SourceFiles->SourceFiles[i]->texHeight,
             1
         };
 
@@ -56,7 +54,7 @@ void TextureCube::SetTexture_Internel(const string& TextureName)
         vkCmdCopyBufferToImage(
             cmd,
             buffers[i]->stagingBuffer,
-            textureImage,
+            SourceFiles->textureImage,
             VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
             1,
             &region
@@ -64,33 +62,46 @@ void TextureCube::SetTexture_Internel(const string& TextureName)
     }
 
     //在copy之后进行一次transition来准备让shader访问
-    VkHelperInstance->transitionCubeImageLayout(cmd, textureImage, VK_FORMAT_R8G8B8A8_SRGB,
+    VkHelperInstance->transitionCubeImageLayout(cmd, SourceFiles->textureImage, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     
 
     VkHelperInstance->EndSingleTimeCommands(cmd);
 
-    textureImageView = VkHelperInstance->createImageView(
-        textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_CUBE);
+    MAX_FRAMES_IN_FLIGHTS_LOOP(i)
+    {
+        textureImageView[i] = VkHelperInstance->createImageView(
+        SourceFiles->textureImage, VK_FORMAT_R8G8B8A8_SRGB,
+        VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_CUBE);
+    }
 }
 
-void TextureCube::cleanUp(VkImageView tempTextureImageView, VkImage tempTextureImage,
-    VkDeviceMemory tempTextureImageMemory)
+void TextureCube::cleanUp()
+{
+    MAX_FRAMES_IN_FLIGHTS_LOOP(CleanUpIndex)
+    {
+        VkImageView& target = *(textureImageView + CleanUpIndex);
+        if(target != VK_NULL_HANDLE)
+        {
+            vkDestroyImageView(GDevice,
+            target   
+            , nullptr);
+            target = VK_NULL_HANDLE;
+        }
+    }
+}
+
+void TextureCube::cleanUp(VkImageView* tempTextureImageView)
 {
     //销毁texture image view
     if(tempTextureImageView)
     {
-        vkDestroyImageView(GDevice, tempTextureImageView, nullptr);
-    }
-    //销毁texture image和对应memory
-    if(tempTextureImage)
-    {
-        vkDestroyImage(GDevice, tempTextureImage, nullptr);
-    }
-    if(tempTextureImageMemory)
-    {
-        vkFreeMemory(GDevice, tempTextureImageMemory, nullptr);
+        vkDestroyImageView(GDevice,
+            *(tempTextureImageView)
+            , nullptr);
+            *(tempTextureImageView) = VK_NULL_HANDLE;
+        
     }
 }
 
@@ -101,22 +112,55 @@ TextureCube::TextureCube(const string& TextureName)
 
 TextureCube::~TextureCube()
 {
-    cleanUp(textureImageView, textureImage, textureImageMemory);
+    cleanUp(textureImageView);
 }
 
-void TextureCube::SetTexture(const string& TextureName)
+void TextureCube::SetTexture(const string& TextureName, bool ClearOld)
 {
     auto tempTextureImageView = textureImageView;
-    auto tempTextureImage = textureImage;
-    auto tempTextureImageMemory = textureImageMemory;
     
-    
-    SetTexture_Internel(TextureName);
+    if(ClearOld)
+    {
+        cleanUp(tempTextureImageView);
+        SourceFiles.reset();
+    }
 
-    cleanUp(tempTextureImageView, tempTextureImage, tempTextureImageMemory);
+    SetTexture_Internel(TextureName);
 }
 
-VkImageView TextureCube::GetImageView()
+void TextureCube::SetTexture(VkImageView ImageView, bool ClearOld)
 {
-    return textureImageView;
+    auto tempTextureImageView = textureImageView;
+    
+    if(ClearOld)
+    {
+        cleanUp(tempTextureImageView);
+        SourceFiles.reset();
+    }
+    
+    MAX_FRAMES_IN_FLIGHTS_LOOP(i)
+    {
+        textureImageView[i] = ImageView;
+    }
+}
+
+void TextureCube::SetTextureAtIndex(VkImageView ImageView, uint32 index, bool ClearOld)
+{
+    if(ClearOld)
+    {
+        cleanUp(textureImageView + index);
+        SourceFiles.reset();
+    }
+    
+    textureImageView[index] = ImageView;
+}
+
+void TextureCube::CleanUp()
+{
+    cleanUp();
+}
+
+VkImageView TextureCube::GetImageView(uint32 FrameIndex)
+{
+    return textureImageView[FrameIndex];
 }

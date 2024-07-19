@@ -91,6 +91,8 @@ TexutreFile::TexutreFile(const string& path)
     {
         throw std::runtime_error("failed to load texture image!");
     }
+
+    CreateImage(textureImage, textureImageMemory, 0);
 }
 
 TextureFileArray::TextureFileArray(const std::vector<Container::Name>& FileNames)
@@ -100,8 +102,21 @@ TextureFileArray::TextureFileArray(const std::vector<Container::Name>& FileNames
         auto file = TexutreFileSourceManager::GetTextureFile(name.ToString());
 
         SourceFiles.emplace_back(file);
+    }
 
-        
+    VkHelperInstance->createImage(*this, VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT,
+        textureImage, textureImageMemory);
+}
+
+TextureFileArray::~TextureFileArray()
+{
+    if(textureImage)
+    {
+        vkDestroyImage(GDevice, textureImage, GAllocatorCallback);
+    }
+    if(textureImageMemory)
+    {
+        vkFreeMemory(GDevice, textureImageMemory, GAllocatorCallback);
     }
 }
 
@@ -136,6 +151,16 @@ TexutreFile::~TexutreFile()
 {
     //销毁原始的像素数组
     stbi_image_free(pixels);
+
+    if(textureImage)
+    {
+        vkDestroyImage(GDevice, textureImage, GAllocatorCallback);
+    }
+
+    if(textureImageMemory)
+    {
+        vkFreeMemory(GDevice, textureImageMemory, GAllocatorCallback);
+    }
 }
 
 #if _DEBUG

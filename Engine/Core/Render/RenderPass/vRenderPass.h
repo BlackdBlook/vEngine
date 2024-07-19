@@ -1,12 +1,12 @@
 #pragma once
 #include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 
-class RenderPass
+class vRenderPass
 {
     VkRenderPass renderPass;
 public:
 
-    RenderPass(
+    vRenderPass(
         VkImageView ColorAttachment,
         VkImageView DepthAttachment);
     

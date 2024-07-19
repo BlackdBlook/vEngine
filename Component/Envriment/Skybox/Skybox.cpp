@@ -3,9 +3,10 @@
 #include <array>
 
 #include "Engine/vEngine.h"
-#include "Engine/Core/FrameInfo/FrameInfo.h"
+#include "Engine/Core/FrameInfo/FrameRenderInfo.h"
 #include "Engine/Core/Material/Material.h"
 #include "Engine/Core/Object/Object.h"
+#include "Engine/Core/Render/SceneComponentRenderInfo.h"
 #include "Meshs/Box/BoxVertices.h"
 
 
@@ -137,21 +138,30 @@ Skybox::~Skybox()
 {
 }
 
-void Skybox::Update(float DeltaTime)
+SceneComponentRenderInfo* Skybox::GenRenderInfo()
 {
-    SceneComponent::Update(DeltaTime);
-    
+    if(renderInfoCache == nullptr)
+    {
+        renderInfoCache = new SceneComponentRenderInfo();
+        renderInfoCache->component = this;
+        renderInfoCache->material = material.get();
+        renderInfoCache->Model = GetModelMat();
+        renderInfoCache->VertexBuffer = &buffer;
+    }
+
+    return renderInfoCache;
 }
 
-void Skybox::Draw(FrameInfo& RenderInfo)
+void Skybox::Draw(FrameRenderInfo& RenderInfo)
 {
     SceneComponent::Draw(RenderInfo);
-    
-    material->Draw(RenderInfo);
 
-    buffer.CmdBind(RenderInfo.CommmandBuffer);
-    
-    vkCmdDraw(RenderInfo.CommmandBuffer,
-        sizeof(BoxVertices) / 8, 1, 0, 0);
+    RenderInfo.SceneComponentRenderInfos.Enqueue(GenRenderInfo());
+    // material->Draw(RenderInfo);
+    //
+    // buffer.CmdBind(RenderInfo.CommmandBuffer);
+    //
+    // vkCmdDraw(RenderInfo.CommmandBuffer,
+    //     sizeof(BoxVertices) / 8, 1, 0, 0);
     
 }

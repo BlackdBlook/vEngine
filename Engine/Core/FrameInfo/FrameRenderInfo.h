@@ -6,7 +6,7 @@
 
 class SceneComponentRenderInfo;
 
-class FrameInfo
+class FrameRenderInfo
 {
 public:
     const VkCommandBuffer CommmandBuffer;

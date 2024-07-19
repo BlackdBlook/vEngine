@@ -5,8 +5,16 @@
 class ITexture
 {
 public:
-    virtual void SetTexture(const std::string& ImageNames) = 0;
-    virtual VkImageView GetImageView() = 0;
+    virtual void SetTexture(const std::string& ImageNames, bool ClearOld = true) = 0;
+    virtual void SetTexture(VkImageView ImageView, bool ClearOld = true) = 0;
+
+
+    virtual void SetTextureAtIndex(VkImageView ImageView,
+        uint32 index, bool ClearOld = true) = 0;
+
+    virtual void CleanUp() = 0;
+    
+    virtual VkImageView GetImageView(uint32 FrameIndex) = 0;
     // TODO
     ShaderTextureInput InputInfo;
 

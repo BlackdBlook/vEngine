@@ -1,5 +1,5 @@
 #include "CubeComponent.h"
-#include "Engine/Core/FrameInfo/FrameInfo.h"
+#include "Engine/Core/FrameInfo/FrameRenderInfo.h"
 #include "Engine/Core/Object/Object.h"
 #include "Engine/Core/Render/SceneComponentRenderInfo.h"
 #include "Meshs/Box/BoxVertices.h"
@@ -20,7 +20,7 @@ void CubeComponent::Update(float DeltaTime)
     
 }
 
-void CubeComponent::Draw(FrameInfo& RenderInfo)
+void CubeComponent::Draw(FrameRenderInfo& RenderInfo)
 {
     SceneComponent::Draw(RenderInfo);
 

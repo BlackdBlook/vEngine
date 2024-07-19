@@ -8,7 +8,7 @@ void PointLight::Update(float DeltaTime)
     
 }
 
-void PointLight::Draw(FrameInfo& RenderInfo)
+void PointLight::Draw(FrameRenderInfo& RenderInfo)
 {
     Component::Draw(RenderInfo);
 

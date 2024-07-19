@@ -37,5 +37,5 @@ inline SPtr<T> NewSPtr(Args&&... args)
 
 #define MAT4(name) glm::mat4 name{1.0f}
 #define VEC3_ZERO glm::vec3(0,0,0)
-
+#define MAX_FRAMES_IN_FLIGHTS_LOOP(Name) for(int Name = 0;Name < MAX_FRAMES_IN_FLIGHTS;Name++)
 

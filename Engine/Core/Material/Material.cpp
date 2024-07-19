@@ -1,8 +1,10 @@
 #include "Material.h"
 
+#include <array>
+
 #include "MaterialRenderPipeline.h"
 #include "Engine/vEngine.h"
-#include "Engine/Core/FrameInfo/FrameInfo.h"
+#include "Engine/Core/FrameInfo/FrameRenderInfo.h"
 #include "Engine/Core/ShaderModule/Shader.h"
 #include "Engine/Core/Texture/Texture2D/Texture2D.h"
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"
@@ -44,7 +46,8 @@ Material::~Material()
     
 }
 
-void Material::SetTexture(const string& TargetName, const string& NewTextureName)
+void Material::SetTexture(const string& TargetName,
+    const string& NewTextureName, bool ClearOld)
 {
     auto target = descriptor->Textures.find(TargetName);
     if(target == descriptor->Textures.end())
@@ -52,7 +55,38 @@ void Material::SetTexture(const string& TargetName, const string& NewTextureName
         ERR("Texture not found");
         return;
     }
-    target->second->SetTexture(NewTextureName);
+    target->second->SetTexture(NewTextureName, ClearOld);
+    
+    descriptor->BindInputBuffer();
+}
+
+void Material::SetTexture(const string& TargetName,
+    VkImageView ImageView, bool ClearOld)
+{
+    auto target = descriptor->Textures.find(TargetName);
+    if(target == descriptor->Textures.end())
+    {
+        ERR("Texture not found");
+        return;
+    }
+    
+    target->second->SetTexture(ImageView, ClearOld);
+    
+    descriptor->BindInputBuffer();
+}
+
+void Material::SetTextureAtFream(const string& TargetName,
+    VkImageView ImageView, uint32 FreamIndex, bool ClearOld)
+{
+    auto target = descriptor->Textures.find(TargetName);
+    if(target == descriptor->Textures.end())
+    {
+        ERR("Texture not found");
+        return;
+    }
+    
+    target->second->SetTextureAtIndex(ImageView, FreamIndex, ClearOld);
+    
     descriptor->BindInputBuffer();
 }
 
@@ -109,7 +143,7 @@ void Material::SetAllUniformData(const Container::Name& MemberName, uint8* Src, 
     }
 }
 
-void Material::Draw(const FrameInfo& RenderInfo)
+void Material::Draw(const FrameRenderInfo& RenderInfo)
 {
     pipeline.CmdBind(RenderInfo.CommmandBuffer);
 

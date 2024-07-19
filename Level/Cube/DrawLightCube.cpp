@@ -82,7 +82,7 @@ namespace
     void UIDemo::Update(float DeltaTime)
     {
         ImGui::Begin("UIDemo");
-        ImGui::SetWindowPos(ImVec2(0, 0));
+        // ImGui::SetWindowPos(ImVec2(0, 0));
         ImGui::Text("Hello, world!");
         // ImGui::SliderFloat("float", &ParentObject->GetPos().x, 0.0f, 1.0f);
         auto pos = ParentObject->GetPos();

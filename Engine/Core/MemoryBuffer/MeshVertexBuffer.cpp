@@ -45,6 +45,10 @@ size_t MeshVertex::GetVertexStep()
     return 3 + 3 + 2;
 }
 
+VertexBuffer::~VertexBuffer()
+{
+}
+
 MeshVertexBuffer::MeshVertexBuffer(size_t Size, const void* Data)
 {
     if(Size == 0)

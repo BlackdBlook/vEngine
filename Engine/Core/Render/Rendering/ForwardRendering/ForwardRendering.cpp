@@ -6,6 +6,7 @@
 #include "Engine/Core/Material/Material.h"
 #include "Engine/Core/Render/RenderCommandQueue.h"
 #include "Engine/Core/Render/SceneComponentRenderInfo.h"
+#include "Engine/Core/Render/FrameBuffer/FrameBufferData.h"
 
 ForwardRendering::ForwardRendering()
 {
@@ -17,7 +18,7 @@ ForwardRendering::ForwardRendering()
 
 void ForwardRendering::createDepthResources()
 {
-    VkFormat depthFormat = VkHelperInstance->findDepthFormat();
+    VkFormat depthFormat = VkHelperInstance->findDepthAttachmentFormat();
 
     auto cmd = VkHelperInstance->BeginSingleTimeCommands();
     for(int i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
@@ -45,9 +46,9 @@ void ForwardRendering::ReleaseDepthResources()
 {
     for(int i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
     {
-        vkDestroyImageView(GDevice, depthImageView[i], nullptr);
-        vkDestroyImage(GDevice, depthImage[i], nullptr);
-        vkFreeMemory(GDevice, depthImageMemory[i], nullptr);
+        vkDestroyImageView(GDevice, depthImageView[i], GAllocatorCallback);
+        vkDestroyImage(GDevice, depthImage[i], GAllocatorCallback);
+        vkFreeMemory(GDevice, depthImageMemory[i], GAllocatorCallback);
     }
 }
 
@@ -62,7 +63,7 @@ void ForwardRendering::createColorResources()
             VkHelperInstance->swapChainExtent.width,
             VkHelperInstance->swapChainExtent.height,
             colorFormat, 0, VK_IMAGE_TILING_OPTIMAL,
-            VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
+            VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, colorImage[i],
             colorImageMemory[i]
             );
@@ -70,8 +71,38 @@ void ForwardRendering::createColorResources()
         colorImageView[i] = VkHelperInstance->createImageView(colorImage[i], colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D);
     
 
-        VkHelperInstance->transitionImageLayout(cmd, colorImage[i], colorFormat, VK_IMAGE_LAYOUT_UNDEFINED,
-                VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+        // VkHelperInstance->transitionImageLayout(cmd, colorImage[i], colorFormat,
+        //          VK_IMAGE_LAYOUT_UNDEFINED,
+        //          VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
+
+        VkImageMemoryBarrier barrier{};
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+        barrier.image = colorImage[i];
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        barrier.subresourceRange.baseMipLevel = 0;
+        barrier.subresourceRange.levelCount = 1;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.layerCount = 1;
+
+        VkPipelineStageFlags srcStage;
+        VkPipelineStageFlags dstStage;
+
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+        srcStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        dstStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+        vkCmdPipelineBarrier(
+            cmd,
+            srcStage,
+            dstStage,
+            0,
+            0, nullptr,
+            0, nullptr,
+            1, &barrier
+        );
 
     }
     VkHelperInstance->EndSingleTimeCommands(cmd);
@@ -81,9 +112,9 @@ void ForwardRendering::ReleaseColorResources()
 {
     for(int i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++)
     {
-        vkDestroyImageView(GDevice, colorImageView[i], nullptr);
-        vkDestroyImage(GDevice, colorImage[i], nullptr);
-        vkFreeMemory(GDevice, colorImageMemory[i], nullptr);
+        vkDestroyImageView(GDevice, colorImageView[i], GAllocatorCallback);
+        vkDestroyImage(GDevice, colorImage[i], GAllocatorCallback);
+        vkFreeMemory(GDevice, colorImageMemory[i], GAllocatorCallback);
     }
 }
 
@@ -110,7 +141,7 @@ void ForwardRendering::createOpaqueRenderPass()
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     VkAttachmentDescription depthAttachment = {};
-    depthAttachment.format = VkHelperInstance->findDepthFormat();
+    depthAttachment.format = VkHelperInstance->findDepthAttachmentFormat();
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     // 清除深度
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -150,7 +181,7 @@ void ForwardRendering::createOpaqueRenderPass()
         OpaqueRenderPassFramebuffers.resize(VkHelperInstance->MainWindowData.ImageCount);
         for (size_t i = 0; i < VkHelperInstance->MainWindowData.ImageCount; i++) {
             std::array<VkImageView, 2> attachmentViews{
-                VkHelperInstance->MainWindowData.Frames[i].BackbufferView,
+                colorImageView[i],
                 depthImageView[i]
             };
     
@@ -158,12 +189,12 @@ void ForwardRendering::createOpaqueRenderPass()
             VkFramebufferCreateInfo framebufferInfo = {};
             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebufferInfo.renderPass = OpaqueRenderPass;
-            framebufferInfo.attachmentCount = attachmentViews.size();
+            framebufferInfo.attachmentCount = (uint32)attachmentViews.size();
             framebufferInfo.pAttachments = attachmentViews.data();
             framebufferInfo.width = VkHelperInstance->swapChainExtent.width;
             framebufferInfo.height = VkHelperInstance->swapChainExtent.height;
             framebufferInfo.layers = 1;
-
+    
             if (vkCreateFramebuffer(VkHelperInstance->Device, &framebufferInfo, nullptr, &OpaqueRenderPassFramebuffers[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to create framebuffer!");
             }
@@ -225,8 +256,8 @@ void ForwardRendering::createTranslucentRenderPass()
             framebufferInfo.width = VkHelperInstance->swapChainExtent.width;
             framebufferInfo.height = VkHelperInstance->swapChainExtent.height;
             framebufferInfo.layers = 1;
-
-            if (vkCreateFramebuffer(VkHelperInstance->Device, &framebufferInfo, nullptr, &TranslucentRenderPassFramebuffers[i]) != VK_SUCCESS) {
+    
+            if (vkCreateFramebuffer(GDevice, &framebufferInfo, nullptr, &TranslucentRenderPassFramebuffers[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to create framebuffer!");
             }
         }
@@ -238,6 +269,10 @@ void ForwardRendering::FrameRender(RenderCommandQueue& queue, VkCommandBuffer cm
     auto& vkHelper = *VkHelperInstance;
     ImGui_ImplVulkanH_Window* wd = &vkHelper.MainWindowData;
     uint32& FrameIndex = queue.FrameIndex;
+
+
+    Read2Attach(cmd, colorImage[FrameIndex]);
+    
     if(!queue.OpaqueOrderInfo.empty())
     {   // Opaque
         {
@@ -258,11 +293,19 @@ void ForwardRendering::FrameRender(RenderCommandQueue& queue, VkCommandBuffer cm
             vkCmdBeginRenderPass(cmd, &info, VK_SUBPASS_CONTENTS_INLINE);
         }
 
-        FrameInfo RenderInfo {
+        FrameRenderInfo RenderInfo {
             cmd,
             vkHelper.swapChainExtent,
             {}
         };
+        
+        if(queue.SkyRenderInfo != nullptr)
+        {
+            queue.SkyRenderInfo->material->Draw(RenderInfo);
+            queue.SkyRenderInfo->VertexBuffer->CmdBind(cmd);
+            vkCmdDraw(cmd, queue.SkyRenderInfo->VertexBuffer->GetVertexNumber(),
+                1, 0, 0);
+        }
 
         for(auto it = queue.OpaqueOrderInfo.begin(); it != queue.OpaqueOrderInfo.end(); ++it)
         {
@@ -296,7 +339,7 @@ void ForwardRendering::FrameRender(RenderCommandQueue& queue, VkCommandBuffer cm
         
             vkCmdBeginRenderPass(cmd, &info, VK_SUBPASS_CONTENTS_INLINE);
         }
-        FrameInfo RenderInfo {
+        FrameRenderInfo RenderInfo {
             cmd,
             vkHelper.swapChainExtent,
             {}
@@ -317,6 +360,71 @@ void ForwardRendering::FrameRender(RenderCommandQueue& queue, VkCommandBuffer cm
         // Submit command buffer
         vkCmdEndRenderPass(cmd);
     }
+    Attach2Read(cmd, colorImage[FrameIndex]);
+}
+
+void ForwardRendering::Attach2Read(VkCommandBuffer cmd, VkImage Image)
+{
+    VkImageMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    barrier.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    barrier.image = Image;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+
+    VkPipelineStageFlags srcStage;
+    VkPipelineStageFlags dstStage;
+
+    barrier.srcAccessMask = VK_ACCESS_MEMORY_READ_BIT;
+    barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    srcStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    dstStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+
+    vkCmdPipelineBarrier(
+        cmd,
+        srcStage,
+        dstStage,
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &barrier
+    );
+}
+
+void ForwardRendering::Read2Attach(VkCommandBuffer cmd, VkImage Image)
+{
+    VkImageMemoryBarrier barrier{};
+    barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+    barrier.oldLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+    barrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    barrier.image = Image;
+    barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+    barrier.subresourceRange.baseMipLevel = 0;
+    barrier.subresourceRange.levelCount = 1;
+    barrier.subresourceRange.baseArrayLayer = 0;
+    barrier.subresourceRange.layerCount = 1;
+
+    VkPipelineStageFlags srcStage;
+    VkPipelineStageFlags dstStage;
+
+    barrier.srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
+    barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    srcStage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    dstStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+    vkCmdPipelineBarrier(
+        cmd,
+        srcStage,
+        dstStage,
+        0,
+        0, nullptr,
+        0, nullptr,
+        1, &barrier
+    );
 }
 
 ForwardRendering::~ForwardRendering()
@@ -344,4 +452,14 @@ VkRenderPass ForwardRendering::GetOpaqueRenderPass()
 VkRenderPass ForwardRendering::GetTranslucentRenderPass()
 {
     return TranslucentRenderPass;
+}
+
+VkImageView ForwardRendering::GetSceneColor(uint32 FrameIndex)
+{
+    return colorImageView[FrameIndex];
+}
+
+VkImageView ForwardRendering::GetSceneDepth(uint32 FrameIndex)
+{
+    return depthImageView[FrameIndex];
 }

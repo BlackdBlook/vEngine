@@ -1,11 +1,11 @@
-#include "RenderPass.h"
+#include "vRenderPass.h"
 
 #include <array>
 
 #include "Engine/vEngine.h"
 #include "Engine/VulkanHelper/VkHelper.h"
 
-RenderPass::RenderPass(VkImageView ColorAttachment, VkImageView DepthAttachment)
+vRenderPass::vRenderPass(VkImageView ColorAttachment, VkImageView DepthAttachment)
 {
     bool EnableColorAttachment = (ColorAttachment != VK_NULL_HANDLE);
     bool EnableDepthAttachment = (DepthAttachment != VK_NULL_HANDLE);
@@ -30,7 +30,7 @@ RenderPass::RenderPass(VkImageView ColorAttachment, VkImageView DepthAttachment)
     colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
     VkAttachmentDescription depthAttachment = {};
-    depthAttachment.format = VkHelperInstance->findDepthFormat();
+    depthAttachment.format = VkHelperInstance->findDepthAttachmentFormat();
     depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
     // 清除深度
     depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
@@ -75,7 +75,7 @@ RenderPass::RenderPass(VkImageView ColorAttachment, VkImageView DepthAttachment)
     }
 }
 
-void RenderPass::cmdBeginRenderPass(VkCommandBuffer cmd)
+void vRenderPass::cmdBeginRenderPass(VkCommandBuffer cmd)
 {
     
 }

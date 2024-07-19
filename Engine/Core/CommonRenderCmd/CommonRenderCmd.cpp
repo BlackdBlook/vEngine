@@ -3,9 +3,9 @@
 #include <vulkan/vulkan_core.h>
 
 #include "Engine/vEngine.h"
-#include "Engine/Core/FrameInfo/FrameInfo.h"
+#include "Engine/Core/FrameInfo/FrameRenderInfo.h"
 
-void CommonRenderCmd::CmdSetFullWindow(const FrameInfo& Info)
+void CommonRenderCmd::CmdSetFullWindow(const FrameRenderInfo& Info)
 {
     VkViewport viewport{};
     viewport.width = (float) vEngine::WindowX;

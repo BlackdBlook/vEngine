@@ -16,22 +16,21 @@ class Texture2D : public ITexture
     friend class DescriptorHelper;
     SPtr<TexutreFile> SourceFile;
 
-    //存储纹理image及其对应device memory
-    VkImage textureImage = nullptr;
-    VkDeviceMemory textureImageMemory = nullptr;
-
     //Texture iamge对应的image view
-    VkImageView textureImageView = nullptr;
+    VkImageView textureImageView[MAX_FRAMES_IN_FLIGHTS] = {VK_NULL_HANDLE};
 
     void SetTexture_Internel(const string& TextureName);
-    void cleanUp(VkImageView tempTextureImageView,
-    VkImage tempTextureImage, VkDeviceMemory tempTextureImageMemory);
+    void cleanUp();
+    void cleanUp(VkImageView* tempTextureImageView);
 public:
     Texture2D(const string& TextureName);
     ~Texture2D() override;
 
-
-
-    void SetTexture(const string& TextureName) override;
-    VkImageView GetImageView() override;
+    
+    void SetTexture(VkImageView ImageView, bool ClearOld = true) override;
+    void SetTexture(const string& TextureName, bool ClearOld = true) override;
+    void SetTextureAtIndex(VkImageView ImageView, uint32 index, bool ClearOld) override;
+    
+    void CleanUp() override;
+    VkImageView GetImageView(uint32 FrameIndex) override;
 };

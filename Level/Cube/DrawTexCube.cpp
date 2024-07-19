@@ -5,7 +5,7 @@
 
 #include "Engine/vEngine.h"
 #include "Engine/Core/Component/Component.h"
-#include "Engine/Core/FrameInfo/FrameInfo.h"
+#include "Engine/Core/FrameInfo/FrameRenderInfo.h"
 #include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/Core/Material/Material.h"
 #include "Engine/Core/Object/Object.h"
@@ -34,7 +34,7 @@ namespace
 
         virtual void Update(float DeltaTime) override;
 
-        virtual void Draw(FrameInfo& RenderInfo) override; 
+        virtual void Draw(FrameRenderInfo& RenderInfo) override; 
     };
 }
 
@@ -95,7 +95,7 @@ void TexCube::Update(float DeltaTime)
     }
 }
 
-void TexCube::Draw(FrameInfo& RenderInfo)
+void TexCube::Draw(FrameRenderInfo& RenderInfo)
 {
     Component::Draw(RenderInfo);
 

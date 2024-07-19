@@ -390,3 +390,8 @@ MigrationBackup/
 .vs
 /Shader/ShaderCache
 /Shader/file_modification_times.json
+
+/VTune
+/imgui.ini
+
+/VTune

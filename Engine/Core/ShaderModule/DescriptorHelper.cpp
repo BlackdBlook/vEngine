@@ -70,7 +70,7 @@ void DescriptorHelper::createDescriptorSets(
 
 void DescriptorHelper::BindInputBuffer()
 {
-    for (size_t freamIndex = 0; freamIndex < MAX_FRAMES_IN_FLIGHTS; freamIndex++)
+    for (uint32 freamIndex = 0; freamIndex < MAX_FRAMES_IN_FLIGHTS; freamIndex++)
     {
         int bufferCount = 0;
         std::vector<VkWriteDescriptorSet> descriptorWrites(buffers.size() + Textures.size());
@@ -118,7 +118,7 @@ void DescriptorHelper::BindInputBuffer()
         {
             auto& imageInfo = imageInfos[imageCount++];
             imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-            imageInfo.imageView = image.second->GetImageView();
+            imageInfo.imageView = image.second->GetImageView(freamIndex);
             imageInfo.sampler = VkHelperInstance->textureSampler;
         
             

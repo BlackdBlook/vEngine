@@ -2,12 +2,16 @@
 #include "Engine/Core/Render/RenderCommandQueue.h"
 #include "Engine/Core/Render/Rendering/IRendering.h"
 
+struct FrameBufferData;
+
 class ForwardRendering : public IRendering
 {
 public:
     VkRenderPass OpaqueRenderPass;
+    // std::vector<VkFramebuffer> OpaqueRenderPassFramebuffers;
     std::vector<VkFramebuffer> OpaqueRenderPassFramebuffers;
     VkRenderPass TranslucentRenderPass;
+    // std::vector<VkFramebuffer> TranslucentRenderPassFramebuffers;
     std::vector<VkFramebuffer> TranslucentRenderPassFramebuffers;
 
     VkImage depthImage[MAX_FRAMES_IN_FLIGHTS];
@@ -30,7 +34,12 @@ public:
 
     void FrameRender(RenderCommandQueue& queue, VkCommandBuffer cmd) override;
 
+    void Attach2Read(VkCommandBuffer cmd, VkImage Image);
+    void Read2Attach(VkCommandBuffer cmd, VkImage Image);
+
     ~ForwardRendering() override;
     VkRenderPass GetOpaqueRenderPass() override;
     VkRenderPass GetTranslucentRenderPass() override;
+    VkImageView GetSceneColor(uint32 FrameIndex) override;
+    VkImageView GetSceneDepth(uint32 FrameIndex) override;
 };

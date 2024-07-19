@@ -7,7 +7,7 @@
 #include "Engine/Core/Component/SceneComponent/SceneComponent.h"
 #include "Engine/Core/Material/Material.h"
 
-void RenderCommandQueue::PushRenderCommand(FrameInfo& NewCommand)
+void RenderCommandQueue::PushRenderCommand(FrameRenderInfo& NewCommand)
 {
     vec3 CameraPos = Camera::GetCamera()->GetPos();
     

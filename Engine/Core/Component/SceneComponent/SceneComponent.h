@@ -109,7 +109,7 @@ public:
     uint32 FindComponentIndex(SceneComponent* component) const;
 
     virtual void Update(float DeltaTime) override;
-    virtual void Draw(FrameInfo& RenderInfo) override;
+    virtual void Draw(FrameRenderInfo& RenderInfo) override;
 
     virtual void AttachComponent(SPtr<SceneComponent> NewChild);
     virtual void RemoveComponent(SceneComponent* Child);

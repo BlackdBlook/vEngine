@@ -8,7 +8,7 @@
 #include "backends/imgui_impl_sdl2.h"
 #include "Core/Camera/Camera.h"
 #include "Core/CommonRenderCmd/CommonRenderCmd.h"
-#include "Core/FrameInfo/FrameInfo.h"
+#include "Core/FrameInfo/FrameRenderInfo.h"
 #include "Core/Level/Level.h"
 #include "Core/Material/Material.h"
 #include "Core/Render/RenderCommandQueue.h"
@@ -95,25 +95,8 @@ void vEngine::DrawLevel(ImGui_ImplVulkanH_Frame* fd)
     queue.FrameIndex = wd->FrameIndex;
     std::shared_ptr<IRendering> rendering = VkHelperInstance->Rendering;
     
-    {   // Prepass
-        {
-            std::array<VkClearValue, 2> clearValues = {};
-            clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
-            clearValues[1].depthStencil = {1.0f, 0};
-            
-            VkRenderPassBeginInfo info = {};
-            info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-            info.renderPass = vkHelper.PreRenderPass;
-            info.framebuffer = vkHelper.PreRenderPassFramebuffers[wd->FrameIndex];
-            // info.framebuffer = fd->Framebuffer;
-            info.renderArea.extent.width = wd->Width;
-            info.renderArea.extent.height = wd->Height;
-            info.clearValueCount = static_cast<uint32_t>(clearValues.size());
-            info.pClearValues = clearValues.data();
-        
-            vkCmdBeginRenderPass(fd->CommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
-        }
-        FrameInfo RenderInfo {
+    {
+        FrameRenderInfo RenderInfo {
             fd->CommandBuffer,
             vkHelper.swapChainExtent,
             {}
@@ -123,51 +106,14 @@ void vEngine::DrawLevel(ImGui_ImplVulkanH_Frame* fd)
 
         CurrentLevel->Draw(RenderInfo);
         queue.PushRenderCommand(RenderInfo);
-
-        if(queue.SkyRenderInfo)
-        {
-        
-            auto mt = queue.SkyRenderInfo->material;
-            mt->Draw(RenderInfo);
-        
-            queue.SkyRenderInfo->VertexBuffer->CmdBind(RenderInfo.CommmandBuffer);
-
-            vkCmdDraw(RenderInfo.CommmandBuffer, queue.SkyRenderInfo->VertexBuffer->GetVertexNumber(),
-                1, 0, 0);
-        }
-
-        // Submit command buffer
-        vkCmdEndRenderPass(fd->CommandBuffer);
     }
     
     rendering->FrameRender(queue, fd->CommandBuffer);
 
     // Postpass
-    // {
-    //     std::array<VkClearValue, 2> clearValues = {};
-    //     clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
-    //     clearValues[1].depthStencil = {1.0f, 0};
-    //         
-    //     VkRenderPassBeginInfo info = {};
-    //     info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-    //     info.renderPass = vkHelper.PostRenderPass;
-    //     info.framebuffer = vkHelper.PostRenderPassFramebuffers[wd->FrameIndex];
-    //     // info.framebuffer = fd->Framebuffer;
-    //     info.renderArea.extent.width = wd->Width;
-    //     info.renderArea.extent.height = wd->Height;
-    //     info.clearValueCount = static_cast<uint32_t>(clearValues.size());
-    //     info.pClearValues = clearValues.data();
-    //     
-    //     vkCmdBeginRenderPass(fd->CommandBuffer, &info, VK_SUBPASS_CONTENTS_INLINE);
-    //
-    //     {
-    //         
-    //     }
-    //     
-    //     // Submit command buffer
-    //     vkCmdEndRenderPass(fd->CommandBuffer);
-    // }
-
+    {
+        vkHelper.PostProcessing->CmdRender(fd->CommandBuffer, queue.FrameIndex);
+    }
 }
 
 
@@ -298,6 +244,8 @@ void vEngine::DrawFrameRateInfoWindow(float DeltaTime)
 
     ImGui::Text("FPS: %f", Fps);
 
+    ImGui::Checkbox("LimtFps", &this->LimtFps);
+
     ImGui::SetWindowPos(ImVec2{0.0f, 0.0f});
     
     ImGui::End();
@@ -338,8 +286,8 @@ void vEngine::Run()
         }
 
         // Start the Dear ImGui frame
-        ImGui_ImplVulkan_NewFrame();
         ImGui_ImplSDL2_NewFrame();
+        ImGui_ImplVulkan_NewFrame();
         ImGui::NewFrame();
 
         DrawFrameRateInfoWindow(DeltaTime);
@@ -347,6 +295,8 @@ void vEngine::Run()
         input_system->Update(DeltaTime);
         
         UpdateLevel(DeltaTime);
+
+        vkHelper.PostProcessing->Update();
         
         cam->Update(DeltaTime);
         
@@ -359,17 +309,17 @@ void vEngine::Run()
             FrameRender(&vkHelper.MainWindowData, draw_data);
             FramePresent(&vkHelper.MainWindowData);
         }
-
+        
         {
             // MaxFpsControl
             std::chrono::microseconds timeSpan = t.GetTimeSpan();
-            while(timeSpan < MinFreamTime)
+            while(LimtFps && timeSpan < MinFreamTime)
             {
                 timeSpan = t.GetTimeSpan();
             }
+            t.Reset();
             DeltaTime = convertToSeconds(timeSpan);
             FrameCount += 1;
-            t.Reset();
         }
     }
 

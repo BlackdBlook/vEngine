@@ -29,7 +29,7 @@ void Object::Update(float DeltaTime)
     }
 }
 
-void Object::Draw(FrameInfo& RenderInfo)
+void Object::Draw(FrameRenderInfo& RenderInfo)
 {
     for(auto& c : Components)
     {
