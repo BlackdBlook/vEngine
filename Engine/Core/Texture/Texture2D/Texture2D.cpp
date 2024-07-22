@@ -41,9 +41,9 @@ void Texture2D::SetTexture_Internel(const string& TextureName)
 void Texture2D::cleanUp()
 {
     //销毁texture image view
-    if(textureImageView)
+    MAX_FRAMES_IN_FLIGHTS_LOOP(i)
     {
-        MAX_FRAMES_IN_FLIGHTS_LOOP(i)
+        if(textureImageView[i])
         {
             vkDestroyImageView(GDevice, *(textureImageView + i), nullptr);
             *(textureImageView + i) = VK_NULL_HANDLE;

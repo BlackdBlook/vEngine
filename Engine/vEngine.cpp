@@ -20,6 +20,7 @@
 #include "Level/Cube/DrawTexCube.h"
 #include "LogPrinter/Log.h"
 #include "SubSystem/InputSystem/InputSysten.h"
+#include "TextureFile/TextureFile.h"
 #include "Toolkit/Timer/Timer.h"
 #include "VulkanHelper/VkHelper.h"
 
@@ -326,6 +327,8 @@ void vEngine::Run()
     vkHelper.WaitDeviceIdle();
 
     CurrentLevel.reset();
+
+    TexutreFileSourceManager::Release();
     
     vkHelper.cleanup();
 }

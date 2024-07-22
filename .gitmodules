@@ -14,3 +14,6 @@
 [submodule "ThirdParty/imgui"]
 	path = ThirdParty/imgui
 	url = https://github.com/ocornut/imgui.git
+[submodule "ThirdParty/cityhash"]
+	path = ThirdParty/cityhash
+	url = https://github.com/google/cityhash.git

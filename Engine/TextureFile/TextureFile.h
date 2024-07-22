@@ -95,4 +95,6 @@ class TexutreFileSourceManager
 public:
     
     static SPtr<TexutreFile> GetTextureFile(const string& TextureName);
+
+    static void Release();
 };

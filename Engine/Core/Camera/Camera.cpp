@@ -136,7 +136,7 @@ glm::vec3 Camera::GetRight()
         glm::cross(
             glm::vec3{0,1,0}
             ,
-            GetFont()
+            GetFont() * vec3{-1, -1, -1}
     ));
 }
 

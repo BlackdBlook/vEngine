@@ -20,13 +20,16 @@ void BasicCameraMove::Update(float DeltaTime)
     glm::vec3 pos = cam->GetPos();
     const float MoveSpeed = MOVE_SPEED * DeltaTime;
     bool flag = false;
-    auto r = cam->GetRight();
-    r.y = 0;
-    r = glm::normalize(r);
+
+    auto f = cam->GetFont();
+    f = glm::normalize(f);
+    
     auto u = glm::vec3{0, 1, 0};
     u = glm::normalize(u);
-    auto f = glm::cross(r,u);
-    f = glm::normalize(f);
+
+    auto r = glm::cross(u, -f);
+    r.y = 0;
+    r = glm::normalize(r);
         
     if (input->GetKeyDown(KeyBoardKey::KEY_W))
     {
@@ -40,31 +43,29 @@ void BasicCameraMove::Update(float DeltaTime)
     }
 
     if (input->GetKeyDown(KeyBoardKey::KEY_A))    {
-        pos += MoveSpeed * r;
+        pos += -MoveSpeed * r;
         flag = true;
     }
 
     if (input->GetKeyDown(KeyBoardKey::KEY_D))    {
-        pos += -MoveSpeed * r;
+        pos += MoveSpeed * r;
         flag = true;
     }
     
 
     if (input->GetKeyDown(KeyBoardKey::KEY_E))    {
-        pos+= MoveSpeed * u;
+        pos += MoveSpeed * u;
         flag = true;
     }
 
     if (input->GetKeyDown(KeyBoardKey::KEY_Q))    {
-        pos+= -MoveSpeed * u;
+        pos += -MoveSpeed * u;
         flag = true;
     }
     if(flag)
     {
         cam->SetPos(pos);
     }
-       
-    InputSystem* input = InputSystem::GetInstance();
 
     if(input->GetMouseButtonDown(true))
     {
@@ -79,7 +80,7 @@ void BasicCameraMove::Update(float DeltaTime)
             
         glm::vec3 inputR ={ (input->MousePositionY - tempY) * -0.2,  (input->MousePositionX - tempX) * -0.2, 0};
 
-        if(inputR.x != 0)
+        if(inputR.x - 0 > 0.00001)
         {
             constexpr float minP = -80.0f;
             constexpr float maxP = 80.0f;

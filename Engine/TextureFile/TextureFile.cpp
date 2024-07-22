@@ -189,3 +189,8 @@ SPtr<TexutreFile> TexutreFileSourceManager::GetTextureFile(const string& Texture
         return File;
     }
 }
+
+void TexutreFileSourceManager::Release()
+{
+    TextureFileCaches.clear();
+}
