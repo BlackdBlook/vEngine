@@ -14,6 +14,7 @@ ForwardRendering::ForwardRendering()
     createDepthResources();
     createOpaqueRenderPass();
     createTranslucentRenderPass();
+    createSkyRenderPass();
 }
 
 void ForwardRendering::createDepthResources()
@@ -125,7 +126,7 @@ void ForwardRendering::createOpaqueRenderPass()
     colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 
     // 不清除颜色
-    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
     colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 
     colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -251,12 +252,73 @@ void ForwardRendering::createTranslucentRenderPass()
             framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
             framebufferInfo.renderPass = TranslucentRenderPass;
             framebufferInfo.attachmentCount = 1;
-            framebufferInfo.pAttachments = &VkHelperInstance->MainWindowData.Frames[i].BackbufferView;
+            framebufferInfo.pAttachments = colorImageView;
             framebufferInfo.width = VkHelperInstance->swapChainExtent.width;
             framebufferInfo.height = VkHelperInstance->swapChainExtent.height;
             framebufferInfo.layers = 1;
     
             if (vkCreateFramebuffer(GDevice, &framebufferInfo, nullptr, &TranslucentRenderPassFramebuffers[i]) != VK_SUCCESS) {
+                throw std::runtime_error("failed to create framebuffer!");
+            }
+        }
+    }
+}
+
+void ForwardRendering::createSkyRenderPass()
+{
+    VkAttachmentDescription colorAttachment{};
+    colorAttachment.format = VkHelperInstance->SwapSurfaceFormat.format;
+    colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+
+    // 清除颜色
+    colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+
+    colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+    colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+
+    VkAttachmentReference colorAttachmentRef{};
+    colorAttachmentRef.attachment = 0;
+    colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    std::array<VkAttachmentDescription, 1> attachments = {colorAttachment};
+
+    VkSubpassDescription subpass = {};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &colorAttachmentRef;
+
+    VkRenderPassCreateInfo renderPassInfo = {};
+    renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+    renderPassInfo.pAttachments = attachments.data();
+    renderPassInfo.subpassCount = 1;
+    renderPassInfo.pSubpasses = &subpass;
+    
+    if (vkCreateRenderPass(VkHelperInstance->Device, &renderPassInfo, nullptr, &SkyRenderPass) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create render pass!");
+    }
+    
+    {
+        SkyRenderPassFramebuffers.resize(MAX_FRAMES_IN_FLIGHTS);
+        for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHTS; i++) {
+            std::array<VkImageView, 1> attachmentViews{
+                colorImageView[i],
+            };
+            
+            VkFramebufferCreateInfo framebufferInfo = {};
+            framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            framebufferInfo.renderPass = SkyRenderPass;
+            framebufferInfo.attachmentCount = (uint32)attachmentViews.size();
+            framebufferInfo.pAttachments = attachmentViews.data();
+            framebufferInfo.width = VkHelperInstance->swapChainExtent.width;
+            framebufferInfo.height = VkHelperInstance->swapChainExtent.height;
+            framebufferInfo.layers = 1;
+    
+            if (vkCreateFramebuffer(GDevice, &framebufferInfo, nullptr, &SkyRenderPassFramebuffers[i]) != VK_SUCCESS) {
                 throw std::runtime_error("failed to create framebuffer!");
             }
         }
@@ -271,6 +333,40 @@ void ForwardRendering::FrameRender(RenderCommandQueue& queue, VkCommandBuffer cm
 
 
     Read2Attach(cmd, colorImage[FrameIndex]);
+
+    if(queue.SkyRenderInfo != nullptr)
+    {
+        {
+            std::array<VkClearValue, 2> clearValues = {};
+            clearValues[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+            clearValues[1].depthStencil = {1.0f, 0};
+            
+            VkRenderPassBeginInfo info = {};
+            info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+            info.renderPass = SkyRenderPass;
+            info.framebuffer = SkyRenderPassFramebuffers[FrameIndex];
+            // info.framebuffer = fd->Framebuffer;
+            info.renderArea.extent.width = wd->Width;
+            info.renderArea.extent.height = wd->Height;
+            info.clearValueCount = static_cast<uint32_t>(clearValues.size());
+            info.pClearValues = clearValues.data();
+        
+            vkCmdBeginRenderPass(cmd, &info, VK_SUBPASS_CONTENTS_INLINE);
+        }
+        
+        FrameRenderInfo RenderInfo {
+            cmd,
+            vkHelper.swapChainExtent,
+            {}
+        };
+        
+        queue.SkyRenderInfo->material->Draw(RenderInfo);
+        queue.SkyRenderInfo->VertexBuffer->CmdBind(cmd);
+        vkCmdDraw(cmd, queue.SkyRenderInfo->VertexBuffer->GetVertexNumber(),
+            1, 0, 0);
+
+        vkCmdEndRenderPass(cmd);
+    }
     
     if(!queue.OpaqueOrderInfo.empty())
     {   // Opaque
@@ -298,14 +394,6 @@ void ForwardRendering::FrameRender(RenderCommandQueue& queue, VkCommandBuffer cm
             {}
         };
         
-        if(queue.SkyRenderInfo != nullptr)
-        {
-            queue.SkyRenderInfo->material->Draw(RenderInfo);
-            queue.SkyRenderInfo->VertexBuffer->CmdBind(cmd);
-            vkCmdDraw(cmd, queue.SkyRenderInfo->VertexBuffer->GetVertexNumber(),
-                1, 0, 0);
-        }
-
         for(auto it = queue.OpaqueOrderInfo.begin(); it != queue.OpaqueOrderInfo.end(); ++it)
         {
             auto info = it->second;
@@ -430,6 +518,7 @@ ForwardRendering::~ForwardRendering()
 {
     vkDestroyRenderPass(GDevice, OpaqueRenderPass, VkHelperInstance->Allocator);
     vkDestroyRenderPass(GDevice, TranslucentRenderPass, VkHelperInstance->Allocator);
+    vkDestroyRenderPass(GDevice, SkyRenderPass, VkHelperInstance->Allocator);
     for(auto framebuffer : OpaqueRenderPassFramebuffers)
     {
         vkDestroyFramebuffer(GDevice, framebuffer, VkHelperInstance->Allocator);
@@ -438,19 +527,14 @@ ForwardRendering::~ForwardRendering()
     {
         vkDestroyFramebuffer(GDevice, framebuffer, VkHelperInstance->Allocator);
     }
+    for(auto framebuffer : SkyRenderPassFramebuffers)
+    {
+        vkDestroyFramebuffer(GDevice, framebuffer, VkHelperInstance->Allocator);
+    }
+
 
     ReleaseColorResources();
     ReleaseDepthResources();
-}
-
-VkRenderPass ForwardRendering::GetOpaqueRenderPass()
-{
-    return OpaqueRenderPass;
-}
-
-VkRenderPass ForwardRendering::GetTranslucentRenderPass()
-{
-    return TranslucentRenderPass;
 }
 
 VkImage ForwardRendering::GetSceneColor(uint32 FrameIndex)
@@ -462,3 +546,25 @@ VkImage ForwardRendering::GetSceneDepth(uint32 FrameIndex)
 {
     return depthImage[FrameIndex];
 }
+
+const IRendering::RenderPassContainer& ForwardRendering::GetNamedRenderPasses()
+{
+    static std::unordered_map<Container::Name, VkRenderPass*> Map {
+        {"Opaque", &OpaqueRenderPass},
+        {"Translucent", &TranslucentRenderPass},
+        {"Sky", &SkyRenderPass}
+    };
+    return Map; 
+}
+
+const IRendering::FramebufferContainer& ForwardRendering::GetNamedFrameBuffers()
+{
+    static std::unordered_map<Container::Name, std::vector<VkFramebuffer>*> Map {
+        {"Opaque", &OpaqueRenderPassFramebuffers},
+        {"Translucent", &TranslucentRenderPassFramebuffers},
+        {"Sky", &SkyRenderPassFramebuffers}
+    };
+    return Map; 
+}
+
+

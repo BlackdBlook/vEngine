@@ -63,7 +63,7 @@ public:
     
     VkRenderPass GetVkRenderPass()
     {
-        return vkHelper.Rendering->GetOpaqueRenderPass();
+        return *(vkHelper.Rendering->GetNamedRenderPasses().find("Opaque")->second);
     }
     
     size_t GetCurrentFrame()

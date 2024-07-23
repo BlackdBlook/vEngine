@@ -79,6 +79,8 @@ SkyBoxMeshVertexBuffer::SkyBoxMeshVertexBuffer(size_t Size, const void* Data)
         return;
     }
 
+    this->Size = Size;
+
     VkBufferCreateInfo bufferInfo{};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     bufferInfo.size = Size;

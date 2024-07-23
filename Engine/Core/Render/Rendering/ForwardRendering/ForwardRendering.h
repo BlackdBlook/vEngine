@@ -8,11 +8,13 @@ class ForwardRendering : public IRendering
 {
 public:
     VkRenderPass OpaqueRenderPass;
-    // std::vector<VkFramebuffer> OpaqueRenderPassFramebuffers;
     std::vector<VkFramebuffer> OpaqueRenderPassFramebuffers;
+    
     VkRenderPass TranslucentRenderPass;
-    // std::vector<VkFramebuffer> TranslucentRenderPassFramebuffers;
     std::vector<VkFramebuffer> TranslucentRenderPassFramebuffers;
+
+    VkRenderPass SkyRenderPass;
+    std::vector<VkFramebuffer> SkyRenderPassFramebuffers;
 
     VkImage depthImage[MAX_FRAMES_IN_FLIGHTS];
     VkDeviceMemory depthImageMemory[MAX_FRAMES_IN_FLIGHTS];
@@ -31,6 +33,7 @@ public:
     
     void createOpaqueRenderPass(); 
     void createTranslucentRenderPass();
+    void createSkyRenderPass();
 
     void FrameRender(RenderCommandQueue& queue, VkCommandBuffer cmd) override;
 
@@ -38,8 +41,9 @@ public:
     void Read2Attach(VkCommandBuffer cmd, VkImage Image);
 
     ~ForwardRendering() override;
-    VkRenderPass GetOpaqueRenderPass() override;
-    VkRenderPass GetTranslucentRenderPass() override;
+
     VkImage GetSceneColor(uint32 FrameIndex) override;
     VkImage GetSceneDepth(uint32 FrameIndex) override;
+    const RenderPassContainer& GetNamedRenderPasses() override;
+    const FramebufferContainer& GetNamedFrameBuffers() override;
 };

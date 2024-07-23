@@ -189,15 +189,31 @@ VkPipelineLayout MaterialRenderPipelineInfo::PipelineLayout()const
 
 VkRenderPass MaterialRenderPipelineInfo::PipelineRenderPass()const
 {
+    static const auto& RenderPassMap = VkHelperInstance->Rendering->GetNamedRenderPasses();
+    Container::Name name;
     switch (RenderType)
     {
-    case MaterialRenderType::Sky:
     case MaterialRenderType::Opaque:
-        return VkHelperInstance->Rendering->GetOpaqueRenderPass();
+        name = Container::Name{"Opaque"};
+        break;
     case MaterialRenderType::Translucent:
-        return VkHelperInstance->Rendering->GetTranslucentRenderPass();
+        name = Container::Name{"Translucent"};
+        break;
+    case MaterialRenderType::Sky:
+        name = Container::Name{"Sky"};
+        break;
+    default:
+        break;
     }
-    return VkHelperInstance->Rendering->GetOpaqueRenderPass();
+    auto value = RenderPassMap.find(name);
+
+    if(value == RenderPassMap.end())
+    {
+        ERR("RenderPass Not Find");
+        return *RenderPassMap.begin()->second;
+    }
+    
+    return *(value->second);
 }
 
 uint32 MaterialRenderPipelineInfo::PipelineSubpass()

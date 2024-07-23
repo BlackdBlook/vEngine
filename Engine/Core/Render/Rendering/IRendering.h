@@ -7,9 +7,12 @@ class IRendering
 {
 public:
 
-    virtual VkRenderPass GetOpaqueRenderPass() = 0;
-    virtual VkRenderPass GetTranslucentRenderPass() = 0;
+    using RenderPassContainer = std::unordered_map<Container::Name, VkRenderPass*>;
+    virtual const RenderPassContainer& GetNamedRenderPasses() = 0;
 
+    using FramebufferContainer = std::unordered_map<Container::Name, std::vector<VkFramebuffer>*>;
+    virtual const FramebufferContainer& GetNamedFrameBuffers() = 0;
+    
     virtual VkImage GetSceneColor(uint32 FrameIndex) = 0;
     virtual VkImage GetSceneDepth(uint32 FrameIndex) = 0;
     
