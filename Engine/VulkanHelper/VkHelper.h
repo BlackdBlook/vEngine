@@ -9,6 +9,7 @@
 #include "Engine/TypeDef.h"
 #include "ThirdParty/StringFormater/StringFormater.h"
 
+struct ExternalImage;
 class RenderPostProcessing;
 struct FrameBufferData;
 class IRendering;
@@ -94,7 +95,8 @@ public:
     void transitionCubeImageLayout(VkCommandBuffer commandBuffer, VkImage image, VkFormat format,
                                    VkImageLayout oldLayout,
                                    VkImageLayout newLayout);
-    VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, VkImageViewType viewType);
+    static VkImageView createImageView(const ExternalImage& Image);
+    static VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags, VkImageViewType viewType);
     
     uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     VkCommandBuffer BeginSingleTimeCommands();

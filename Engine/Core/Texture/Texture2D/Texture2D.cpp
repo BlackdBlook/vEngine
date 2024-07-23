@@ -45,7 +45,7 @@ void Texture2D::cleanUp()
     {
         if(textureImageView[i])
         {
-            vkDestroyImageView(GDevice, *(textureImageView + i), nullptr);
+            vkDestroyImageView(GDevice, textureImageView[i], GAllocatorCallback);
             *(textureImageView + i) = VK_NULL_HANDLE;
         }
     }
@@ -56,7 +56,7 @@ void Texture2D::cleanUp(VkImageView* tempTextureImageView)
     //销毁texture image view
     if(tempTextureImageView)
     {
-        vkDestroyImageView(GDevice, *tempTextureImageView, nullptr);
+        vkDestroyImageView(GDevice, *tempTextureImageView, GAllocatorCallback);
         *tempTextureImageView = VK_NULL_HANDLE;
     }
 }
@@ -68,46 +68,38 @@ Texture2D::Texture2D(const string& TextureName)
 
 Texture2D::~Texture2D()
 {
-    cleanUp(textureImageView);
+    cleanUp();
 }
 
-void Texture2D::SetTexture(VkImageView ImageView, bool ClearOld)
+void Texture2D::SetTexture(const ExternalImage& ImageView, bool ClearOld)
 {
-    auto tempTextureImageView = textureImageView;
-    
-    if(ClearOld)
-    {
-        cleanUp(tempTextureImageView);
-    }
+    cleanUp();
+
     MAX_FRAMES_IN_FLIGHTS_LOOP(i)
     {
-        textureImageView[i] = ImageView;
+        textureImageView[i] = VkHelper::createImageView(ImageView);
     }
 }
 
 void Texture2D::SetTexture(const string& TextureName, bool ClearOld)
 {
-    auto tempTextureImageView = textureImageView;
-    
-    if(ClearOld)
-    {
-        cleanUp(tempTextureImageView);
-    }
+
+    cleanUp();
+
     
     SetTexture_Internel(TextureName);
 
 }
 
-void Texture2D::SetTextureAtIndex(VkImageView ImageView, uint32 index, bool ClearOld)
+void Texture2D::SetTextureAtIndex(const ExternalImage& ExternalImage, uint32 index, bool ClearOld)
 {
-    if(ClearOld)
-    {
-        SourceFile.reset();
-        cleanUp(textureImageView);
-    }
+    // if(ClearOld)
+    // {
+    SourceFile.reset();
+    cleanUp(textureImageView + index);
+    // }
 
-    textureImageView[index] = ImageView;
-    
+    textureImageView[index] = VkHelper::createImageView(ExternalImage);
 }
 
 void Texture2D::CleanUp()

@@ -13,6 +13,7 @@
 #include "Engine/vEngine.h"
 #include "Engine/Core/Render/FrameBuffer/FrameBufferData.h"
 #include "Engine/Core/Render/Rendering/ForwardRendering/ForwardRendering.h"
+#include "Engine/Core/Texture/TextureInterface/ITexture.h"
 #include "Engine/Core/UniformBuffer/GlobalUniformBuffer/GlobalUniformBufferManager.h"
 #include "Engine/TextureFile/TextureFile.h"
 #include "LogPrinter/Log.h"
@@ -846,6 +847,11 @@ void VkHelper::transitionCubeImageLayout(VkCommandBuffer commandBuffer,
         1, &barrier);
 
     // endSingleTimeCommands(commandBuffer);
+}
+
+VkImageView VkHelper::createImageView(const ExternalImage& Image)
+{
+    return createImageView(Image.Image, Image.Format, Image.aspectFlags, Image.viewType);
 }
 
 //创建image view的抽象

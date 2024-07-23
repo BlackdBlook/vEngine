@@ -6,6 +6,7 @@
 #include "Engine/Core/ShaderModule/Shader.h"
 #include "Engine/Core/UniformBuffer/UniformBuffer.h"
 
+struct ExternalImage;
 class MaterialRenderPipelineInfo;
 class FrameRenderInfo;
 
@@ -36,9 +37,9 @@ public:
     void SetTexture(const string& TargetName,
         const string& NewTextureName, bool ClearOld = true);
     void SetTexture(const string& TargetName,
-        VkImageView ImageView, bool ClearOld = true);
+        const ExternalImage& ImageView, bool ClearOld = true);
     void SetTextureAtFream(const string& TargetName,
-        VkImageView ImageView, uint32 FreamIndex, bool ClearOld = true);
+        const ExternalImage& ImageView, uint32 FreamIndex, bool ClearOld = true);
     
     void SetCurrentUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset);
     void SetAllUniformData(const Container::Name& MemberName, uint8* Src, size_t Size, size_t Offset);

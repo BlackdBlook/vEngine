@@ -24,8 +24,8 @@ public:
     ~TextureCube() override;
     
     void SetTexture(const string& TextureName, bool ClearOld = true) override;
-    virtual void SetTexture(VkImageView ImageView, bool ClearOld = true) override;
-    void SetTextureAtIndex(VkImageView ImageView, uint32 index, bool ClearOld) override;
     void CleanUp() override;
     VkImageView GetImageView(uint32 FrameIndex) override;
+    void SetTexture(const ExternalImage& ImageView, bool ClearOld) override;
+    void SetTextureAtIndex(const ExternalImage& ExternalImage, uint32 index, bool ClearOld) override;
 };

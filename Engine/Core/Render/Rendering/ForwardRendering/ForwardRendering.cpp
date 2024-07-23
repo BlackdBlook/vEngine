@@ -32,7 +32,7 @@ void ForwardRendering::createDepthResources()
             depthImageMemory[i]
             );
     
-        depthImageView[i] = VkHelperInstance->createImageView(depthImage[i], depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D);
+        depthImageView[i] = VkHelper::createImageView(depthImage[i], depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT, VK_IMAGE_VIEW_TYPE_2D);
     
 
         VkHelperInstance->transitionImageLayout(cmd, depthImage[i], depthFormat, VK_IMAGE_LAYOUT_UNDEFINED,
@@ -68,9 +68,8 @@ void ForwardRendering::createColorResources()
             colorImageMemory[i]
             );
     
-        colorImageView[i] = VkHelperInstance->createImageView(colorImage[i], colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D);
-    
-
+        colorImageView[i] = VkHelper::createImageView(colorImage[i], colorFormat, VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_2D);
+        
         // VkHelperInstance->transitionImageLayout(cmd, colorImage[i], colorFormat,
         //          VK_IMAGE_LAYOUT_UNDEFINED,
         //          VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
@@ -454,12 +453,12 @@ VkRenderPass ForwardRendering::GetTranslucentRenderPass()
     return TranslucentRenderPass;
 }
 
-VkImageView ForwardRendering::GetSceneColor(uint32 FrameIndex)
+VkImage ForwardRendering::GetSceneColor(uint32 FrameIndex)
 {
-    return colorImageView[FrameIndex];
+    return colorImage[FrameIndex];
 }
 
-VkImageView ForwardRendering::GetSceneDepth(uint32 FrameIndex)
+VkImage ForwardRendering::GetSceneDepth(uint32 FrameIndex)
 {
-    return depthImageView[FrameIndex];
+    return depthImage[FrameIndex];
 }

@@ -40,6 +40,6 @@ public:
     ~ForwardRendering() override;
     VkRenderPass GetOpaqueRenderPass() override;
     VkRenderPass GetTranslucentRenderPass() override;
-    VkImageView GetSceneColor(uint32 FrameIndex) override;
-    VkImageView GetSceneDepth(uint32 FrameIndex) override;
+    VkImage GetSceneColor(uint32 FrameIndex) override;
+    VkImage GetSceneDepth(uint32 FrameIndex) override;
 };

@@ -4,6 +4,7 @@
 
 #include "Engine/vEngine.h"
 #include "Engine/Core/FrameInfo/FrameRenderInfo.h"
+#include "Engine/Core/Texture/TextureInterface/ITexture.h"
 #include "Engine/VulkanHelper/VkHelper.h"
 
 void RenderPostProcessing::CreateRenderPass()
@@ -100,7 +101,7 @@ void RenderPostProcessing::CmdRender(VkCommandBuffer cmd, uint32 FrameIndex)
         // info.framebuffer = fd->Framebuffer;
         info.renderArea.extent.width = GWindowData.Width;
         info.renderArea.extent.height = GWindowData.Height;
-        info.clearValueCount = clearValues.size();
+        info.clearValueCount = (uint32)clearValues.size();
         info.pClearValues = clearValues.data();
         
         vkCmdBeginRenderPass(cmd, &info, VK_SUBPASS_CONTENTS_INLINE);
@@ -164,8 +165,11 @@ RenderPostProcessing::RenderPostProcessing()
 
     MAX_FRAMES_IN_FLIGHTS_LOOP(i)
     {
-        mat->SetTexture("texture0",
-            VkHelperInstance->Rendering->GetSceneColor(i),
+        mat->SetTextureAtFream("texture0",
+            ExternalImage(
+                VkHelperInstance->Rendering->GetSceneColor(i)
+            ),
+            i,
             false);
     }
 }
@@ -173,11 +177,17 @@ RenderPostProcessing::RenderPostProcessing()
 RenderPostProcessing::~RenderPostProcessing()
 {
     ReleaseRenderPass();
+
     MAX_FRAMES_IN_FLIGHTS_LOOP(i)
     {
-        mat->SetTextureAtFream("texture0",
-            VK_NULL_HANDLE,
-            i,
-            false);
+        vkDestroyFramebuffer(GDevice, PostProcessFrameBuffer[i], GAllocatorCallback);
     }
+    
+    // MAX_FRAMES_IN_FLIGHTS_LOOP(i)
+    // {
+    //     mat->SetTextureAtFream("texture0",
+    //         VK_NULL_HANDLE,
+    //         i,
+    //         false);
+    // }
 }

@@ -61,7 +61,7 @@ void Material::SetTexture(const string& TargetName,
 }
 
 void Material::SetTexture(const string& TargetName,
-    VkImageView ImageView, bool ClearOld)
+    const ExternalImage& ImageView, bool ClearOld)
 {
     auto target = descriptor->Textures.find(TargetName);
     if(target == descriptor->Textures.end())
@@ -76,7 +76,7 @@ void Material::SetTexture(const string& TargetName,
 }
 
 void Material::SetTextureAtFream(const string& TargetName,
-    VkImageView ImageView, uint32 FreamIndex, bool ClearOld)
+    const ExternalImage& ImageView, uint32 FreamIndex, bool ClearOld)
 {
     auto target = descriptor->Textures.find(TargetName);
     if(target == descriptor->Textures.end())

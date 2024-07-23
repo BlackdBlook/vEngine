@@ -71,7 +71,7 @@ void TextureCube::SetTexture_Internel(const string& TextureName)
 
     MAX_FRAMES_IN_FLIGHTS_LOOP(i)
     {
-        textureImageView[i] = VkHelperInstance->createImageView(
+        textureImageView[i] = VkHelper::createImageView(
         SourceFiles->textureImage, VK_FORMAT_R8G8B8A8_SRGB,
         VK_IMAGE_ASPECT_COLOR_BIT, VK_IMAGE_VIEW_TYPE_CUBE);
     }
@@ -86,7 +86,7 @@ void TextureCube::cleanUp()
         {
             vkDestroyImageView(GDevice,
             target   
-            , nullptr);
+            , GAllocatorCallback);
             target = VK_NULL_HANDLE;
         }
     }
@@ -95,11 +95,11 @@ void TextureCube::cleanUp()
 void TextureCube::cleanUp(VkImageView* tempTextureImageView)
 {
     //销毁texture image view
-    if(tempTextureImageView)
+    if(*tempTextureImageView)
     {
         vkDestroyImageView(GDevice,
             *(tempTextureImageView)
-            , nullptr);
+            , GAllocatorCallback);
             *(tempTextureImageView) = VK_NULL_HANDLE;
         
     }
@@ -112,47 +112,18 @@ TextureCube::TextureCube(const string& TextureName)
 
 TextureCube::~TextureCube()
 {
-    cleanUp(textureImageView);
+    cleanUp();
 }
 
 void TextureCube::SetTexture(const string& TextureName, bool ClearOld)
 {
-    auto tempTextureImageView = textureImageView;
-    
     if(ClearOld)
     {
-        cleanUp(tempTextureImageView);
+        cleanUp();
         SourceFiles.reset();
     }
 
     SetTexture_Internel(TextureName);
-}
-
-void TextureCube::SetTexture(VkImageView ImageView, bool ClearOld)
-{
-    auto tempTextureImageView = textureImageView;
-    
-    if(ClearOld)
-    {
-        cleanUp(tempTextureImageView);
-        SourceFiles.reset();
-    }
-    
-    MAX_FRAMES_IN_FLIGHTS_LOOP(i)
-    {
-        textureImageView[i] = ImageView;
-    }
-}
-
-void TextureCube::SetTextureAtIndex(VkImageView ImageView, uint32 index, bool ClearOld)
-{
-    if(ClearOld)
-    {
-        cleanUp(textureImageView + index);
-        SourceFiles.reset();
-    }
-    
-    textureImageView[index] = ImageView;
 }
 
 void TextureCube::CleanUp()
@@ -163,4 +134,29 @@ void TextureCube::CleanUp()
 VkImageView TextureCube::GetImageView(uint32 FrameIndex)
 {
     return textureImageView[FrameIndex];
+}
+
+void TextureCube::SetTexture(const ExternalImage& ImageView, bool ClearOld)
+{
+    if(ClearOld)
+    {
+        cleanUp();
+        SourceFiles.reset();
+    }
+    
+    MAX_FRAMES_IN_FLIGHTS_LOOP(i)
+    {
+        textureImageView[i] = VkHelper::createImageView(ImageView);
+    }
+}
+
+void TextureCube::SetTextureAtIndex(const ExternalImage& ExternalImage, uint32 index, bool ClearOld)
+{
+    if(ClearOld)
+    {
+        cleanUp(textureImageView + index);
+        SourceFiles.reset();
+    }
+    
+    textureImageView[index] = VkHelper::createImageView(ExternalImage);
 }
