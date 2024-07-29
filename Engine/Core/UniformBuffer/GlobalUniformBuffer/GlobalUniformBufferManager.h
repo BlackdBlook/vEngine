@@ -30,7 +30,7 @@ public:
 
     SPtr<GlobalUniformBuffer> GetBuffer(size_t size, ShaderUniformBufferBlock* block);
 
-    GlobalUniformBufferInfo* globalInfo;
+    GlobalUniformBufferInfo* globalInfo = nullptr;
     
     static GlobalUniformBufferManager* Get();
 

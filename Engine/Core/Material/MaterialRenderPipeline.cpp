@@ -334,14 +334,14 @@ std::unordered_map<Container::Name, SPtr<UniformBuffer>> MaterialRenderPipelineI
 void MaterialRenderPipelineInfo::MakeInputTextures(std::unordered_map<string, SPtr<ITexture>>& out) const
 {
     for(auto& tex :
-        VertShader->ShaderTextureInputs.Members)
+        VertShader->ShaderTextureInputsObject.Members)
     {
         auto texture = tex.second.CreateTextureObject();
         out.emplace(tex.first, texture);
     }
 
     for(auto& tex :
-        FragShader->ShaderTextureInputs.Members)
+        FragShader->ShaderTextureInputsObject.Members)
     {
         auto texture = tex.second.CreateTextureObject();
         out.emplace(tex.first, texture);

@@ -11,6 +11,6 @@ class SceneComponentRenderInfo
 public:
     SceneComponent* component;
     Material* material;
-    VertexBuffer* VertexBuffer;
+    VertexBuffer* VertexBufferPtr;
     MAT4(Model);
 };

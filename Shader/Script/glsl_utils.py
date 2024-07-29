@@ -22,6 +22,8 @@ glsl_fshader_stage['fs']='-fshader-stage=frag'
 glsl_fshader_stage['gs']='-fshader-stage=gero'
 glsl_fshader_stage['cs']='-fshader-stage=comp'
 
+compile_name = sys.argv[3]
+
 def combine_output_path(file_name : str, shader_output_suffix : str)->str:
     shader_output_suffix = os.path.join('ShaderCache', file_name + shader_output_suffix)
     # print(shader_output_suffix)
@@ -39,7 +41,7 @@ def gen_compile_command(file_path : str)->list:
         shader_output = os.path.join('ShaderCache', file_name.lower() + '.spv')
         shader_output = os.path.abspath(shader_output)
         print(shader_output)
-        return [['glslc.exe', file_path, '-o', shader_output]]
+        return [[compile_name, file_path, '-o', shader_output]]
     
     suffixes = name.split('_')
 
@@ -54,7 +56,7 @@ def gen_compile_command(file_path : str)->list:
 
 def gen_signel_compile_command(file_path, file_name, suffix)->list:
     compile_command = []
-    compile_command.append('glslc.exe')
+    compile_command.append(compile_name)
 
     compile_command.append(glsl_fshader_stage[suffix])
 

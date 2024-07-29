@@ -2,4 +2,4 @@
 
 cd /d %~dp0
 
-python Script/ShaderIc.py %cd%
+python Script/ShaderIc.py %cd% ./hlslc.exe ./glslc.exe

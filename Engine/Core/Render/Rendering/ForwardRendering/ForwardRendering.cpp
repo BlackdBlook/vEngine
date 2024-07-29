@@ -361,8 +361,8 @@ void ForwardRendering::FrameRender(RenderCommandQueue& queue, VkCommandBuffer cm
         };
         
         queue.SkyRenderInfo->material->Draw(RenderInfo);
-        queue.SkyRenderInfo->VertexBuffer->CmdBind(cmd);
-        vkCmdDraw(cmd, queue.SkyRenderInfo->VertexBuffer->GetVertexNumber(),
+        queue.SkyRenderInfo->VertexBufferPtr->CmdBind(cmd);
+        vkCmdDraw(cmd, queue.SkyRenderInfo->VertexBufferPtr->GetVertexNumber(),
             1, 0, 0);
 
         vkCmdEndRenderPass(cmd);
@@ -400,9 +400,9 @@ void ForwardRendering::FrameRender(RenderCommandQueue& queue, VkCommandBuffer cm
             auto mt = info->material;
             mt->Draw(RenderInfo);
         
-            info->VertexBuffer->CmdBind(cmd);
+            info->VertexBufferPtr->CmdBind(cmd);
 
-            vkCmdDraw(cmd, info->VertexBuffer->GetVertexNumber(),
+            vkCmdDraw(cmd, info->VertexBufferPtr->GetVertexNumber(),
                 1, 0, 0);
         }
 
@@ -438,9 +438,9 @@ void ForwardRendering::FrameRender(RenderCommandQueue& queue, VkCommandBuffer cm
             auto mt = info->material;
             mt->Draw(RenderInfo);
         
-            info->VertexBuffer->CmdBind(cmd);
+            info->VertexBufferPtr->CmdBind(cmd);
 
-            vkCmdDraw(cmd, info->VertexBuffer->GetVertexNumber(),
+            vkCmdDraw(cmd, info->VertexBufferPtr->GetVertexNumber(),
                 1, 0, 0);
         }
 

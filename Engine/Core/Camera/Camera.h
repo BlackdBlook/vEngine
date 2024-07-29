@@ -9,33 +9,16 @@ class Camera :public Object
     glm::mat4 projection;
     std::function<void(float)> updateFun;
     bool needUpdateView = true;
-    static Camera* malloc();
+    Camera();
 public:
 
-    void* operator new(size_t s)
-    {
-        //static Camera* cam = malloc();
-        auto malloc = []() ->Camera*
-        {
-            void* cam = ::malloc(sizeof(Camera));
-            if (cam == 0)
-                return nullptr;
-            memset(cam, 0, sizeof(Camera));
-            Camera* ans = static_cast<Camera*>(cam);
-            ans->Camera::Camera();
-            return ans;
-        };
-        static Camera* cam = malloc();
-        cam->Reset();
-        return cam;
-    }
     static Camera* GetCamera();
 
-    virtual void Update(float DeltaTime) override;
+    void Update(float DeltaTime) override;
     void Attach(std::shared_ptr<Component> Target) override;
     void Dettach(std::shared_ptr<Component> Target) override;
 
-    Camera();
+    
     Camera(std::function<void(float)> update);
     void Reset(std::function<void(float)> update = [](float) {});
     glm::mat4 GetCameraView();

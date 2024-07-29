@@ -50,9 +50,8 @@ std::ostream& operator<<(std::ostream& output, const std::vector<std::string>& D
     return output;
 }
 
-template <>
-void Log::print<bool>(bool arg)
-{
-    const char* c = arg?"True":"False";
-    std::cout << c << ' ';
+std::ostream &operator<<(std::ostream &output, const bool &D) {
+    const auto end = D ? "True" : "False";
+    output << end;
+    return output;
 }

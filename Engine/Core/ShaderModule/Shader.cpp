@@ -177,7 +177,7 @@ VkShaderStageFlagBits vShader::GetVkShaderStageFlagBits()
 
 void vShader::CountTextureInputNum(uint32& textureNum, uint32& samplerNum, uint32& CombindImageNum)
 {
-    for(auto& block:ShaderTextureInputs.Members)
+    for(auto& block:ShaderTextureInputsObject.Members)
     {
         switch (block.second.type)
         {
@@ -236,9 +236,9 @@ vShader::vShader(const char* Name, ShaderType type, ShaderUniformBufferBlocks* b
 
     reflector.MergeToUniformBufferBlocks(blocks);
 
-    ShaderTextureInputs = ShaderDecoder::DecodeTextures(&data);
+    ShaderTextureInputsObject = ShaderDecoder::DecodeTextures(&data);
     
-    ShaderTextureInputs.Log();
+    ShaderTextureInputsObject.Log();
 
     vkshadermodule = createShaderModule(data);
     
@@ -282,7 +282,7 @@ void vShader:: FillDescriptorSetLayoutBinding(std::vector<VkDescriptorSetLayoutB
     // }
 
     for(auto& block :
-        ShaderTextureInputs.Members)
+        ShaderTextureInputsObject.Members)
     {
         VkDescriptorSetLayoutBinding ImageBinding = {};
 

@@ -2,22 +2,24 @@
 
 #pragma once
 // Alignment.
-#if defined(__clang__)
+#if PLATFORM_LINUX
 	#define GCC_PACK(n) __attribute__((packed,aligned(n)))
 	#define GCC_ALIGN(n) __attribute__((aligned(n)))
-	#if defined(_MSC_VER)
-		#define MS_ALIGN(n) __declspec(align(n)) // With -fms-extensions, Clang will accept either alignment attribute
-	#endif
-#else
+    #define ALIGN(n) GCC_ALIGN(n)
+#elif PLATFORM_WINDOWS
 	#define MS_ALIGN(n) __declspec(align(n))
+    #define ALIGN(n) MS_ALIGN(n)
 #endif
 
 #include <algorithm>
-#include <intrin.h>
 
-/**
- * Enumerates concurrent queue modes.
- */
+
+#if PLATFORM_WINDOWS
+#include <intrin.h>
+#elif PLATFORM_LINUX
+#include <xmmintrin.h>
+#endif
+
 enum class EQueueMode
 {
 	/** Multiple-producers, single-consumer queue. */
@@ -107,7 +109,7 @@ public:
 
 		TNode* OldHead;
 
-		if (Mode == EQueueMode::Mpsc)
+		if constexpr (Mode == EQueueMode::Mpsc)
 		{
             OldHead = (TNode*)InterlockedExchangePtr((void**)&Head, NewNode);
 			InterlockedExchangePtr((void**)&OldHead->NextNode, NewNode);
@@ -142,11 +144,11 @@ public:
 
 		TNode* OldHead;
 
-		if (Mode == EQueueMode::Mpsc)
+		if constexpr (Mode == EQueueMode::Mpsc)
 		{
-            OldHead = (TNode*)::_InterlockedExchangePointer((void**)&Head, NewNode);
-            ::_InterlockedExchangePointer((void**)&OldHead->NextNode, NewNode);
-		}
+            OldHead = (TNode*)InterlockedExchangePtr((void**)&Head, NewNode);
+            InterlockedExchangePtr((void**)&OldHead->NextNode, NewNode);
+        }
 		else
 		{
 			OldHead = Head;
@@ -269,7 +271,7 @@ private:
 	};
 
 	/** Holds a pointer to the head of the list. */
-	MS_ALIGN(16) TNode* volatile Head;
+	ALIGN(16) TNode* volatile Head;
 
 	/** Holds a pointer to the tail of the list. */
 	TNode* Tail;

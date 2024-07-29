@@ -24,7 +24,7 @@ public:
 
     SPtr<MaterialRenderPipelineInfo> info;
 
-    SPtr<ShaderUniformBufferBlocks> ShaderUniformBufferBlocks;
+    SPtr<ShaderUniformBufferBlocks> ShaderUniformBufferBlocksPtr;
 
     Material(const string& shaderName, ShaderCodeType codeType = ShaderCodeType::HLSL);
     

@@ -57,7 +57,11 @@ from hlsl_utils import *
 from glsl_utils import *
 
 def run_command(cmd : list):
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    cmdStr = ""
+    for c in cmd:
+        cmdStr += c
+        cmdStr += ' '
+    p = subprocess.Popen(cmdStr, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     # 获取stdout和stderr
     stdout, stderr = p.communicate()
@@ -68,7 +72,7 @@ def run_command(cmd : list):
 
     # 如果有stderr，添加ANSI转义码后输出
     if stderr:
-        print(cmd)
+        print(cmdStr)
         print(f"{RED}{stderr.decode('gbk')}{RESET}")
 
 def compile_shaders(path, shader_files):
@@ -89,7 +93,7 @@ def compile_shaders(path, shader_files):
                 print(file_name, 'unknow hlsl shader type')
                 continue
             
-            hlslc_path = os.path.join(sys.argv[1], 'hlslc.exe')
+            hlslc_path = os.path.abspath(sys.argv[2])
 
             # 调用dxc.exe编译shader
             # dxc.exe -spirv -T vs_6_1 -E main .\input.vert -Fo .\output.vert.spv -fspv-extension=SPV_EXT_descriptor_indexin
@@ -99,12 +103,12 @@ def compile_shaders(path, shader_files):
                 print(output_file_path)
                 command = [hlslc_path, '-spirv', 
                            '-T', hlsl_shader_config[shader_type], 
-                           '-E', hlsl_entry_Point[shader_type], shader_file, 
-                           '-Fo', output_file_path,
+                           '-E', hlsl_entry_Point[shader_type], 
+                           os.path.abspath(shader_file), 
+                           '-Fo', os.path.abspath(output_file_path),
                            '-Zi'
                            ]
                 run_command(command)
-                # print(command)
 
 
         else:

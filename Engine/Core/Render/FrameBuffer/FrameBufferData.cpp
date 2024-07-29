@@ -15,7 +15,7 @@ FrameBufferData::FrameBufferData(const FrameBufferDataCreateInfo& CreateInfo)
 {
     if(CreateInfo.TargetRenderPass == VK_NULL_HANDLE)
     {
-        throw std::exception("创建FrameBuffer时TargetRenderPass不能为空");
+        throw std::runtime_error("RenderPass Is Null When Create FrameBuffer");
         return;
     }
     

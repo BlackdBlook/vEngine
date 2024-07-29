@@ -5,11 +5,6 @@
 #include "Engine/Toolkit/math_utils.h"
 #include "LogPrinter/Log.h"
 
-Camera* Camera::malloc()
-{
-    void* ans = ::malloc(sizeof(Camera));
-    return static_cast<Camera*>(ans);
-}
 
 Camera* Camera::GetCamera()
 {

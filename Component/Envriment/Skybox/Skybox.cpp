@@ -148,7 +148,7 @@ SceneComponentRenderInfo* Skybox::GenRenderInfo()
         renderInfoCache->component = this;
         renderInfoCache->material = material.get();
         renderInfoCache->Model = GetModelMat();
-        renderInfoCache->VertexBuffer = &buffer;
+        renderInfoCache->VertexBufferPtr = &buffer;
     }
 
     return renderInfoCache;

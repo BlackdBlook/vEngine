@@ -1,7 +1,7 @@
 #include "FileToolKit.h"
 #include <fstream>
 #include <filesystem>
-#include <direct.h>
+#include <algorithm>
 
 #include "Engine/TypeDef.h"
 #include "LogPrinter/Log.h"
@@ -172,14 +172,11 @@ bool FileToolKit::AppendWrite(const char* path, const char* context)
 
 string PathToolKit::GetCurrentPath()
 {
-    char* ans = nullptr;
-    if ((ans = _getcwd(NULL, 0)) == nullptr)
-    {
-        LOG(L"运行路径获取失败");
-        return "";
-    }
-    string s(ans);
-    delete[] ans;
+    path ans;
+    ans = std::filesystem::current_path();
+    
+    string s(ans.c_str());
+
     return s;
 }
 

@@ -10,6 +10,7 @@
 *.userosscache
 *.sln.docstates
 
+
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -395,3 +396,5 @@ MigrationBackup/
 /imgui.ini
 
 /VTune
+/CMake
+/cmake-build*

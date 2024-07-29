@@ -61,7 +61,7 @@ public:
     
     void CountTextureInputNum(uint32& textureNum, uint32& samplerNum, uint32& CombindImageNum);
 
-    ShaderTextureInputs ShaderTextureInputs;
+    ShaderTextureInputs ShaderTextureInputsObject;
     
     VkShaderModule GetShaderModule()
     {

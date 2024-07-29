@@ -16,7 +16,7 @@ class IRendering;
 class TextureFileArray;
 class TexutreFile;
 extern class VkHelper* VkHelperInstance;
-#ifdef _DEBUG
+#ifdef _DEBUG 
 #define APP_USE_VULKAN_DEBUG_REPORT
 #endif
 

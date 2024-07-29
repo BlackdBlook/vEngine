@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <vulkan/vulkan_core.h>
+#include <vector>
 
 #include "Engine/TypeDef.h"
 #include "Engine/Core/Container/Name.h"

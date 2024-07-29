@@ -2,4 +2,4 @@
 
 del .\file_modification_times.json
 
-python Script/ShaderIc.py %cd%
+python Script/ShaderIc.py . ./hlslc.exe ./glslc.exe

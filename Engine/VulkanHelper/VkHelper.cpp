@@ -1,7 +1,6 @@
 ﻿#include "VkHelper.h"
 
 #include <array>
-#include <Windows.h>
 #include <SDL.h>
 #include <SDL_vulkan.h>
 #include <unordered_set>

@@ -1,5 +1,6 @@
 #include "AssetSystem.h"
 #include <stack>
+#include <algorithm>
 #include "Engine/Toolkit/FileToolKit/FileToolKit.h"
 #include "LogPrinter/Log.h"
 #include "ThirdParty/stb/stb_image.h"
