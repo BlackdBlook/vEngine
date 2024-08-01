@@ -53,7 +53,7 @@ public:
     static void NameSpacePrinterLog(const char* FileName, int Line, TS ... args)
     {
         std::cout << "\033[44m";
-        std::cout << std::string_view{FileName} << " Line:" << Line ;
+        std::cout << FileName << " Line:" << Line ;
         std::cout << ' ' << '\n';
         std::cout << "\033[0m";
         std::cout << '\t';
@@ -64,7 +64,7 @@ public:
     static void NameSpacePrinterWaring(const char* FileName, int Line, TS ... args)
     {
         std::cout << "\033[43m";
-        std::cout << std::string_view{FileName}  << " Line:" << Line ;
+        std::cout << FileName  << " Line:" << Line ;
         std::cout << ' ' << '\n';
         std::cout << "\033[0m";
         std::cout << '\t';
@@ -75,7 +75,7 @@ public:
     static void NameSpacePrinterError(const char* FileName, int Line, TS ... args)
     {
         std::cout << "\033[45m";
-        std::cout << std::string_view{FileName}  << " Line:" << Line ;
+        std::cout << FileName << " Line:" << Line ;
         std::cout << ' ' << '\n';
         std::cout << "\033[0m";
         std::cout << '\t';

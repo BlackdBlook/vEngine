@@ -398,3 +398,4 @@ MigrationBackup/
 /VTune
 /CMake
 /cmake-build*
+/out

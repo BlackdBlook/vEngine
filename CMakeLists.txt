@@ -35,6 +35,7 @@ add_compile_definitions(PLATFORM_WINDOWS=${PLATFORM_WINDOWS})
 add_compile_definitions(PLATFORM_LINUX=${PLATFORM_LINUX})
 
 
+
 ################################################################################
 # Global configuration types
 ################################################################################
@@ -81,11 +82,6 @@ function(use_package TARGET PACKAGE VERSION)
                     "Package \"${PACKAGE}\" with version \"${VERSION}\" "
                     "for target \"${TARGET}\" is ignored!")
 endfunction()
-
-################################################################################
-# Common utils
-################################################################################
-include(CMake/Utils.cmake)
 
 ################################################################################
 # Additional Global Settings(add specific info there)
@@ -318,22 +314,28 @@ set(ALL_FILES
     ${Source_Files}
 )
 
+set(HLSL_FILES
+    ${ALL_FILES})
+
+# 创建一个新的变量HLSL_FILES来存储筛选后的.hlsl文件
+list(FILTER HLSL_FILES INCLUDE REGEX "\\.hlsl$")
+
+# 对每个 HLSL 文件设置属性为不编译
+foreach(HLSL_FILE ${HLSL_FILES})
+    set_source_files_properties(${HLSL_FILE} PROPERTIES VS_TOOL_OVERRIDE "None")
+endforeach()
+
 ################################################################################
 # Target
 ################################################################################
 add_executable(${PROJECT_NAME} ${ALL_FILES})
 
-use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
 set(ROOT_NAMESPACE vEngine)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     VS_GLOBAL_KEYWORD "Win32Proj"
 )
 if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
-    )
-elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
     set_target_properties(${PROJECT_NAME} PROPERTIES
         INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
     )

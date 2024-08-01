@@ -175,7 +175,7 @@ string PathToolKit::GetCurrentPath()
     path ans;
     ans = std::filesystem::current_path();
     
-    string s(ans.c_str());
+    string s(ans.generic_string());
 
     return s;
 }
